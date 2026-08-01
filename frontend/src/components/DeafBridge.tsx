@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useSpeechRecognition } from '@/hooks';
+import SignLanguage2DAvatar from './SignLanguage2DAvatar';
 import StatusIndicator from './StatusIndicator';
 
 export default function DeafBridge() {
@@ -61,15 +62,33 @@ export default function DeafBridge() {
       </div>
 
       <div className="deaf-layout">
-        {/* Controls and Input */}
-        <div className="controls-column" style={{ width: '100%', maxWidth: '800px', margin: '0 auto' }}>
+        {/* Left Column: 2D Animated Avatar Viewport Pane */}
+        <div className="avatar-column">
+          <div className="avatar-container-wrapper">
+            <SignLanguage2DAvatar
+              textToSign={activeSignText}
+              signingSpeed={signingSpeed}
+              onStatusChange={setSigningStatus}
+            />
+          </div>
+
           {/* Status Indicators */}
-          <div style={{ display: 'flex', gap: '20px', alignItems: 'center', marginBottom: '10px' }}>
+          <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
             <StatusIndicator
               state={listeningState}
               error={speechError ? { type: 'unknown', message: speechError.message } : null}
             />
+            <div className="env-detector-status" style={{ margin: 0 }}>
+              <span className={`env-status-dot ${signingStatus !== 'Idle' ? 'active' : ''}`} style={{ backgroundColor: signingStatus !== 'Idle' ? 'var(--color-accent-primary)' : 'var(--color-border)' }} />
+              <span className="env-status-text" style={{ fontSize: 'var(--font-size-sm)' }}>
+                Avatar: <strong>{signingStatus}</strong>
+              </span>
+            </div>
           </div>
+        </div>
+
+        {/* Right Column: Controls and Input */}
+        <div className="controls-column">
           {/* Text Input Panel */}
           <section className="text-translation-panel" aria-labelledby="text-translation-heading">
             <h3 id="text-translation-heading" className="section-title">

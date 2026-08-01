@@ -111,6 +111,94 @@ const GESTURE_TARGETS: Record<string, JointRotations[]> = {
       rightFingers: 0,
     },
   ],
+  teacher: [
+    {
+      leftShoulder: [0.8, 0.3, 0.4],
+      leftElbow: [1.7, -0.2, 0],
+      leftWrist: [0.2, 0.1, 0.2],
+      rightShoulder: [0.8, -0.3, -0.4],
+      rightElbow: [1.7, 0.2, 0],
+      rightWrist: [0.2, -0.1, -0.2],
+      leftFingers: 0.3,
+      rightFingers: 0.3,
+    },
+    {
+      leftShoulder: [0.8, 0.4, 0.3],
+      leftElbow: [1.5, -0.1, 0],
+      leftWrist: [0.3, 0.2, 0.1],
+      rightShoulder: [0.8, -0.4, -0.3],
+      rightElbow: [1.5, 0.1, 0],
+      rightWrist: [0.3, -0.2, -0.1],
+      leftFingers: 0.3,
+      rightFingers: 0.3,
+    },
+    {
+      leftShoulder: [0.4, 0.2, 0.2],
+      leftElbow: [0.8, 0, 0],
+      leftWrist: [0.1, 0, 0],
+      rightShoulder: [0.4, -0.2, -0.2],
+      rightElbow: [0.8, 0, 0],
+      rightWrist: [0.1, 0, 0],
+      leftFingers: 1.0,
+      rightFingers: 1.0,
+    }
+  ],
+  toilet: [
+    {
+      rightShoulder: [0.6, -0.3, 0.2],
+      rightElbow: [1.2, 0, 0],
+      rightWrist: [0.1, -0.2, 0],
+      rightFingers: 0.5,
+    },
+    {
+      rightShoulder: [0.6, -0.3, 0.2],
+      rightElbow: [1.2, 0, 0],
+      rightWrist: [0.1, 0.2, 0],
+      rightFingers: 0.5,
+    },
+    {
+      rightShoulder: [0.6, -0.3, 0.2],
+      rightElbow: [1.2, 0, 0],
+      rightWrist: [0.1, -0.2, 0],
+      rightFingers: 0.5,
+    }
+  ],
+  food: [
+    {
+      rightShoulder: [0.8, -0.4, 0.2],
+      rightElbow: [1.8, 0, 0],
+      rightWrist: [0.4, 0.2, 0],
+      head: [0.15, 0, 0],
+      rightFingers: 0.2,
+    },
+    {
+      rightShoulder: [0.8, -0.4, 0.2],
+      rightElbow: [1.6, 0, 0],
+      rightWrist: [0.3, 0.2, 0],
+      head: [0.1, 0, 0],
+      rightFingers: 0.2,
+    },
+    {
+      rightShoulder: [0.8, -0.4, 0.2],
+      rightElbow: [1.8, 0, 0],
+      rightWrist: [0.4, 0.2, 0],
+      head: [0.15, 0, 0],
+      rightFingers: 0.2,
+    }
+  ],
+  home: [
+    {
+      leftShoulder: [0.7, 0.4, 0.5],
+      leftElbow: [1.6, -0.3, 0],
+      leftWrist: [0.3, 0.3, 0.4],
+      rightShoulder: [0.7, -0.4, -0.5],
+      rightElbow: [1.6, 0.3, 0],
+      rightWrist: [0.3, -0.3, -0.4],
+      head: [0.1, 0, 0],
+      leftFingers: 1.0,
+      rightFingers: 1.0,
+    }
+  ],
   welcome: [
     {
       leftShoulder: [0.4, 0.6, 0.5],
@@ -496,6 +584,14 @@ export default function SkeletalBody3D({
   const rightElbowGroupRef = useRef<THREE.Group>(null);
   const rightWristGroupRef = useRef<THREE.Group>(null);
 
+  const leftFingersRef = useRef<Array<THREE.Group | null>>([]);
+  const rightFingersRef = useRef<Array<THREE.Group | null>>([]);
+  const leftThumbRef = useRef<THREE.Group | null>(null);
+  const rightThumbRef = useRef<THREE.Group | null>(null);
+
+  leftFingersRef.current = [];
+  rightFingersRef.current = [];
+
   // Material Theme
   const boneMaterial = useMemo(
     () =>
@@ -694,22 +790,72 @@ export default function SkeletalBody3D({
         lerpFactor
       );
     }
+
+    // Apply Left Fingers and Thumb Bending
+    const leftFingersVal = target.leftFingers !== undefined ? target.leftFingers : 0.1;
+    const leftCurlAngle = leftFingersVal * 1.4;
+    leftFingersRef.current.forEach(finger => {
+      if (finger) {
+        finger.rotation.x = THREE.MathUtils.lerp(
+          finger.rotation.x,
+          -leftCurlAngle,
+          lerpFactor
+        );
+      }
+    });
+    if (leftThumbRef.current) {
+      leftThumbRef.current.rotation.y = THREE.MathUtils.lerp(
+        leftThumbRef.current.rotation.y,
+        leftCurlAngle * 0.5,
+        lerpFactor
+      );
+    }
+
+    // Apply Right Fingers and Thumb Bending
+    const rightFingersVal = target.rightFingers !== undefined ? target.rightFingers : 0.1;
+    const rightCurlAngle = rightFingersVal * 1.4;
+    rightFingersRef.current.forEach(finger => {
+      if (finger) {
+        finger.rotation.x = THREE.MathUtils.lerp(
+          finger.rotation.x,
+          -rightCurlAngle,
+          lerpFactor
+        );
+      }
+    });
+    if (rightThumbRef.current) {
+      rightThumbRef.current.rotation.y = THREE.MathUtils.lerp(
+        rightThumbRef.current.rotation.y,
+        -rightCurlAngle * 0.5,
+        lerpFactor
+      );
+    }
   });
 
+  const LEFT_FINGER_SPECS = [
+    { name: 'pinky', xOff: -0.022, len: 0.038, rad: 0.004, yOff: -0.075 },
+    { name: 'ring', xOff: -0.007, len: 0.050, rad: 0.005, yOff: -0.082 },
+    { name: 'middle', xOff: 0.007, len: 0.055, rad: 0.0055, yOff: -0.085 },
+    { name: 'index', xOff: 0.022, len: 0.048, rad: 0.005, yOff: -0.080 }
+  ];
+
+  const RIGHT_FINGER_SPECS = [
+    { name: 'index', xOff: -0.022, len: 0.048, rad: 0.005, yOff: -0.080 },
+    { name: 'middle', xOff: -0.007, len: 0.055, rad: 0.0055, yOff: -0.085 },
+    { name: 'ring', xOff: 0.007, len: 0.050, rad: 0.005, yOff: -0.082 },
+    { name: 'pinky', xOff: 0.022, len: 0.038, rad: 0.004, yOff: -0.075 }
+  ];
+
   return (
-    <group position={[0, -1.25, 0]} scale={1.4}>
-      {/* Pelvis & Upper Body Spine Root */}
+    <group position={[0, -0.28, 0]} scale={1.25}>
+      {/* Upper Body Torso & Head Root */}
       <group ref={spineGroupRef} position={[0, 0, 0]}>
-        {/* Pelvic Bone Girdle */}
+        {/* Sleek Torso Base Finish Pedestal */}
         <mesh position={[0, 0, 0]} material={boneMaterial}>
-          <boxGeometry args={[0.26, 0.08, 0.14]} />
+          <cylinderGeometry args={[0.18, 0.20, 0.08, 16]} />
         </mesh>
-        {/* Hip Joint Spheres (Lower Anchor Points) */}
-        <mesh position={[-0.12, -0.04, 0]} material={jointGlowMaterial}>
-          <sphereGeometry args={[0.038, 16, 16]} />
-        </mesh>
-        <mesh position={[0.12, -0.04, 0]} material={jointGlowMaterial}>
-          <sphereGeometry args={[0.038, 16, 16]} />
+        <mesh position={[0, 0.04, 0]} material={jointGlowMaterial}>
+          <cylinderGeometry args={[0.16, 0.18, 0.02, 16]} />
         </mesh>
 
         {/* Vertebrae Column (Spine) */}
@@ -785,25 +931,43 @@ export default function SkeletalBody3D({
 
                   <group ref={leftWristGroupRef}>
                     {/* Left Hand Palm Plate */}
-                    <mesh position={[0, -0.05, 0]} material={boneMaterial}>
-                      <boxGeometry args={[0.055, 0.06, 0.018]} />
+                    <mesh position={[0, -0.035, 0]} material={boneMaterial}>
+                      <boxGeometry args={[0.05, 0.06, 0.014]} />
+                    </mesh>
+                    {/* Skeleton Thenar Eminence Joint */}
+                    <mesh position={[0.015, -0.04, 0.005]} material={jointGlowMaterial}>
+                      <sphereGeometry args={[0.014, 10, 10]} />
                     </mesh>
 
                     {/* 5 Articulated Finger Digits */}
-                    {[-0.02, -0.007, 0.007, 0.02].map((xOff, fIdx) => (
-                      <group key={`l-finger-${fIdx}`} position={[xOff, -0.08, 0]}>
-                        <mesh material={boneMaterial}>
-                          <cylinderGeometry args={[0.004, 0.003, 0.045, 8]} />
+                    {LEFT_FINGER_SPECS.map((spec, fIdx) => (
+                      <group 
+                        key={`l-finger-${fIdx}`} 
+                        position={[spec.xOff, spec.yOff, 0]}
+                        ref={(el: THREE.Group | null) => {
+                          if (el) leftFingersRef.current[fIdx] = el;
+                        }}
+                      >
+                        {/* Knuckle joint */}
+                        <mesh position={[0, spec.len / 2, 0]} material={jointGlowMaterial}>
+                          <sphereGeometry args={[spec.rad * 1.3, 8, 8]} />
                         </mesh>
-                        <mesh position={[0, -0.025, 0]} material={jointGlowMaterial}>
-                          <sphereGeometry args={[0.005, 8, 8]} />
+                        <mesh material={boneMaterial}>
+                          <capsuleGeometry args={[spec.rad, spec.len - spec.rad * 2, 4, 8]} />
                         </mesh>
                       </group>
                     ))}
                     {/* Thumb */}
-                    <group position={[0.025, -0.03, 0.01]} rotation={[0, 0, -0.5]}>
+                    <group 
+                      ref={leftThumbRef}
+                      position={[0.025, -0.03, 0.01]} 
+                      rotation={[0, 0, -0.5]}
+                    >
+                      <mesh position={[0, 0.015, 0]} material={jointGlowMaterial}>
+                        <sphereGeometry args={[0.007, 8, 8]} />
+                      </mesh>
                       <mesh material={boneMaterial}>
-                        <cylinderGeometry args={[0.005, 0.004, 0.035, 8]} />
+                        <capsuleGeometry args={[0.005, 0.035 - 0.01, 4, 8]} />
                       </mesh>
                     </group>
                   </group>
@@ -849,25 +1013,43 @@ export default function SkeletalBody3D({
 
                   <group ref={rightWristGroupRef}>
                     {/* Right Hand Palm Plate */}
-                    <mesh position={[0, -0.05, 0]} material={boneMaterial}>
-                      <boxGeometry args={[0.055, 0.06, 0.018]} />
+                    <mesh position={[0, -0.035, 0]} material={boneMaterial}>
+                      <boxGeometry args={[0.05, 0.06, 0.014]} />
+                    </mesh>
+                    {/* Skeleton Thenar Eminence Joint */}
+                    <mesh position={[-0.015, -0.04, 0.005]} material={jointGlowMaterial}>
+                      <sphereGeometry args={[0.014, 10, 10]} />
                     </mesh>
 
                     {/* 5 Articulated Finger Digits */}
-                    {[-0.02, -0.007, 0.007, 0.02].map((xOff, fIdx) => (
-                      <group key={`r-finger-${fIdx}`} position={[xOff, -0.08, 0]}>
-                        <mesh material={boneMaterial}>
-                          <cylinderGeometry args={[0.004, 0.003, 0.045, 8]} />
+                    {RIGHT_FINGER_SPECS.map((spec, fIdx) => (
+                      <group 
+                        key={`r-finger-${fIdx}`} 
+                        position={[spec.xOff, spec.yOff, 0]}
+                        ref={(el: THREE.Group | null) => {
+                          if (el) rightFingersRef.current[fIdx] = el;
+                        }}
+                      >
+                        {/* Knuckle joint */}
+                        <mesh position={[0, spec.len / 2, 0]} material={jointGlowMaterial}>
+                          <sphereGeometry args={[spec.rad * 1.3, 8, 8]} />
                         </mesh>
-                        <mesh position={[0, -0.025, 0]} material={jointGlowMaterial}>
-                          <sphereGeometry args={[0.005, 8, 8]} />
+                        <mesh material={boneMaterial}>
+                          <capsuleGeometry args={[spec.rad, spec.len - spec.rad * 2, 4, 8]} />
                         </mesh>
                       </group>
                     ))}
                     {/* Thumb */}
-                    <group position={[-0.025, -0.03, 0.01]} rotation={[0, 0, 0.5]}>
+                    <group 
+                      ref={rightThumbRef}
+                      position={[-0.025, -0.03, 0.01]} 
+                      rotation={[0, 0, 0.5]}
+                    >
+                      <mesh position={[0, 0.015, 0]} material={jointGlowMaterial}>
+                        <sphereGeometry args={[0.007, 8, 8]} />
+                      </mesh>
                       <mesh material={boneMaterial}>
-                        <cylinderGeometry args={[0.005, 0.004, 0.035, 8]} />
+                        <capsuleGeometry args={[0.005, 0.035 - 0.01, 4, 8]} />
                       </mesh>
                     </group>
                   </group>

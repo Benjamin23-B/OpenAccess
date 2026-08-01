@@ -116,8 +116,13 @@ export function useEnvDetector(
       worker.terminate();
       audioQueue.current.destroy();
       cancelAnimationFrame(rafId.current);
+      if (streamRef && streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        // @ts-ignore
+        streamRef.current = null;
+      }
     };
-  }, []);
+  }, [streamRef]);
 
   const frameLoopRef = useRef<() => void>(() => {});
 
@@ -175,9 +180,36 @@ export function useEnvDetector(
         deltaEngine.current.reset();
         audioQueue.current.clear();
         lastFrameTime.current = 0;
-        rafId.current = requestAnimationFrame(frameLoopRef.current);
+        
+        // Dynamically request webcam stream when scene narration starts
+        navigator.mediaDevices.getUserMedia({
+          video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'environment' }
+        }).then(stream => {
+          if (streamRef) {
+            // @ts-ignore
+            streamRef.current = stream;
+          }
+          rafId.current = requestAnimationFrame(frameLoopRef.current);
+        }).catch(err => {
+          console.warn('EnvDetector webcam error:', err);
+          // Retry once with simpler constraints
+          navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+            if (streamRef) {
+              // @ts-ignore
+              streamRef.current = stream;
+            }
+            rafId.current = requestAnimationFrame(frameLoopRef.current);
+          }).catch(retryErr => {
+            console.error('EnvDetector webcam fallback error:', retryErr);
+          });
+        });
       } else {
         cancelAnimationFrame(rafId.current);
+        if (streamRef && streamRef.current) {
+          streamRef.current.getTracks().forEach(track => track.stop());
+          // @ts-ignore
+          streamRef.current = null;
+        }
         audioQueue.current.clear();
         setLast('');
         setCount(0);
@@ -185,7 +217,7 @@ export function useEnvDetector(
 
       return next;
     });
-  }, []);
+  }, [streamRef]);
 
   return { isActive, isModelReady, webnnAvailable, lastAnnouncement, detectionCount, toggle };
 }

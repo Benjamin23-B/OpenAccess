@@ -8,9 +8,9 @@ export default function ObjectDetectionBridge() {
   const [useMockCamera, setUseMockCamera] = useState(false);
   const [highResMode, setHighResMode] = useState(false);
   const [transcripts, setTranscripts] = useState<Array<{ id: string; text: string; timestamp: string }>>([]);
-  const [vqaInput, setVqaInput] = useState('');
+
   const [fps, setFps] = useState<number>(0);
-  const [cameraStatus, setCameraStatus] = useState<string>('Initializing camera...');
+  const [cameraStatus, setCameraStatus] = useState<string>('Camera Off');
   const [isHapticActive, setIsHapticActive] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -89,18 +89,44 @@ export default function ObjectDetectionBridge() {
         tracks.forEach(track => track.stop());
       }
 
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'environment' }
+      });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        videoRef.current.setAttribute('autoplay', '');
+        videoRef.current.setAttribute('playsinline', '');
         await videoRef.current.play();
         setUseMockCamera(false);
         setCameraStatus('Live Webcam Connected');
       }
     } catch (err) {
       console.warn('Webcam error:', err);
+      // Retry once with simpler constraints
+      try {
+        const fallbackStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        if (videoRef.current) {
+          videoRef.current.srcObject = fallbackStream;
+          await videoRef.current.play();
+          setUseMockCamera(false);
+          setCameraStatus('Live Webcam Connected');
+          return;
+        }
+      } catch (retryErr) {
+        console.warn('Webcam retry also failed:', retryErr);
+      }
       setUseMockCamera(true);
       setCameraStatus('Mock Camera (Permission / Device Busy)');
     }
+  }, []);
+
+  const stopWebcam = useCallback(() => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
+      tracks.forEach(track => track.stop());
+      videoRef.current.srcObject = null;
+    }
+    setCameraStatus('Camera Off');
   }, []);
 
   // WebSocket Connection
@@ -158,7 +184,13 @@ export default function ObjectDetectionBridge() {
 
   // Initial camera setup & render loop
   useEffect(() => {
-    setupWebcam();
+    // Set initial canvas dimensions so it's not stuck at 300x150
+    if (displayCanvasRef.current) {
+      displayCanvasRef.current.width = 1280;
+      displayCanvasRef.current.height = 720;
+    }
+
+    // Camera is not setup on mount anymore. It will be initialized when narration starts.
 
     let animationFrameId: number;
 
@@ -168,16 +200,19 @@ export default function ObjectDetectionBridge() {
       if (canvas) {
         const ctx = canvas.getContext('2d');
         if (ctx) {
-          const w = canvas.width || 1280;
-          const h = canvas.height || 720;
-
-          if (video && video.videoWidth > 0 && canvas.width !== video.videoWidth) {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+          // Sync canvas to video resolution once available
+          if (video && video.videoWidth > 0 && video.videoHeight > 0) {
+            if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
+              canvas.width = video.videoWidth;
+              canvas.height = video.videoHeight;
+            }
           }
 
-          if (!useMockCameraRef.current && video && video.readyState === video.HAVE_ENOUGH_DATA) {
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const w = canvas.width;
+          const h = canvas.height;
+
+          if (!useMockCameraRef.current && video && video.readyState >= video.HAVE_CURRENT_DATA && isNarratingRef.current) {
+            ctx.drawImage(video, 0, 0, w, h);
           } else if (useMockCameraRef.current) {
             // Draw Mock Camera Frame
             const time = Date.now() / 1000;
@@ -206,6 +241,15 @@ export default function ObjectDetectionBridge() {
             ctx.fillStyle = '#a7f3d0';
             ctx.fillText(`Time: ${new Date().toLocaleTimeString()}`, 50, 130);
             ctx.fillText('Connect webcam for live vision processing', 50, 165);
+          } else {
+            // Waiting for webcam to initialize - show loading state
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(0, 0, w, h);
+            ctx.font = 'bold 24px sans-serif';
+            ctx.fillStyle = '#9ca3af';
+            ctx.textAlign = 'center';
+            ctx.fillText(isNarratingRef.current ? 'Initializing Camera...' : 'Camera Off - Click Start Narration', w / 2, h / 2);
+            ctx.textAlign = 'start';
           }
         }
       }
@@ -225,6 +269,10 @@ export default function ObjectDetectionBridge() {
 
     return () => {
       cancelAnimationFrame(animationFrameId);
+      if (videoRef.current && videoRef.current.srcObject) {
+        const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
+        tracks.forEach(track => track.stop());
+      }
     };
   }, [setupWebcam]);
 
@@ -280,12 +328,15 @@ export default function ObjectDetectionBridge() {
     return () => clearInterval(interval);
   }, [captureAndSendFrame]);
 
-  const handleToggleNarration = () => {
+  const handleToggleNarration = async () => {
     const nextState = !isNarrating;
     setIsNarrating(nextState);
     if (nextState) {
+      setCameraStatus('Initializing camera...');
+      await setupWebcam();
       captureAndSendFrame();
     } else {
+      stopWebcam();
       if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
         window.speechSynthesis.cancel();
       }
@@ -293,15 +344,7 @@ export default function ObjectDetectionBridge() {
     }
   };
 
-  const handleSendVqa = (e: React.FormEvent) => {
-    e.preventDefault();
-    const q = vqaInput.trim();
-    if (q) {
-      addTranscript(`Question: ${q}`);
-      captureAndSendFrame(q);
-      setVqaInput('');
-    }
-  };
+
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '100%', maxWidth: '1200px', margin: '0 auto', padding: '1rem' }}>
@@ -365,29 +408,6 @@ export default function ObjectDetectionBridge() {
               >
                 {isNarrating ? '⏸ Pause Narration' : '▶ Start Narration'}
               </button>
-
-              <button
-                onClick={() => {
-                  if (useMockCamera) {
-                    setupWebcam();
-                  } else {
-                    setUseMockCamera(true);
-                    setCameraStatus('Mock Camera Active');
-                  }
-                }}
-                style={{
-                  padding: '0.65rem 1rem',
-                  borderRadius: '10px',
-                  fontWeight: 500,
-                  fontSize: '0.85rem',
-                  cursor: 'pointer',
-                  background: 'rgba(255, 255, 255, 0.06)',
-                  color: '#f3f4f6',
-                  border: '1px solid rgba(255, 255, 255, 0.1)'
-                }}
-              >
-                {useMockCamera ? 'Switch to Live Webcam' : 'Switch to Mock Camera'}
-              </button>
             </div>
 
             <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', color: '#9ca3af', cursor: 'pointer' }}>
@@ -426,40 +446,7 @@ export default function ObjectDetectionBridge() {
             )}
           </div>
 
-          {/* VQA Form */}
-          <form onSubmit={handleSendVqa} style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto', paddingTop: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-            <input
-              type="text"
-              placeholder="Ask about scene (e.g. What is on the table?)"
-              value={vqaInput}
-              onChange={e => setVqaInput(e.target.value)}
-              style={{
-                flex: 1,
-                background: 'rgba(0, 0, 0, 0.3)',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
-                borderRadius: '10px',
-                padding: '0.65rem 0.85rem',
-                color: 'white',
-                fontSize: '0.85rem',
-                outline: 'none'
-              }}
-            />
-            <button
-              type="submit"
-              style={{
-                padding: '0.65rem 1rem',
-                borderRadius: '10px',
-                background: '#6366f1',
-                color: 'white',
-                fontWeight: 600,
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: '0.85rem'
-              }}
-            >
-              Ask
-            </button>
-          </form>
+
 
         </div>
 
