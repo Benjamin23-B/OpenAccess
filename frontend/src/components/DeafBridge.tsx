@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useSpeechRecognition } from '@/hooks';
-import SignLanguage2DAvatar from './SignLanguage2DAvatar';
+import SignLanguageCanvas from './SignLanguageCanvas';
 import StatusIndicator from './StatusIndicator';
 
 export default function DeafBridge() {
@@ -62,10 +62,10 @@ export default function DeafBridge() {
       </div>
 
       <div className="deaf-layout">
-        {/* Left Column: 2D Animated Avatar Viewport Pane */}
+        {/* Left Column: Avatar Viewport Pane */}
         <div className="avatar-column">
           <div className="avatar-container-wrapper">
-            <SignLanguage2DAvatar
+            <SignLanguageCanvas
               textToSign={activeSignText}
               signingSpeed={signingSpeed}
               onStatusChange={setSigningStatus}

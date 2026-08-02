@@ -1,0 +1,5 @@
+inputs/
+extracted_landmarks/
+*.npy
+*.mp4
+parallel_isl_dataset.json
