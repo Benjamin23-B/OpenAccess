@@ -162,7 +162,7 @@ def detect_fruits(image_cv) -> list:
     return fruits
 
 class VLMEngine:
-    def __init__(self, mock_mode: bool = False, conf_threshold: float = 0.25):
+    def __init__(self, mock_mode: bool = False, conf_threshold: float = 0.75):
         self.mock_mode = mock_mode
         self.conf_threshold = conf_threshold
         self.model = None
@@ -283,8 +283,8 @@ class VLMEngine:
 - text reading "10:30 AM": [490, 120, 570, 160]
 """
             
-        # Actual Inference Logic using YOLO
-        results = self.model(image, verbose=False)
+        # Actual Inference Logic using YOLO (imgsz=320 drastically improves latency)
+        results = self.model(image, conf=self.conf_threshold, iou=0.45, imgsz=320, verbose=False)
         
         markdown_lines = ["# Scene Analysis\n", "## Objects Detected"]
         detected_boxes = []
@@ -313,36 +313,15 @@ class VLMEngine:
                     markdown_lines.append(f"- {friendly_name}: [{norm_x1}, {norm_y1}, {norm_x2}, {norm_y2}]")
                     detected_boxes.append([norm_x1, norm_y1, norm_x2, norm_y2])
                     
-        # Run custom traditional CV detectors for book/pen/fruits to complement YOLO
-        try:
-            image_np = np.array(image)
-            image_cv = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
-            
-            # 1. Pen detection (aspect ratio contours)
-            pens = detect_pens(image_cv)
-            for pen_box in pens:
-                if not any(check_overlap(pen_box, yolo_box) for yolo_box in detected_boxes):
-                    markdown_lines.append(f"- pen: {pen_box}")
-                    detected_boxes.append(pen_box)
-                    
-            # 2. Fruit detection (HSV color + circularity)
-            fruits = detect_fruits(image_cv)
-            for fruit in fruits:
-                fruit_box = fruit["box"]
-                fruit_label = fruit["label"]
-                # Only add if it doesn't overlap with existing YOLO detections
-                if not any(check_overlap(fruit_box, yolo_box) for yolo_box in detected_boxes):
-                    markdown_lines.append(f"- {fruit_label}: {fruit_box}")
-                    detected_boxes.append(fruit_box)
-        except Exception as cv_err:
-            print(f"Custom traditional CV detector error: {cv_err}")
+        # The naive traditional CV detectors (Canny/HSV) have been removed 
+        # because they are highly prone to false positives. YOLO handles all classes natively.
         
         if len(markdown_lines) == 2:
             markdown_lines.append("- None detected.")
             
         # OCR / Text Detection Layer
         if self.reader is not None:
-            ocr_max_dim = 600
+            ocr_max_dim = 320
             ocr_image = image.copy()
             w, h = ocr_image.size
             if max(w, h) > ocr_max_dim:
