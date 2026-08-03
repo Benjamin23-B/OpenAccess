@@ -36,6 +36,24 @@ export default function CwasaAvatarRenderer({
       window.alert = (msg?: any) => {
         console.warn('[Avatar Engine Notice (Alert Suppressed)]:', msg);
       };
+
+      // Suppress unhandled promise rejections caused by audio play() interruptions / unsupported sources
+      const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+        if (
+          event.reason &&
+          (event.reason.name === 'AbortError' ||
+           event.reason.name === 'NotSupportedError' ||
+           (typeof event.reason.message === 'string' &&
+            (event.reason.message.includes('play()') ||
+             event.reason.message.includes('supported source') ||
+             event.reason.message.includes('media was removed'))))
+        ) {
+          event.preventDefault();
+          console.warn('[Media Playback Suppressed]:', event.reason.message || event.reason);
+        }
+      };
+
+      window.addEventListener('unhandledrejection', handleUnhandledRejection);
     }
 
     // 1. Snapshot browser's native WebAssembly BEFORE allcsa.js (exact Kozha app.html pattern)
@@ -62,6 +80,7 @@ export default function CwasaAvatarRenderer({
               ambIdle: false,
               allowFrameSteps: false,
               allowSiGMLText: false,
+              audioEnabled: false,
             },
           ],
         });
