@@ -39,8 +39,24 @@ export default function CwasaAvatarRenderer({
     setDebugLogs((prev) => [...prev.slice(-15), formatted]);
   };
 
+  const triggerResize = () => {
+    window.dispatchEvent(new Event('resize'));
+    const avDiv = containerRef.current?.querySelector('.divAv') as HTMLElement;
+    const canvas = containerRef.current?.querySelector('canvas') as HTMLCanvasElement;
+    if (avDiv || canvas) {
+      const w = avDiv?.clientWidth || canvas?.clientWidth || 0;
+      const h = avDiv?.clientHeight || canvas?.clientHeight || 0;
+      addLog(`Resized CWASA viewport: width=${w}px, height=${h}px`);
+    }
+  };
+
   useEffect(() => {
     addLog(`Component mounted. Target avatar: '${avatarName}'`);
+
+    // Snapshot native WebAssembly before allcsa.js Emscripten polyfill
+    if (typeof window !== 'undefined' && (window as any).WebAssembly && !(window as any).__nativeWebAssembly) {
+      (window as any).__nativeWebAssembly = (window as any).WebAssembly;
+    }
 
     // Check WebGL hardware acceleration
     const checkWebGL = () => {
@@ -48,13 +64,15 @@ export default function CwasaAvatarRenderer({
         const canvas = document.createElement('canvas');
         const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
         if (!gl) {
-          addLog('ERROR: WebGL context creation returned null.');
+          addLog('ERROR: WebGL context is NULL. Hardware acceleration may be disabled in your browser.');
+          setErrorMsg('WebGL graphics acceleration is disabled in your browser. Please enable "Use graphics acceleration when available" in Chrome/Firefox settings.');
           return false;
         }
         addLog('WebGL Context is available.');
         return true;
       } catch (e: any) {
         addLog(`ERROR testing WebGL: ${e.message}`);
+        setErrorMsg(`WebGL error: ${e.message}`);
         return false;
       }
     };
@@ -75,7 +93,7 @@ export default function CwasaAvatarRenderer({
       // Check if canvas already exists inside our current container
       let hasCanvas = avContainer.querySelector('canvas') || avContainer.querySelector('.divAv');
 
-      // Check if an existing CWASA canvas exists in window or document body (from a previous mount)
+      // Check if an existing CWASA canvas exists in window or document body
       if (!hasCanvas) {
         const globalCanvas = window.CWASA_CANVAS_NODE || document.querySelector('.divAv') || document.querySelector('.CWASAAvatar canvas');
         if (globalCanvas && globalCanvas.parentElement !== avContainer) {
@@ -96,12 +114,12 @@ export default function CwasaAvatarRenderer({
             sigmlBase: 'sigml',
             avJARBase: 'avatars',
             useClientConfig: false,
-            useCwaConfig: false,
+            useCwaConfig: true,
             avSettings: [
               {
                 width: 512,
                 height: 384,
-                avList: 'avs',
+                avList: 'avsfull',
                 initAv: (Boolean(avatarName) && (avatarName as string) !== 'null') ? avatarName : 'anna',
                 initCamera: [0, 0.23, 3.24, 5, 18, 30, -1, -1],
                 ambIdle: true,
@@ -110,24 +128,35 @@ export default function CwasaAvatarRenderer({
               },
             ],
           });
-          addLog('CWASA.init() executed.');
+          addLog('CWASA.init() executed with avList="avsfull".');
 
-          // Store reference to created canvas container
+          // Store reference to created canvas container & trigger viewport resizes
           setTimeout(() => {
-            const createdNode = avContainer.querySelector('.divAv') || avContainer.querySelector('canvas');
+            const createdNode = avContainer.querySelector('.divAv') || avContainer.querySelector('canvas') || document.querySelector('.divAv');
             if (createdNode) {
+              if (createdNode.parentElement !== avContainer) {
+                avContainer.appendChild(createdNode);
+              }
               window.CWASA_CANVAS_NODE = createdNode as HTMLElement;
-              addLog(`Saved CWASA canvas reference (${createdNode.tagName}).`);
-            } else {
-              addLog('WARNING: .divAv / canvas element not found immediately after init.');
+              triggerResize();
             }
-          }, 300);
+          }, 200);
+
+          setTimeout(triggerResize, 500);
+          setTimeout(triggerResize, 1000);
         } catch (e: any) {
           addLog(`EXCEPTION during CWASA.init(): ${e.message}`);
           console.error('CWASA init exception:', e);
         }
       } else {
+        // Re-parent global canvas into active container if React re-rendered DOM
+        const activeCanvas = window.CWASA_CANVAS_NODE || document.querySelector('.divAv') || document.querySelector('.CWASAAvatar canvas');
+        if (activeCanvas && activeCanvas.parentElement !== avContainer) {
+          addLog('Re-attaching active CWASA WebGL canvas into viewport container...');
+          avContainer.appendChild(activeCanvas);
+        }
         addLog('CWASA canvas is attached and active in container.');
+        setTimeout(triggerResize, 150);
       }
 
       if (window.CWASA.ready && typeof window.CWASA.ready.then === 'function') {
@@ -137,6 +166,7 @@ export default function CwasaAvatarRenderer({
             setIsLoaded(true);
             setErrorMsg(null);
             onStatusChange?.('Kozha 3D Avatar Ready');
+            setTimeout(triggerResize, 200);
           })
           .catch((err: any) => {
             addLog(`WARNING: window.CWASA.ready rejected: ${err}`);
@@ -146,6 +176,7 @@ export default function CwasaAvatarRenderer({
         addLog('CWASA engine ready flag set.');
         setIsLoaded(true);
         onStatusChange?.('Kozha 3D Avatar Ready');
+        setTimeout(triggerResize, 200);
       }
     };
 
@@ -301,6 +332,7 @@ export default function CwasaAvatarRenderer({
     if (window.CWASA && typeof window.CWASA.setAvatar === 'function') {
       try {
         window.CWASA.setAvatar(avatarName, 0);
+        setTimeout(triggerResize, 150);
       } catch (e: any) {
         addLog(`WARNING during setAvatar: ${e.message}`);
       }
@@ -310,25 +342,27 @@ export default function CwasaAvatarRenderer({
   return (
     <div
       ref={containerRef}
-      className="cwasa-avatar-container relative w-full h-full min-h-[480px] bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex flex-col items-center justify-center"
-      style={{ minHeight: '480px', position: 'relative' }}
+      className="cwasa-avatar-container relative w-full h-[480px] min-h-[480px] bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex flex-col items-center justify-center"
+      style={{ width: '100%', height: '480px', minHeight: '480px', position: 'relative' }}
     >
       <style jsx global>{`
-        .CWASAAvatar.av0 {
+        .CWASAAvatar.av0,
+        .CWASAAvatar {
           width: 100% !important;
-          height: 100% !important;
-          min-height: 460px !important;
+          height: 480px !important;
+          min-height: 480px !important;
           position: relative !important;
           background: #020617 !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
+          display: block !important;
         }
         .CWASAAvatar.av0 canvas,
-        .CWASAAvatar.av0 .divAv {
+        .CWASAAvatar canvas,
+        .CWASAAvatar.av0 .divAv,
+        .CWASAAvatar .divAv {
           width: 100% !important;
-          height: 100% !important;
-          min-height: 460px !important;
+          height: 480px !important;
+          min-height: 480px !important;
+          display: block !important;
           object-fit: contain !important;
         }
       `}</style>
@@ -353,9 +387,10 @@ export default function CwasaAvatarRenderer({
 
       {/* CWASA WebGL Panel Container */}
       <div
-        className="CWASAAvatar av0 w-full h-full flex items-center justify-center"
-        style={{ width: '100%', height: '100%', minHeight: '460px', background: '#020617' }}
+        className="CWASAAvatar av0 w-full h-[480px] block"
+        style={{ width: '100%', height: '480px', minHeight: '480px', background: '#020617', display: 'block' }}
       />
+      <div className="CWASAGUI av0" style={{ display: 'none' }} />
 
       {/* On-screen Debug Log Panel */}
       <div className="absolute bottom-2 left-2 right-2 z-30 bg-slate-900/95 border border-slate-800 rounded-xl p-3 text-[11px] font-mono text-slate-300 flex flex-col gap-1.5 shadow-2xl">
