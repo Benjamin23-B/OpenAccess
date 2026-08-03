@@ -16,8 +16,6 @@ declare global {
   }
 }
 
-import SignLanguageTranslationR3F from './SignLanguageTranslationR3F';
-
 export default function CwasaAvatarRenderer({
   sigmlText = '',
   avatarName = 'anna',
@@ -26,7 +24,6 @@ export default function CwasaAvatarRenderer({
 }: CwasaAvatarRendererProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [useR3FFallback, setUseR3FFallback] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const lastPlayedSigml = useRef<string>('');
 
@@ -38,8 +35,6 @@ export default function CwasaAvatarRenderer({
       if (window.CWASA && typeof window.CWASA.init === 'function') {
         try {
           window.CWASA.init({
-            jasBase: '/cwa/',
-            cwaBase: '/cwa/',
             useClientConfig: false,
             useCwaConfig: true,
             avSettings: [
@@ -62,14 +57,14 @@ export default function CwasaAvatarRenderer({
           window.CWASA.ready
             .then(() => {
               setIsLoaded(true);
-              onStatusChange?.('3D Avatar Ready');
+              onStatusChange?.('Kozha 3D Avatar Ready');
             })
             .catch(() => {
               setIsLoaded(true);
             });
         } else {
           setIsLoaded(true);
-          onStatusChange?.('3D Avatar Ready');
+          onStatusChange?.('Kozha 3D Avatar Ready');
         }
       }
     };
@@ -111,7 +106,7 @@ export default function CwasaAvatarRenderer({
           if (window.CWASA && typeof window.CWASA.init === 'function') {
             clearInterval(check);
             initCwasaEngine();
-          } else if (attempts > 30) {
+          } else if (attempts > 50) {
             clearInterval(check);
             setIsLoaded(true);
           }
@@ -119,25 +114,14 @@ export default function CwasaAvatarRenderer({
       };
 
       scriptEl.onerror = () => {
-        setUseR3FFallback(true);
-        setIsLoaded(true);
+        setErrorMsg('Failed to load Kozha 3D Avatar script');
+        onStatusChange?.('Engine Error');
       };
 
       document.body.appendChild(scriptEl);
     };
 
     loadAssets();
-
-    // Watchdog fallback after 5 seconds
-    const watchdog = setTimeout(() => {
-      const canvas = containerRef.current?.querySelector('canvas');
-      if (!canvas && !window.CWASA) {
-        setUseR3FFallback(true);
-        setIsLoaded(true);
-      }
-    }, 5000);
-
-    return () => clearTimeout(watchdog);
   }, []);
 
   // Play SiGML whenever sigmlText updates
@@ -175,16 +159,6 @@ export default function CwasaAvatarRenderer({
     }
   }, [avatarName]);
 
-  if (useR3FFallback) {
-    return (
-      <SignLanguageTranslationR3F
-        textToSign={sigmlText}
-        signingSpeed={signingSpeed}
-        onStatusChange={onStatusChange}
-      />
-    );
-  }
-
   return (
     <div
       ref={containerRef}
@@ -215,8 +189,17 @@ export default function CwasaAvatarRenderer({
       {!isLoaded && !errorMsg && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/80 z-20 text-cyan-400 p-6 text-center">
           <div className="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mb-4" />
-          <p className="font-semibold text-lg">Initializing 3D Sign Language Avatar Engine...</p>
+          <p className="font-semibold text-lg">Initializing Kozha 3D Avatar (Anna / Marc / Francoise)...</p>
           <p className="text-sm text-slate-400 mt-1">Loading WebGL shaders and Kozha sign dictionaries</p>
+        </div>
+      )}
+
+      {/* Error Fallback */}
+      {errorMsg && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-red-950/80 z-20 text-red-200 p-6 text-center">
+          <span className="text-4xl mb-2">⚠️</span>
+          <p className="font-semibold text-lg">{errorMsg}</p>
+          <p className="text-sm opacity-80 mt-1">Please check WebGL availability in your browser</p>
         </div>
       )}
 
