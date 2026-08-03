@@ -299,6 +299,17 @@ export const CURATED_SIGN_DICTIONARY: Record<string, SignDictionaryEntry> = {
     movement: 'Interlock index fingers then reverse',
     location: 'Neutral Space',
   },
+  may: {
+    id: 'c-0022',
+    gloss: 'MAY',
+    language: 'ISL',
+    category: 'General',
+    hamnosys: 'hamflathand hamextfingeru hampalml hamchest hammoveo',
+    sigml: `<hns_sign gloss="MAY"><hamnosys_manual><hamflathand/><hamextfingeru/><hampalml/><hamchest/><hammoveo/></hamnosys_manual></hns_sign>`,
+    handshape: 'Open Flat Hand',
+    movement: 'Forward movement at chest level',
+    location: 'Chest / Neutral Space',
+  },
 };
 
 // Alphabet Fingerspelling Map for SiGML fallback
@@ -363,6 +374,10 @@ export function sanitizeSigml(sigml: any): string {
   }
   let cleaned = sigml;
 
+  // Clean orphan or invalid <hamreplace/> tags directly inside <hamparbegin> or before <hamparend>
+  cleaned = cleaned.replace(/(<hamparbegin\s*\/?>\s*)<hamreplace\s*\/?>/gi, '$1');
+  cleaned = cleaned.replace(/<hamreplace\s*\/?>\s*(?=<hamparend\s*\/?>)/gi, '');
+
   // Convert all HamNoSys tokens (e.g. HamFlathand, HamFinger23spread, <HamFlathand/>) to lowercase
   cleaned = cleaned.replace(/\b(ham[a-zA-Z0-9_]*)\b/gi, (m) => m.toLowerCase());
 
@@ -384,6 +399,13 @@ export function sanitizeSigml(sigml: any): string {
     /\b(hamthumboutmod|hamthumbacrossmod|hamthumbopenmod)\s+(hamextfinger[a-z0-9]+)\b/gi,
     '$2 $1'
   );
+
+  // Prepend default initial handshape if manual sequence begins directly with finger tokens without valid handshape
+  cleaned = cleaned.replace(
+    /(<hamnosys_manual\s*>)(?=\s*<(?:hamfinger23|hamfinger1|hamfinger2345|hamextfinger[a-z0-9]+)\s*\/?>)/gi,
+    '$1<hamflathand/>'
+  );
+
   cleaned = cleaned.replace(
     /<(?:hammiddlefinger|hamringfinger|hampinky|hamthumb|hamindexfinger|hamfingerpad)\s*\/?>/gi,
     ''

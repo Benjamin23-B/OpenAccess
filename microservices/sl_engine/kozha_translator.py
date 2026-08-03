@@ -132,6 +132,11 @@ SYNONYMS = {
 def sanitize_sigml(sigml: str) -> str:
     if not sigml:
         return sigml
+
+    # Clean orphan or invalid <hamreplace/> tags directly inside <hamparbegin> or before <hamparend>
+    sigml = re.sub(r'(<hamparbegin\s*\/?>\s*)<hamreplace\s*\/?>', r'\1', sigml, flags=re.IGNORECASE)
+    sigml = re.sub(r'<hamreplace\s*\/?>\s*(?=<hamparend\s*\/?>)', '', sigml, flags=re.IGNORECASE)
+
     # Clean duplicate hamsplit tags
     sigml = re.sub(r'(?:<hamsplit\/>\s*)+', r'<hamsplit/>', sigml, flags=re.IGNORECASE)
     sigml = re.sub(r'(?:hamsplit\s+)+', r'hamsplit ', sigml, flags=re.IGNORECASE)
@@ -140,6 +145,7 @@ def sanitize_sigml(sigml: str) -> str:
     if '<hamsplit/>' not in sigml and 'hamsplit' not in sigml:
         sigml = re.sub(r'(<hamfist\/>)\s*(<hamflathand\/>)', r'<hamsplit/>\1\2', sigml, flags=re.IGNORECASE)
         sigml = re.sub(r'\bhamfist\s+hamflathand\b', r'hamsplit hamfist hamflathand', sigml, flags=re.IGNORECASE)
+
     # Swap thumb modifier placed before extension direction
     sigml = re.sub(
         r'(<(?:hamthumboutmod|hamthumbacrossmod|hamthumbopenmod)\s*\/?>\s*)(<hamextfinger[a-z0-9]+\s*\/?>)',
@@ -153,6 +159,15 @@ def sanitize_sigml(sigml: str) -> str:
         sigml,
         flags=re.IGNORECASE
     )
+
+    # Prepend default initial handshape if manual sequence begins directly with finger tokens without valid handshape
+    sigml = re.sub(
+        r'(<hamnosys_manual\s*>)(?=\s*<(?:hamfinger23|hamfinger1|hamfinger2345|hamextfinger[a-z0-9]+)\s*\/?>)',
+        r'\1<hamflathand/>',
+        sigml,
+        flags=re.IGNORECASE
+    )
+
     # Strip invalid finger/pad AST tokens that trigger HamFingertip parser errors
     sigml = re.sub(
         r'<(?:hammiddlefinger|hamringfinger|hampinky|hamthumb|hamindexfinger|hamfingerpad)\s*\/?>',
@@ -245,6 +260,7 @@ def get_sign_database(sign_lang: str) -> Dict[str, str]:
         "home": '<hns_sign gloss="HOME"><hamnosys_manual><hampinchall/><hamextfingeri/><hampalmd/><hamcheek/><hamclose/></hamnosys_manual></hns_sign>',
         "love": '<hns_sign gloss="LOVE"><hamnosys_manual><hamsymmlr/><hamfist/><hamextfingeru/><hampalmu/><hamchest/><hamclose/></hamnosys_manual></hns_sign>',
         "friend": '<hns_sign gloss="FRIEND"><hamnosys_manual><hamsymmlr/><hamfinger1/><hamextfingero/><hampalmd/><hamchest/><hamclose/></hamnosys_manual></hns_sign>',
+        "may": '<hns_sign gloss="MAY"><hamnosys_manual><hamflathand/><hamextfingeru/><hampalml/><hamchest/><hammoveo/></hamnosys_manual></hns_sign>',
     }
 
     for word, sigml_code in builtin_signs.items():
