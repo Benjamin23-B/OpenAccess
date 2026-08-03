@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { sanitizeSigml } from '../services/signDictionaryService';
 
 interface CwasaAvatarRendererProps {
   sigmlText?: string;
@@ -42,7 +43,7 @@ export default function CwasaAvatarRenderer({
                 width: 512,
                 height: 384,
                 avList: 'avsfull',
-                initAv: avatarName || 'anna',
+                initAv: (Boolean(avatarName) && (avatarName as string) !== 'null') ? avatarName : 'anna',
                 ambIdle: false,
                 allowFrameSteps: false,
                 allowSiGMLText: true,
@@ -124,40 +125,67 @@ export default function CwasaAvatarRenderer({
     loadAssets();
   }, []);
 
-  // Play SiGML whenever sigmlText updates
+  const playTimerRef = useRef<any>(null);
+
+  // Play SiGML whenever sigmlText updates (Sequential playback for multi-sign phrases)
   useEffect(() => {
     if (!sigmlText || sigmlText === lastPlayedSigml.current || !isLoaded) return;
+    lastPlayedSigml.current = sigmlText;
 
-    if (window.CWASA && typeof window.CWASA.playSiGMLText === 'function') {
-      try {
-        lastPlayedSigml.current = sigmlText;
-        onStatusChange?.('Signing Animation');
-        
-        setTimeout(() => {
-          try {
-            if (window.CWASA && typeof window.CWASA.playSiGMLText === 'function') {
-              window.CWASA.playSiGMLText(sigmlText, 0);
-            }
-          } catch (e) {
-            console.warn('CWASA animation notice:', e);
-          }
-        }, 300);
-      } catch (err: any) {
-        console.warn('CWASA Play Error:', err);
-      }
+    const signMatches = sigmlText.match(/<hns_sign[\s\S]*?<\/hns_sign>/gi);
+    if (!signMatches || signMatches.length === 0) return;
+
+    if (playTimerRef.current) {
+      clearTimeout(playTimerRef.current);
     }
-  }, [sigmlText, isLoaded, onStatusChange]);
+
+    let index = 0;
+
+    const playNextSign = () => {
+      if (index >= signMatches.length) {
+        onStatusChange?.('Kozha 3D Avatar Ready');
+        return;
+      }
+
+      const singleSigml = sanitizeSigml(`<?xml version="1.0" encoding="utf-8"?>\n<sigml>\n${signMatches[index]}\n</sigml>`);
+      const glossMatch = signMatches[index].match(/gloss="([^"]+)"/i);
+      const gloss = glossMatch ? glossMatch[1] : `Sign ${index + 1}`;
+      
+      onStatusChange?.(`Signing (${index + 1}/${signMatches.length}): ${gloss}`);
+
+      if (window.CWASA && typeof window.CWASA.playSiGMLText === 'function') {
+        try {
+          window.CWASA.playSiGMLText(singleSigml, 0);
+        } catch (e) {
+          console.warn('CWASA sign playback warning:', e);
+        }
+      }
+
+      index++;
+      const delay = Math.max(900, Math.round(1400 / (signingSpeed || 1.0)));
+      playTimerRef.current = setTimeout(playNextSign, delay);
+    };
+
+    playNextSign();
+
+    return () => {
+      if (playTimerRef.current) {
+        clearTimeout(playTimerRef.current);
+      }
+    };
+  }, [sigmlText, isLoaded, signingSpeed, onStatusChange]);
 
   // Switch avatar if requested
   useEffect(() => {
-    if (window.CWASA && typeof window.CWASA.setAvatar === 'function') {
+    const validAvatar = (Boolean(avatarName) && (avatarName as string) !== 'null') ? avatarName : 'anna';
+    if (isLoaded && window.CWASA && typeof window.CWASA.setAvatar === 'function') {
       try {
-        window.CWASA.setAvatar(avatarName, 0);
+        window.CWASA.setAvatar(validAvatar, 0);
       } catch (e) {
         // Ignore if unsupported in active mode
       }
     }
-  }, [avatarName]);
+  }, [avatarName, isLoaded]);
 
   return (
     <div

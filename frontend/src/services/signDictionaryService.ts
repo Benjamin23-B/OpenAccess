@@ -24,7 +24,7 @@ export const CURATED_SIGN_DICTIONARY: Record<string, SignDictionaryEntry> = {
     language: 'ISL',
     category: 'Greetings',
     hamnosys: 'hamflathand hamthumboutmod hamextfingeru hampalml hamforehead hamclose hamshoulders',
-    sigml: `<hns_sign gloss="HELLO"><hamnosys_manual><hamflathand/><hamthumboutmod/><hamextfingeru/><hampalml/><hamforehead/><hamclose/></hamnosys_manual></hns_sign>`,
+    sigml: `<hns_sign gloss="HELLO"><hamnosys_manual><hamflathand/><hamextfingeru/><hamthumboutmod/><hampalml/><hamforehead/><hamclose/></hamnosys_manual></hns_sign>`,
     handshape: 'Open B Flat Hand',
     movement: 'Salute outward movement from forehead',
     location: 'Head / Forehead',
@@ -57,7 +57,7 @@ export const CURATED_SIGN_DICTIONARY: Record<string, SignDictionaryEntry> = {
     language: 'ISL',
     category: 'Greetings',
     hamnosys: 'hamflathand hamthumboutmod hamextfingeru hampalml hamunderchin hamclose',
-    sigml: `<hns_sign gloss="THANK-YOU"><hamnosys_manual><hamflathand/><hamthumboutmod/><hamextfingeru/><hampalml/><hamunderchin/><hamclose/></hamnosys_manual></hns_sign>`,
+    sigml: `<hns_sign gloss="THANK-YOU"><hamnosys_manual><hamflathand/><hamextfingeru/><hamthumboutmod/><hampalml/><hamunderchin/><hamclose/></hamnosys_manual></hns_sign>`,
     handshape: 'Flat hand',
     movement: 'Fingertips touch chin then extend forward',
     location: 'Chin / Mouth',
@@ -68,7 +68,7 @@ export const CURATED_SIGN_DICTIONARY: Record<string, SignDictionaryEntry> = {
     language: 'ISL',
     category: 'Greetings',
     hamnosys: 'hamflathand hamthumboutmod hamextfingeru hampalml hamunderchin hamclose',
-    sigml: `<hns_sign gloss="THANK-YOU"><hamnosys_manual><hamflathand/><hamthumboutmod/><hamextfingeru/><hampalml/><hamunderchin/><hamclose/></hamnosys_manual></hns_sign>`,
+    sigml: `<hns_sign gloss="THANK-YOU"><hamnosys_manual><hamflathand/><hamextfingeru/><hamthumboutmod/><hampalml/><hamunderchin/><hamclose/></hamnosys_manual></hns_sign>`,
     handshape: 'Flat hand',
     movement: 'Fingertips touch chin then extend forward',
     location: 'Chin / Mouth',
@@ -90,7 +90,7 @@ export const CURATED_SIGN_DICTIONARY: Record<string, SignDictionaryEntry> = {
     language: 'ISL',
     category: 'Greetings',
     hamnosys: 'hamfist hamthumboutmod hamextfingeru hampalml hamchest hamcircle',
-    sigml: `<hns_sign gloss="SORRY"><hamnosys_manual><hamfist/><hamthumboutmod/><hamextfingeru/><hampalml/><hamchest/><hamcircle/></hamnosys_manual></hns_sign>`,
+    sigml: `<hns_sign gloss="SORRY"><hamnosys_manual><hamfist/><hamextfingeru/><hamthumboutmod/><hampalml/><hamchest/><hamcircle/></hamnosys_manual></hns_sign>`,
     handshape: 'Fist with thumb out (A-hand)',
     movement: 'Circular motion over chest',
     location: 'Chest',
@@ -303,31 +303,31 @@ export const CURATED_SIGN_DICTIONARY: Record<string, SignDictionaryEntry> = {
 
 // Alphabet Fingerspelling Map for SiGML fallback
 export const ALPHABET_SIGML_MAP: Record<string, string> = {
-  a: `<hns_sign gloss="A"><hamnosys_manual><hamfist/><hamthumboutmod/><hamextfingeru/><hampalml/></hamnosys_manual></hns_sign>`,
-  b: `<hns_sign gloss="B"><hamnosys_manual><hamflathand/><hamthumbacrossmod/><hamextfingeru/><hampalmd/></hamnosys_manual></hns_sign>`,
+  a: `<hns_sign gloss="A"><hamnosys_manual><hamfist/><hamextfingeru/><hamthumboutmod/><hampalml/></hamnosys_manual></hns_sign>`,
+  b: `<hns_sign gloss="B"><hamnosys_manual><hamflathand/><hamextfingeru/><hamthumbacrossmod/><hampalmd/></hamnosys_manual></hns_sign>`,
   c: `<hns_sign gloss="C"><hamnosys_manual><hamceeall/><hamextfingeru/><hampalml/></hamnosys_manual></hns_sign>`,
-  d: `<hns_sign gloss="D"><hamnosys_manual><hampinch12open/><hammiddlefinger/><hamringfinger/><hampinky/><hamextfingeru/><hampalml/></hamnosys_manual></hns_sign>`,
-  e: `<hns_sign gloss="E"><hamnosys_manual><hamflathand/><hamfingerbendmod/><hamthumbacrossmod/><hamextfingeru/><hampalmd/></hamnosys_manual></hns_sign>`,
-  f: `<hns_sign gloss="F"><hamnosys_manual><hampinch12open/><hamthumb/><hamindexfinger/><hamextfingeru/><hampalmd/></hamnosys_manual></hns_sign>`,
-  g: `<hns_sign gloss="G"><hamnosys_manual><hamfinger1/><hamthumboutmod/><hamextfingero/><hampalmd/></hamnosys_manual></hns_sign>`,
-  h: `<hns_sign gloss="H"><hamnosys_manual><hamfinger23/><hamthumboutmod/><hamextfingero/><hampalmd/></hamnosys_manual></hns_sign>`,
+  d: `<hns_sign gloss="D"><hamnosys_manual><hamfinger1/><hamextfingeru/><hampalml/></hamnosys_manual></hns_sign>`,
+  e: `<hns_sign gloss="E"><hamnosys_manual><hamflathand/><hamextfingeru/><hamfingerbendmod/><hamthumbacrossmod/><hampalmd/></hamnosys_manual></hns_sign>`,
+  f: `<hns_sign gloss="F"><hamnosys_manual><hampinch12open/><hamextfingeru/><hampalmd/></hamnosys_manual></hns_sign>`,
+  g: `<hns_sign gloss="G"><hamnosys_manual><hamfinger1/><hamextfingero/><hamthumboutmod/><hampalmd/></hamnosys_manual></hns_sign>`,
+  h: `<hns_sign gloss="H"><hamnosys_manual><hamfinger23/><hamextfingero/><hamthumboutmod/><hampalmd/></hamnosys_manual></hns_sign>`,
   i: `<hns_sign gloss="I"><hamnosys_manual><hampinky/><hamextfingeru/><hampalml/></hamnosys_manual></hns_sign>`,
   j: `<hns_sign gloss="J"><hamnosys_manual><hampinky/><hamextfingeru/><hampalml/><hamcircle/></hamnosys_manual></hns_sign>`,
-  k: `<hns_sign gloss="K"><hamnosys_manual><hamfinger23/><hamthumboutmod/><hamextfingeru/><hampalml/></hamnosys_manual></hns_sign>`,
-  l: `<hns_sign gloss="L"><hamnosys_manual><hamfinger1/><hamthumboutmod/><hamextfingeru/><hampalml/></hamnosys_manual></hns_sign>`,
-  m: `<hns_sign gloss="M"><hamnosys_manual><hamfist/><hamthumbacrossmod/><hamextfingerd/><hampalml/></hamnosys_manual></hns_sign>`,
-  n: `<hns_sign gloss="N"><hamnosys_manual><hamfist/><hamthumbacrossmod/><hamextfingerd/><hampalml/></hamnosys_manual></hns_sign>`,
+  k: `<hns_sign gloss="K"><hamnosys_manual><hamfinger23/><hamextfingeru/><hamthumboutmod/><hampalml/></hamnosys_manual></hns_sign>`,
+  l: `<hns_sign gloss="L"><hamnosys_manual><hamfinger1/><hamextfingeru/><hamthumboutmod/><hampalml/></hamnosys_manual></hns_sign>`,
+  m: `<hns_sign gloss="M"><hamnosys_manual><hamfist/><hamextfingerd/><hamthumbacrossmod/><hampalml/></hamnosys_manual></hns_sign>`,
+  n: `<hns_sign gloss="N"><hamnosys_manual><hamfist/><hamextfingerd/><hamthumbacrossmod/><hampalml/></hamnosys_manual></hns_sign>`,
   o: `<hns_sign gloss="O"><hamnosys_manual><hamceeall/><hamextfingeru/><hampalml/></hamnosys_manual></hns_sign>`,
-  p: `<hns_sign gloss="P"><hamnosys_manual><hamfinger23/><hamthumboutmod/><hamextfingerd/><hampalml/></hamnosys_manual></hns_sign>`,
-  q: `<hns_sign gloss="Q"><hamnosys_manual><hamfinger1/><hamthumboutmod/><hamextfingerd/><hampalmd/></hamnosys_manual></hns_sign>`,
+  p: `<hns_sign gloss="P"><hamnosys_manual><hamfinger23/><hamextfingerd/><hamthumboutmod/><hampalml/></hamnosys_manual></hns_sign>`,
+  q: `<hns_sign gloss="Q"><hamnosys_manual><hamfinger1/><hamextfingerd/><hamthumboutmod/><hampalmd/></hamnosys_manual></hns_sign>`,
   r: `<hns_sign gloss="R"><hamnosys_manual><hamfinger23/><hamextfingeru/><hampalml/></hamnosys_manual></hns_sign>`,
-  s: `<hns_sign gloss="S"><hamnosys_manual><hamfist/><hamthumbacrossmod/><hamextfingeru/><hampalml/></hamnosys_manual></hns_sign>`,
-  t: `<hns_sign gloss="T"><hamnosys_manual><hamfist/><hamthumbacrossmod/><hamextfingeru/><hampalml/></hamnosys_manual></hns_sign>`,
+  s: `<hns_sign gloss="S"><hamnosys_manual><hamfist/><hamextfingeru/><hamthumbacrossmod/><hampalml/></hamnosys_manual></hns_sign>`,
+  t: `<hns_sign gloss="T"><hamnosys_manual><hamfist/><hamextfingeru/><hamthumbacrossmod/><hampalml/></hamnosys_manual></hns_sign>`,
   u: `<hns_sign gloss="U"><hamnosys_manual><hamfinger23/><hamextfingeru/><hampalml/></hamnosys_manual></hns_sign>`,
   v: `<hns_sign gloss="V"><hamnosys_manual><hamfinger23/><hamextfingeru/><hampalml/></hamnosys_manual></hns_sign>`,
   w: `<hns_sign gloss="W"><hamnosys_manual><hamfinger234/><hamextfingeru/><hampalml/></hamnosys_manual></hns_sign>`,
   x: `<hns_sign gloss="X"><hamnosys_manual><hamfinger1/><hamextfingeru/><hampalml/></hamnosys_manual></hns_sign>`,
-  y: `<hns_sign gloss="Y"><hamnosys_manual><hampinky/><hamthumboutmod/><hamextfingeru/><hampalml/></hamnosys_manual></hns_sign>`,
+  y: `<hns_sign gloss="Y"><hamnosys_manual><hampinky/><hamextfingeru/><hamthumboutmod/><hampalml/></hamnosys_manual></hns_sign>`,
   z: `<hns_sign gloss="Z"><hamnosys_manual><hamfinger1/><hamextfingero/><hampalmd/><hamcircle/></hamnosys_manual></hns_sign>`,
 };
 
@@ -341,6 +341,24 @@ export interface ProcessedSignSequence {
     hamnosys?: string;
     sigml: string;
   }[];
+}
+
+export function sanitizeSigml(sigml: string): string {
+  if (!sigml) return sigml;
+  let cleaned = sigml;
+  cleaned = cleaned.replace(
+    /(<(?:hamthumboutmod|hamthumbacrossmod|hamthumbopenmod)\s*\/?>\s*)(<hamextfinger[a-z0-9]+\s*\/?>)/gi,
+    '$2$1'
+  );
+  cleaned = cleaned.replace(
+    /\b(hamthumboutmod|hamthumbacrossmod|hamthumbopenmod)\s+(hamextfinger[a-z0-9]+)\b/gi,
+    '$2 $1'
+  );
+  cleaned = cleaned.replace(
+    /<(?:hammiddlefinger|hamringfinger|hampinky|hamthumb|hamindexfinger|hamfingerpad)\s*\/?>/gi,
+    ''
+  );
+  return cleaned;
 }
 
 class SignDictionaryService {
@@ -368,12 +386,12 @@ class SignDictionaryService {
         if (data && data.sigml) {
           return {
             tokens: data.glosses || [],
-            sigmlSequence: data.sigml,
+            sigmlSequence: sanitizeSigml(data.sigml),
             signBreakdown: (data.signBreakdown || []).map((sb: any) => ({
               word: sb.word,
               gloss: sb.gloss,
               isFingerspelled: sb.isFingerspelled,
-              sigml: sb.sigml,
+              sigml: sanitizeSigml(sb.sigml),
             })),
           };
         }
@@ -407,25 +425,27 @@ class SignDictionaryService {
       const match = CURATED_SIGN_DICTIONARY[token];
 
       if (match && match.sigml) {
+        const cleanSigml = sanitizeSigml(match.sigml);
         signBreakdown.push({
           word: token,
           gloss: match.gloss,
           isFingerspelled: false,
           hamnosys: match.hamnosys,
-          sigml: match.sigml,
+          sigml: cleanSigml,
         });
-        sigmlBlocks.push(match.sigml);
+        sigmlBlocks.push(cleanSigml);
       } else {
         const charSigmlBlocks: string[] = [];
         for (const char of token.split('')) {
           if (ALPHABET_SIGML_MAP[char]) {
-            charSigmlBlocks.push(ALPHABET_SIGML_MAP[char]);
+            const cleanCharSigml = sanitizeSigml(ALPHABET_SIGML_MAP[char]);
+            charSigmlBlocks.push(cleanCharSigml);
             signBreakdown.push({
               word: char.toUpperCase(),
               gloss: `LETTER: ${char.toUpperCase()}`,
               isFingerspelled: true,
               hamnosys: 'Fingerspelling letter',
-              sigml: ALPHABET_SIGML_MAP[char],
+              sigml: cleanCharSigml,
             });
           }
         }

@@ -102,6 +102,32 @@ DEFAULT_GRAMMAR = {"verb_final": False, "time_first": True}
 # Cached SiGML / CSV Gloss maps
 _GLOSS_CACHE: Dict[str, Dict[str, str]] = {}
 
+def sanitize_sigml(sigml: str) -> str:
+    if not sigml:
+        return sigml
+    # Swap thumb modifier placed before extension direction
+    sigml = re.sub(
+        r'(<(?:hamthumboutmod|hamthumbacrossmod|hamthumbopenmod)\s*\/?>\s*)(<hamextfinger[a-z0-9]+\s*\/?>)',
+        r'\2\1',
+        sigml,
+        flags=re.IGNORECASE
+    )
+    sigml = re.sub(
+        r'\b(hamthumboutmod|hamthumbacrossmod|hamthumbopenmod)\s+(hamextfinger[a-z0-9]+)\b',
+        r'\2 \1',
+        sigml,
+        flags=re.IGNORECASE
+    )
+    # Strip invalid finger/pad AST tokens that trigger HamFingertip parser errors
+    sigml = re.sub(
+        r'<(?:hammiddlefinger|hamringfinger|hampinky|hamthumb|hamindexfinger|hamfingerpad)\s*\/?>',
+        '',
+        sigml,
+        flags=re.IGNORECASE
+    )
+    return sigml
+
+
 def get_sign_database(sign_lang: str) -> Dict[str, str]:
     lang_key = sign_lang.lower().strip()
     if lang_key in _GLOSS_CACHE:
@@ -136,7 +162,7 @@ def get_sign_database(sign_lang: str) -> Dict[str, str]:
                     if gloss:
                         sigml_str = ET.tostring(child, encoding="utf-8").decode("utf-8")
                         if gloss not in db:
-                            db[gloss] = sigml_str
+                            db[gloss] = sanitize_sigml(sigml_str)
         except Exception as e:
             logger.warning(f"Error parsing SiGML file {fname}: {e}")
 
@@ -153,7 +179,7 @@ def get_sign_database(sign_lang: str) -> Dict[str, str]:
                         word = row[0].strip().lower()
                         ham = row[1].strip()
                         if word and word not in db and ham:
-                            db[word] = f'<hns_sign gloss="{word.upper()}"><hamnosys_manual>{ham}</hamnosys_manual></hns_sign>'
+                            db[word] = sanitize_sigml(f'<hns_sign gloss="{word.upper()}"><hamnosys_manual>{ham}</hamnosys_manual></hns_sign>')
         except Exception as e:
             logger.warning(f"Error parsing CSV file {csv_fname}: {e}")
 

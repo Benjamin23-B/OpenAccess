@@ -177,7 +177,9 @@ export function useEnvDetector(
       activeRef.current = next;
 
       if (next) {
-        deltaEngine.current.reset();
+        if (deltaEngine.current && typeof deltaEngine.current.reset === 'function') {
+          deltaEngine.current.reset();
+        }
         audioQueue.current.clear();
         lastFrameTime.current = 0;
         

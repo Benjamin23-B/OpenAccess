@@ -54,6 +54,10 @@ export default function SignLanguageTranslationR3F({
 
   useEffect(() => {
     if (textToSign) {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
       const tokens = textToSign
         .toLowerCase()
         .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '')
@@ -71,10 +75,8 @@ export default function SignLanguageTranslationR3F({
       });
 
       if (expandedTokens.length > 0) {
-        queueRef.current = [...queueRef.current, ...expandedTokens];
-        if (!isSigning) {
-          processNextWord();
-        }
+        queueRef.current = expandedTokens;
+        processNextWord();
       }
     }
   }, [textToSign]);
