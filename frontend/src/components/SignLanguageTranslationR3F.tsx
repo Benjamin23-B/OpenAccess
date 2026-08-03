@@ -158,8 +158,8 @@ export default function SignLanguageTranslationR3F({
 
   // 2D / CSS Animated Assistive Card Fallback when browser WebGL is disabled
   const Fallback2DView = (
-    <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-slate-950/90 text-cyan-300">
-      <div className="bg-slate-900 border border-cyan-500/40 rounded-2xl p-6 max-w-md w-full shadow-2xl flex flex-col items-center gap-3">
+    <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-slate-950 text-cyan-300">
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-md w-full shadow-2xl flex flex-col items-center gap-3">
         <div className="text-4xl animate-bounce">🤟</div>
         <h3 className="font-bold text-lg text-white">Sign Language Active</h3>
         
@@ -176,7 +176,7 @@ export default function SignLanguageTranslationR3F({
           <p className="text-xs text-slate-400 italic">Waiting for text input to sign...</p>
         )}
 
-        <div className="text-[11px] text-slate-500 bg-slate-950/60 px-3 py-1.5 rounded-lg border border-slate-800">
+        <div className="text-[11px] text-slate-400 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
           💡 Note: WebGL hardware acceleration is disabled in your browser. Displaying 2D Sign Assistive View.
         </div>
       </div>
@@ -185,7 +185,7 @@ export default function SignLanguageTranslationR3F({
 
   return (
     <div
-      className="w-full h-full relative overflow-hidden rounded-2xl border border-cyan-500/30 bg-gradient-to-b from-[#0f172a] via-[#090d16] to-[#04070d] shadow-2xl flex items-center justify-center"
+      className="w-full h-full relative overflow-hidden bg-slate-950 flex items-center justify-center"
       style={{ minHeight: '480px', height: '100%' }}
       aria-label="3D Avatar Viewport Container"
     >
