@@ -345,9 +345,29 @@ export interface ProcessedSignSequence {
   plannerSource?: string;
 }
 
-export function sanitizeSigml(sigml: string): string {
-  if (!sigml) return sigml;
+export function sanitizeSigml(sigml: any): string {
+  if (!sigml) return '';
+  if (typeof sigml !== 'string') {
+    if (typeof sigml === 'object') {
+      if (typeof sigml.sigml === 'string') {
+        sigml = sigml.sigml;
+      } else {
+        return '';
+      }
+    } else {
+      sigml = String(sigml);
+    }
+  }
+  if (typeof sigml !== 'string' || sigml.includes('[object Object]')) {
+    return '';
+  }
   let cleaned = sigml;
+
+  // Convert all HamNoSys XML tags (e.g. <HamFlathand/>, <HamExtfingeru/>) to lowercase
+  cleaned = cleaned.replace(/<(ham[a-z0-9_]+)(\s*\/?>)/gi, (_m, tag, end) => {
+    return '<' + tag.toLowerCase() + end;
+  });
+
   cleaned = cleaned.replace(
     /(<(?:hamthumboutmod|hamthumbacrossmod|hamthumbopenmod)\s*\/?>\s*)(<hamextfinger[a-z0-9]+\s*\/?>)/gi,
     '$2$1'

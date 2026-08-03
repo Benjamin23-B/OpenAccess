@@ -134,6 +134,8 @@ export default function CwasaAvatarRenderer({
   // Play SiGML whenever sigmlText updates
   useEffect(() => {
     if (!sigmlText || sigmlText === lastPlayedSigml.current || !isLoaded) return;
+    if (typeof sigmlText !== 'string' || !sigmlText.trim()) return;
+    if (sigmlText.includes('[object Object]')) return;
 
     if (window.CWASA && typeof window.CWASA.playSiGMLText === 'function') {
       try {
