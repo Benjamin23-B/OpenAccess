@@ -26,10 +26,15 @@ export default function CwasaAvatarRenderer({
 }: CwasaAvatarRendererProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [timeoutOccurred, setTimeoutOccurred] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const lastPlayedSigml = useRef<string>('');
 
   useEffect(() => {
+    const safetyTimer = setTimeout(() => {
+      setTimeoutOccurred(true);
+    }, 2500);
+
     let scriptEl: HTMLScriptElement | null = null;
     let linkEl: HTMLLinkElement | null = null;
 
@@ -44,15 +49,16 @@ export default function CwasaAvatarRenderer({
             cwaBase: '/cwa/',
             sigmlBase: 'sigml',
             avJARBase: 'avatars',
-            useClientConfig: false,
-            useCwaConfig: true,
+            useClientConfig: true,
+            useCwaConfig: false,
             avSettings: [
               {
                 width: 512,
                 height: 384,
-                avList: 'avsfull',
+                avList: 'avs',
                 initAv: (Boolean(avatarName) && (avatarName as string) !== 'null') ? avatarName : 'anna',
-                ambIdle: false,
+                initCamera: [0, 0.23, 3.24, 5, 18, 30, -1, -1],
+                ambIdle: true,
                 allowFrameSteps: false,
                 allowSiGMLText: true,
               },
@@ -268,12 +274,17 @@ export default function CwasaAvatarRenderer({
         </div>
       )}
 
-      {/* Error Fallback */}
-      {errorMsg && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-red-950/80 z-20 text-red-200 p-6 text-center">
-          <span className="text-4xl mb-2">⚠️</span>
-          <p className="font-semibold text-lg">{errorMsg}</p>
-          <p className="text-sm opacity-80 mt-1">Please check WebGL availability in your browser</p>
+      {/* Error / Timeout Fallback */}
+      {(errorMsg || (!isLoaded && timeoutOccurred)) && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/95 z-30 text-cyan-200 p-6 text-center">
+          <span className="text-4xl mb-3">🤟</span>
+          <p className="font-bold text-lg text-white">CWASA WebGL Canvas Warning</p>
+          <p className="text-xs text-slate-400 mt-1 max-w-sm">
+            {errorMsg || 'CWASA WebGL shader context is loading slowly or hardware acceleration is restricted in your browser.'}
+          </p>
+          <p className="text-xs text-cyan-400 font-semibold mt-3">
+            Tip: You can switch to the high-performance Smooth 3D Avatar mode anytime!
+          </p>
         </div>
       )}
 
