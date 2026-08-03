@@ -363,10 +363,8 @@ export function sanitizeSigml(sigml: any): string {
   }
   let cleaned = sigml;
 
-  // Convert all HamNoSys XML tags (e.g. <HamFlathand/>, <HamExtfingeru/>) to lowercase
-  cleaned = cleaned.replace(/<(ham[a-z0-9_]+)(\s*\/?>)/gi, (_m, tag, end) => {
-    return '<' + tag.toLowerCase() + end;
-  });
+  // Convert all HamNoSys tokens (e.g. HamFlathand, HamFinger23spread, <HamFlathand/>) to lowercase
+  cleaned = cleaned.replace(/\b(ham[a-zA-Z0-9_]*)\b/gi, (m) => m.toLowerCase());
 
   cleaned = cleaned.replace(
     /(<(?:hamthumboutmod|hamthumbacrossmod|hamthumbopenmod)\s*\/?>\s*)(<hamextfinger[a-z0-9]+\s*\/?>)/gi,

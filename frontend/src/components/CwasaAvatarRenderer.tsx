@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { sanitizeSigml } from '../services/signDictionaryService';
 
 interface CwasaAvatarRendererProps {
   sigmlText?: string;
@@ -137,6 +138,9 @@ export default function CwasaAvatarRenderer({
     if (typeof sigmlText !== 'string' || !sigmlText.trim()) return;
     if (sigmlText.includes('[object Object]')) return;
 
+    const cleanSigml = sanitizeSigml(sigmlText);
+    if (!cleanSigml || !cleanSigml.trim()) return;
+
     if (window.CWASA && typeof window.CWASA.playSiGMLText === 'function') {
       try {
         lastPlayedSigml.current = sigmlText;
@@ -144,8 +148,13 @@ export default function CwasaAvatarRenderer({
         
         setTimeout(() => {
           try {
-            if (window.CWASA && typeof window.CWASA.playSiGMLText === 'function') {
-              window.CWASA.playSiGMLText(sigmlText, 0);
+            if (window.CWASA) {
+              if (typeof window.CWASA.stop === 'function') {
+                try { window.CWASA.stop(0); } catch (_e) {}
+              }
+              if (typeof window.CWASA.playSiGMLText === 'function') {
+                window.CWASA.playSiGMLText(cleanSigml, 0);
+              }
             }
           } catch (e) {
             console.warn('CWASA animation notice:', e);
