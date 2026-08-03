@@ -535,13 +535,17 @@ export function sanitizeSigml(sigml: any): string {
   // Clean inter-tag whitespace
   cleaned = cleaned.replace(/>\s+</g, '><');
 
-  // If input contains <hns_sign>, strip inner xml headers and ensure single root <sigml>
-  if (cleaned.includes('<hns_sign')) {
-    const innerContent = cleaned
-      .replace(/<\?xml[^>]*\?>/gi, '')
-      .replace(/<\/?sigml>/gi, '')
-      .trim();
-    cleaned = `<?xml version="1.0" encoding="utf-8"?>\n<sigml>\n${innerContent}\n</sigml>`;
+  // Ensure output is ALWAYS wrapped in valid <sigml><hns_sign><hamnosys_manual> XML tags
+  if (!cleaned.includes('<sigml>') && !cleaned.includes('<sigml ')) {
+    if (cleaned.includes('<hns_sign')) {
+      const innerContent = cleaned.replace(/<\?xml[^>]*\?>/gi, '').trim();
+      cleaned = `<?xml version="1.0" encoding="utf-8"?>\n<sigml>\n${innerContent}\n</sigml>`;
+    } else if (cleaned.includes('<hamnosys_manual')) {
+      const innerContent = cleaned.replace(/<\?xml[^>]*\?>/gi, '').trim();
+      cleaned = `<?xml version="1.0" encoding="utf-8"?>\n<sigml>\n<hns_sign gloss="SIGN">\n${innerContent}\n</hns_sign>\n</sigml>`;
+    } else {
+      cleaned = `<?xml version="1.0" encoding="utf-8"?>\n<sigml>\n<hns_sign gloss="SIGN">\n<hamnosys_manual>\n${cleaned}\n</hamnosys_manual>\n</hns_sign>\n</sigml>`;
+    }
   }
 
   return cleaned.trim();

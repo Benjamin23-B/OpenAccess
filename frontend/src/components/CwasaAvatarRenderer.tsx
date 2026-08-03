@@ -180,22 +180,14 @@ export default function CwasaAvatarRenderer({
 
         // Estimate duration based on sign count & speed
         const signCount = (cleanSigml.match(/<hns_sign/g) || [1]).length;
-        const durationMs = Math.max(2500, Math.round((signCount * 2200) / (signingSpeed || 1.0)));
+        const durationMs = Math.max(3000, Math.round((signCount * 2500) / (signingSpeed || 1.0)));
         
-        setTimeout(() => {
-          try {
-            if (window.CWASA) {
-              if (typeof window.CWASA.stop === 'function') {
-                try { window.CWASA.stop(0); } catch (_e) {}
-              }
-              if (typeof window.CWASA.playSiGMLText === 'function') {
-                window.CWASA.playSiGMLText(cleanSigml, 0);
-              }
-            }
-          } catch (e) {
-            console.warn('CWASA animation notice:', e);
-          }
-        }, 200);
+        // Directly trigger playSiGMLText without calling CWASA.stop(0) which freezes WebGL bone meshes
+        try {
+          window.CWASA.playSiGMLText(cleanSigml, 0);
+        } catch (e) {
+          console.warn('CWASA animation trigger notice:', e);
+        }
 
         // Schedule transition back to Idle pose after talking/signing completes
         const timer = setTimeout(() => {

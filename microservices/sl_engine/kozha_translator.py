@@ -266,7 +266,16 @@ def sanitize_sigml(sigml: str) -> str:
     # Clean inter-tag whitespace
     sigml = re.sub(r'>\s+<', '><', sigml)
 
-    return sigml.strip()
+    sigml_clean = sigml.strip()
+    if not sigml_clean.startswith('<sigml>') and not sigml_clean.startswith('<?xml'):
+        if '<hns_sign' in sigml_clean:
+            sigml_clean = f'<?xml version="1.0" encoding="utf-8"?>\n<sigml>\n{sigml_clean}\n</sigml>'
+        elif '<hamnosys_manual' in sigml_clean:
+            sigml_clean = f'<?xml version="1.0" encoding="utf-8"?>\n<sigml>\n<hns_sign gloss="SIGN">\n{sigml_clean}\n</hns_sign>\n</sigml>'
+        else:
+            sigml_clean = f'<?xml version="1.0" encoding="utf-8"?>\n<sigml>\n<hns_sign gloss="SIGN">\n<hamnosys_manual>\n{sigml_clean}\n</hamnosys_manual>\n</hns_sign>\n</sigml>'
+
+    return sigml_clean
 
 
 def get_sign_database(sign_lang: str) -> Dict[str, str]:
@@ -469,7 +478,13 @@ def process_text_to_gloss_list(text: str, language: str = "en", sign_language: s
         return synonym_mapped
 
 
+_PLAN_CACHE: Dict[str, Dict[str, object]] = {}
+
 def plan_from_text(text: str, language: str = "en", sign_language: str = "bsl", use_ai: bool = True) -> Dict[str, object]:
+    cache_key = f"{text.strip().lower()}:{language.lower()}:{sign_language.lower()}:{use_ai}"
+    if cache_key in _PLAN_CACHE:
+        return _PLAN_CACHE[cache_key]
+
     ai_plan = None
     if use_ai:
         ai_plan = translate_text_with_ai(text, sign_language=sign_language)
@@ -531,7 +546,7 @@ def plan_from_text(text: str, language: str = "en", sign_language: str = "bsl", 
 
     full_sigml = f'<?xml version="1.0" encoding="utf-8"?>\n<sigml>\n' + "\n".join(clean_blocks) + "\n</sigml>"
 
-    return {
+    res = {
         "raw": text,
         "final": " ".join(glosses).upper(),
         "glosses": [g.upper() for g in glosses],
@@ -542,4 +557,6 @@ def plan_from_text(text: str, language: str = "en", sign_language: str = "bsl", 
         "facial_expression": facial_expression,
         "planner_source": source
     }
+    _PLAN_CACHE[cache_key] = res
+    return res
 
