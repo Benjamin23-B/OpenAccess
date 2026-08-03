@@ -132,6 +132,14 @@ SYNONYMS = {
 def sanitize_sigml(sigml: str) -> str:
     if not sigml:
         return sigml
+    # Clean duplicate hamsplit tags
+    sigml = re.sub(r'(?:<hamsplit\/>\s*)+', r'<hamsplit/>', sigml, flags=re.IGNORECASE)
+    sigml = re.sub(r'(?:hamsplit\s+)+', r'hamsplit ', sigml, flags=re.IGNORECASE)
+
+    # Insert <hamsplit/> between two consecutive handshapes if missing
+    if '<hamsplit/>' not in sigml and 'hamsplit' not in sigml:
+        sigml = re.sub(r'(<hamfist\/>)\s*(<hamflathand\/>)', r'<hamsplit/>\1\2', sigml, flags=re.IGNORECASE)
+        sigml = re.sub(r'\bhamfist\s+hamflathand\b', r'hamsplit hamfist hamflathand', sigml, flags=re.IGNORECASE)
     # Swap thumb modifier placed before extension direction
     sigml = re.sub(
         r'(<(?:hamthumboutmod|hamthumbacrossmod|hamthumbopenmod)\s*\/?>\s*)(<hamextfinger[a-z0-9]+\s*\/?>)',
@@ -209,6 +217,39 @@ def get_sign_database(sign_lang: str) -> Dict[str, str]:
                             db[word] = sanitize_sigml(f'<hns_sign gloss="{word.upper()}"><hamnosys_manual>{ham}</hamnosys_manual></hns_sign>')
         except Exception as e:
             logger.warning(f"Error parsing CSV file {csv_fname}: {e}")
+
+    # Built-in fallback dictionary for core signs
+    builtin_signs = {
+        "help": '<hns_sign gloss="HELP"><hamnosys_manual><hamsymmlr/><hamsplit/><hamfist/><hamflathand/><hamextfingeru/><hampalmu/><hamchest/></hamnosys_manual></hns_sign>',
+        "hello": '<hns_sign gloss="HELLO"><hamnosys_manual><hamflathand/><hamextfingeru/><hamthumboutmod/><hampalml/><hamforehead/><hamclose/></hamnosys_manual></hns_sign>',
+        "hi": '<hns_sign gloss="HI"><hamnosys_manual><hamflathand/><hamextfingeru/><hampalml/><hamshoulders/><hamclose/></hamnosys_manual></hns_sign>',
+        "namaste": '<hns_sign gloss="NAMASTE"><hamnosys_manual><hamsymmlr/><hamflathand/><hamextfingeru/><hampalml/><hamchest/><hamclose/></hamnosys_manual></hns_sign>',
+        "thanks": '<hns_sign gloss="THANK-YOU"><hamnosys_manual><hamflathand/><hamextfingeru/><hamthumboutmod/><hampalml/><hamunderchin/><hamclose/></hamnosys_manual></hns_sign>',
+        "thankyou": '<hns_sign gloss="THANK-YOU"><hamnosys_manual><hamflathand/><hamextfingeru/><hamthumboutmod/><hampalml/><hamunderchin/><hamclose/></hamnosys_manual></hns_sign>',
+        "please": '<hns_sign gloss="PLEASE"><hamnosys_manual><hamflathand/><hamextfingeru/><hampalml/><hamchest/><hamcircle/></hamnosys_manual></hns_sign>',
+        "sorry": '<hns_sign gloss="SORRY"><hamnosys_manual><hamfist/><hamextfingeru/><hamthumboutmod/><hampalml/><hamchest/><hamcircle/></hamnosys_manual></hns_sign>',
+        "doctor": '<hns_sign gloss="DOCTOR"><hamnosys_manual><hamflathand/><hamextfingeru/><hampalml/><hamwrist/><hamclose/></hamnosys_manual></hns_sign>',
+        "hospital": '<hns_sign gloss="HOSPITAL"><hamnosys_manual><hamfinger23/><hamextfingeru/><hampalml/><hamupperarm/><hamclose/></hamnosys_manual></hns_sign>',
+        "danger": '<hns_sign gloss="DANGER"><hamnosys_manual><hamfist/><hamextfingeru/><hampalml/><hamchest/></hamnosys_manual></hns_sign>',
+        "safe": '<hns_sign gloss="SAFE"><hamnosys_manual><hamsymmlr/><hamfist/><hamextfingeru/><hampalml/><hamchest/></hamnosys_manual></hns_sign>',
+        "what": '<hns_sign gloss="WHAT"><hamnosys_manual><hamsymmlr/><hamflathand/><hamextfingero/><hampalmu/><hamchest/></hamnosys_manual></hns_sign>',
+        "where": '<hns_sign gloss="WHERE"><hamnosys_manual><hamfinger1/><hamextfingeru/><hampalmo/><hamshoulders/></hamnosys_manual></hns_sign>',
+        "who": '<hns_sign gloss="WHO"><hamnosys_manual><hamfinger1/><hamextfingeru/><hampalmo/><hamchin/><hamcircle/></hamnosys_manual></hns_sign>',
+        "why": '<hns_sign gloss="WHY"><hamnosys_manual><hamflathand/><hamextfingeru/><hampalml/><hamforehead/><hamclose/></hamnosys_manual></hns_sign>',
+        "how": '<hns_sign gloss="HOW"><hamnosys_manual><hamsymmlr/><hamflathand/><hamextfingerd/><hampalmd/><hamchest/></hamnosys_manual></hns_sign>',
+        "yes": '<hns_sign gloss="YES"><hamnosys_manual><hamfist/><hamextfingero/><hampalmd/><hamchest/></hamnosys_manual></hns_sign>',
+        "no": '<hns_sign gloss="NO"><hamnosys_manual><hamfinger23/><hamthumboutmod/><hamextfingero/><hampalmd/><hamchest/></hamnosys_manual></hns_sign>',
+        "eat": '<hns_sign gloss="EAT"><hamnosys_manual><hampinchall/><hamextfingeri/><hampalmd/><hamlips/><hamclose/></hamnosys_manual></hns_sign>',
+        "food": '<hns_sign gloss="FOOD"><hamnosys_manual><hampinchall/><hamextfingeri/><hampalmd/><hamlips/><hamclose/></hamnosys_manual></hns_sign>',
+        "water": '<hns_sign gloss="WATER"><hamnosys_manual><hamfinger345/><hamthumboutmod/><hamextfingeru/><hampalml/><hamchin/><hamclose/></hamnosys_manual></hns_sign>',
+        "home": '<hns_sign gloss="HOME"><hamnosys_manual><hampinchall/><hamextfingeri/><hampalmd/><hamcheek/><hamclose/></hamnosys_manual></hns_sign>',
+        "love": '<hns_sign gloss="LOVE"><hamnosys_manual><hamsymmlr/><hamfist/><hamextfingeru/><hampalmu/><hamchest/><hamclose/></hamnosys_manual></hns_sign>',
+        "friend": '<hns_sign gloss="FRIEND"><hamnosys_manual><hamsymmlr/><hamfinger1/><hamextfingero/><hampalmd/><hamchest/><hamclose/></hamnosys_manual></hns_sign>',
+    }
+
+    for word, sigml_code in builtin_signs.items():
+        if word not in db:
+            db[word] = sanitize_sigml(sigml_code)
 
     _GLOSS_CACHE[lang_key] = db
     return db
@@ -316,7 +357,12 @@ def plan_from_text(text: str, language: str = "en", sign_language: str = "isl", 
 
     for gloss in glosses:
         gloss_clean = SYNONYMS.get(gloss, gloss)
-        match_sigml = db.get(gloss_clean) or db.get(gloss)
+        match_sigml = (
+            db.get(gloss_clean.lower()) or 
+            db.get(gloss_clean.upper()) or 
+            db.get(gloss.lower()) or 
+            db.get(gloss.upper())
+        )
         
         if match_sigml:
             sign_breakdown.append({
@@ -341,7 +387,15 @@ def plan_from_text(text: str, language: str = "en", sign_language: str = "isl", 
             if char_blocks:
                 sigml_blocks.extend(char_blocks)
 
-    full_sigml = f'<?xml version="1.0" encoding="utf-8"?>\n<sigml>\n' + "\n".join(sigml_blocks) + "\n</sigml>"
+    clean_blocks = []
+    for b in sigml_blocks:
+        if b:
+            b_clean = re.sub(r'<\?xml[^>]*\?>', '', b)
+            b_clean = re.sub(r'<\/?sigml>', '', b_clean).strip()
+            if b_clean:
+                clean_blocks.append(b_clean)
+
+    full_sigml = f'<?xml version="1.0" encoding="utf-8"?>\n<sigml>\n' + "\n".join(clean_blocks) + "\n</sigml>"
 
     return {
         "raw": text,

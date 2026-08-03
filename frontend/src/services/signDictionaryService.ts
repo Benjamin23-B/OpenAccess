@@ -102,8 +102,8 @@ export const CURATED_SIGN_DICTIONARY: Record<string, SignDictionaryEntry> = {
     gloss: 'HELP',
     language: 'ISL',
     category: 'Emergency',
-    hamnosys: 'hamsymmlr hamfist hamflathand hamextfingeru hampalmu hamchest',
-    sigml: `<hns_sign gloss="HELP"><hamnosys_manual><hamsymmlr/><hamfist/><hamflathand/><hamextfingeru/><hampalmu/><hamchest/></hamnosys_manual></hns_sign>`,
+    hamnosys: 'hamsymmlr hamsplit hamfist hamflathand hamextfingeru hampalmu hamchest',
+    sigml: `<hns_sign gloss="HELP"><hamnosys_manual><hamsymmlr/><hamsplit/><hamfist/><hamflathand/><hamextfingeru/><hampalmu/><hamchest/></hamnosys_manual></hns_sign>`,
     handshape: 'Fist resting on open palm',
     movement: 'Both hands moving upward together',
     location: 'Neutral Space',
@@ -366,6 +366,16 @@ export function sanitizeSigml(sigml: any): string {
   // Convert all HamNoSys tokens (e.g. HamFlathand, HamFinger23spread, <HamFlathand/>) to lowercase
   cleaned = cleaned.replace(/\b(ham[a-zA-Z0-9_]*)\b/gi, (m) => m.toLowerCase());
 
+  // Clean duplicate hamsplit tags
+  cleaned = cleaned.replace(/(?:<hamsplit\/>\s*)+/gi, '<hamsplit/>');
+  cleaned = cleaned.replace(/(?:hamsplit\s+)+/gi, 'hamsplit ');
+
+  // Automatically insert missing <hamsplit/> between two handshapes under two-handed symmetry
+  if (!cleaned.includes('<hamsplit/>') && !cleaned.includes('hamsplit')) {
+    cleaned = cleaned.replace(/(<hamfist\/>)\s*(<hamflathand\/>)/gi, '<hamsplit/>$1$2');
+    cleaned = cleaned.replace(/\bhamfist\s+hamflathand\b/gi, 'hamsplit hamfist hamflathand');
+  }
+
   cleaned = cleaned.replace(
     /(<(?:hamthumboutmod|hamthumbacrossmod|hamthumbopenmod)\s*\/?>\s*)(<hamextfinger[a-z0-9]+\s*\/?>)/gi,
     '$2$1'
@@ -378,7 +388,17 @@ export function sanitizeSigml(sigml: any): string {
     /<(?:hammiddlefinger|hamringfinger|hampinky|hamthumb|hamindexfinger|hamfingerpad)\s*\/?>/gi,
     ''
   );
-  return cleaned;
+
+  // If input contains <hns_sign>, strip inner xml headers and ensure single root <sigml>
+  if (cleaned.includes('<hns_sign')) {
+    const innerContent = cleaned
+      .replace(/<\?xml[^>]*\?>/gi, '')
+      .replace(/<\/?sigml>/gi, '')
+      .trim();
+    cleaned = `<?xml version="1.0" encoding="utf-8"?>\n<sigml>\n${innerContent}\n</sigml>`;
+  }
+
+  return cleaned.trim();
 }
 
 class SignDictionaryService {

@@ -48,7 +48,7 @@ def get_config():
 
     return api_key, base_url, model
 
-SYSTEM_PROMPT = """You are an expert Sign Language Translator specializing in Indian Sign Language (ISL) and British Sign Language (BSL).
+SYSTEM_PROMPT = """You are an expert Sign Language Translator specializing in Indian Sign Language (ISL), American Sign Language (ASL), and British Sign Language (BSL).
 Your job is to translate spoken/written natural language text into a structured Sign Language plan.
 
 Rules for Sign Language Translation:
@@ -58,7 +58,7 @@ Rules for Sign Language Translation:
    - QUESTION AT END: Place question words (WHAT, WHERE, WHY, HOW) at the end.
    - OMIT STOPWORDS: Remove articles (a, an, the), auxiliary verbs (is, am, are, was, were, be), and conjunctions (and, but) unless essential.
 2. Produce a JSON object with:
-   - "glosses": array of uppercase root sign words (e.g. ["TODAY", "HOSPITAL", "GO", "WHERE"]).
+   - "glosses": array of uppercase root sign words (e.g. ["TODAY", "HOSPITAL", "GO", "WHERE"]). Only return standard English gloss dictionary words. Do NOT generate raw character codes or HamNoSys notation.
    - "facial_expression": facial/head posture marker ("question_eyebrows_raised", "affirmative_nod", "negative_headshake", "neutral").
    - "grammar_note": short explanation of sign grammar ordering applied.
 
