@@ -31,6 +31,13 @@ export default function CwasaAvatarRenderer({
   const initializedRef = useRef(false);
 
   useEffect(() => {
+    // Intercept browser alert dialogs and direct them to console logging instead
+    if (typeof window !== 'undefined') {
+      window.alert = (msg?: any) => {
+        console.warn('[Avatar Engine Notice (Alert Suppressed)]:', msg);
+      };
+    }
+
     // 1. Snapshot browser's native WebAssembly BEFORE allcsa.js (exact Kozha app.html pattern)
     if (typeof window !== 'undefined' && window.WebAssembly && !window.__nativeWebAssembly) {
       window.__nativeWebAssembly = window.WebAssembly;
