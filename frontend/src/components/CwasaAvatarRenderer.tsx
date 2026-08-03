@@ -192,6 +192,11 @@ export default function CwasaAvatarRenderer({
         // Schedule transition back to Idle pose after talking/signing completes
         const timer = setTimeout(() => {
           onStatusChange?.('Idle');
+          try {
+            if (window.CWASA && typeof window.CWASA.stop === 'function') {
+              window.CWASA.stop(0);
+            }
+          } catch (_e) {}
         }, durationMs);
 
         return () => clearTimeout(timer);

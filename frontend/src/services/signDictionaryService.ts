@@ -674,7 +674,8 @@ class SignDictionaryService {
       }
     });
 
-    const fullSigml = `<?xml version="1.0" encoding="utf-8"?>\n<sigml>\n${sigmlBlocks.join('\n')}\n</sigml>`;
+    const REST_BLOCK = '<hns_sign gloss="REST"><hamnosys_manual><hamflathand/><hamextfingerd/><hampalmd/><hamnomotion/></hamnosys_manual></hns_sign>';
+    const fullSigml = `<?xml version="1.0" encoding="utf-8"?>\n<sigml>\n${sigmlBlocks.join('\n')}\n${REST_BLOCK}\n</sigml>`;
 
     return {
       tokens: cleanTokens,

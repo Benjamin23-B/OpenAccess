@@ -544,6 +544,9 @@ def plan_from_text(text: str, language: str = "en", sign_language: str = "bsl", 
             if b_clean:
                 clean_blocks.append(b_clean)
 
+    REST_BLOCK = '<hns_sign gloss="REST"><hamnosys_manual><hamflathand/><hamextfingerd/><hampalmd/><hamnomotion/></hamnosys_manual></hns_sign>'
+    clean_blocks.append(REST_BLOCK)
+
     full_sigml = f'<?xml version="1.0" encoding="utf-8"?>\n<sigml>\n' + "\n".join(clean_blocks) + "\n</sigml>"
 
     res = {
