@@ -19,7 +19,8 @@ export default function DeafBridge() {
   // Kozha Integration State
   const [rendererMode, setRendererMode] = useState<'cwasa' | 'r3f'>('cwasa');
   const [selectedAvatar, setSelectedAvatar] = useState<'anna' | 'marc' | 'francoise' | 'luna' | 'siggi'>('anna');
-  const [signLanguage, setSignLanguage] = useState<'ISL' | 'ASL' | 'BSL' | 'DGS' | 'LSF'>('ISL');
+  const [signLanguage, setSignLanguage] = useState<'ISL' | 'BSL' | 'ASL' | 'DGS' | 'LSF'>('ISL');
+  const [useAiTranslator, setUseAiTranslator] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'translate' | 'dictionary' | 'inspector'>('translate');
 
@@ -54,7 +55,7 @@ export default function DeafBridge() {
     setProcessedSequence(initialLocal);
 
     // Fetch async NLP plan from Kozha Engine on port 8001
-    signDictionaryService.fetchKozhaPlan(activeSignText, signLanguage).then((plan) => {
+    signDictionaryService.fetchKozhaPlan(activeSignText, signLanguage, useAiTranslator).then((plan) => {
       if (isMounted && plan && plan.sigmlSequence) {
         setProcessedSequence(plan);
       }
@@ -63,7 +64,7 @@ export default function DeafBridge() {
     return () => {
       isMounted = false;
     };
-  }, [activeSignText, signLanguage]);
+  }, [activeSignText, signLanguage, useAiTranslator]);
 
   // Watch for new voice transcripts and forward them to the avatar
   useEffect(() => {
@@ -108,12 +109,26 @@ export default function DeafBridge() {
               <span aria-hidden="true" className="text-3xl">🤟</span> Deaf / HoH Assistive Bridge
             </h2>
             <p className="bridge-description text-slate-400 mt-1 text-sm md:text-base">
-              Real-time Speech & Text to 3D Sign Language (ISL / ASL / BSL) with Kozha CWASA WebGL & HamNoSys/SiGML pipeline.
+              Real-time Speech & Text to 3D Sign Language (ISL / BSL / ASL) with Kozha AI Translation & SiGML pipeline.
             </p>
           </div>
 
           {/* Renderer & Sign Language & Avatar Model Controls */}
           <div className="flex flex-wrap items-center gap-3 bg-slate-950 p-2.5 rounded-xl border border-slate-800 shadow-md">
+            {/* AI Translator Toggle */}
+            <button
+              onClick={() => setUseAiTranslator(!useAiTranslator)}
+              className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-all flex items-center gap-1.5 ${
+                useAiTranslator
+                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 border-indigo-400 text-white shadow-md'
+                  : 'bg-slate-900 border-slate-700 text-slate-400'
+              }`}
+              title="Toggle AI LLM Text-to-Sign Gloss Translation"
+            >
+              <span>✨ AI Sign Mode:</span>
+              <span className="uppercase">{useAiTranslator ? 'ON' : 'OFF'}</span>
+            </button>
+
             {/* Renderer Switcher */}
             <div className="flex items-center bg-slate-900 rounded-lg p-1 border border-slate-800">
               <button
@@ -142,7 +157,7 @@ export default function DeafBridge() {
             {rendererMode === 'cwasa' && (
               <div className="flex items-center gap-2 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800">
                 <span className="text-xs text-slate-400 font-semibold flex items-center gap-1">
-                  👤 Avatar Model:
+                  👤 Avatar:
                 </span>
                 <select
                   value={selectedAvatar}
@@ -165,8 +180,8 @@ export default function DeafBridge() {
               className="bg-slate-900 text-cyan-400 border border-cyan-500/30 rounded-lg px-3 py-1.5 text-xs font-semibold outline-none focus:ring-2 focus:ring-cyan-500 cursor-pointer"
             >
               <option value="ISL">Indian Sign Language (ISL)</option>
-              <option value="ASL">American Sign Language (ASL)</option>
               <option value="BSL">British Sign Language (BSL)</option>
+              <option value="ASL">American Sign Language (ASL)</option>
               <option value="DGS">German Sign Language (DGS)</option>
               <option value="LSF">French Sign Language (LSF)</option>
             </select>
@@ -413,9 +428,21 @@ export default function DeafBridge() {
               </h3>
               
               <div className="flex flex-col gap-3">
-                <div className="bg-slate-950 p-3 rounded-xl border border-slate-800">
-                  <p className="text-xs font-bold text-cyan-400 mb-1">Active Input Sentence:</p>
+                <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 flex flex-col gap-1.5">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="font-bold text-cyan-400">Active Input Sentence:</span>
+                    {processedSequence.plannerSource && (
+                      <span className="bg-indigo-950 text-indigo-300 border border-indigo-700/60 px-2 py-0.5 rounded text-[10px] font-mono">
+                        {processedSequence.plannerSource}
+                      </span>
+                    )}
+                  </div>
                   <p className="text-xs text-slate-200">{activeSignText || '(No active input)'}</p>
+                  {processedSequence.facialExpression && processedSequence.facialExpression !== 'neutral' && (
+                    <p className="text-[11px] text-purple-300 font-semibold mt-1">
+                      😊 Expression / Non-Manual Marker: {processedSequence.facialExpression}
+                    </p>
+                  )}
                 </div>
 
                 <div className="bg-slate-950 p-3 rounded-xl border border-slate-800">

@@ -102,6 +102,33 @@ DEFAULT_GRAMMAR = {"verb_final": False, "time_first": True}
 # Cached SiGML / CSV Gloss maps
 _GLOSS_CACHE: Dict[str, Dict[str, str]] = {}
 
+from ai_sign_wrapper import translate_text_with_ai
+
+COMMON_PHRASES = {
+    "thank you": "thanks",
+    "thank-you": "thanks",
+    "good morning": "morning",
+    "good afternoon": "afternoon",
+    "good evening": "evening",
+    "good night": "night",
+    "how are you": "how you",
+    "what is your name": "you name what",
+}
+
+SYNONYMS = {
+    "doctors": "doctor",
+    "physician": "doctor",
+    "hospitals": "hospital",
+    "eating": "eat",
+    "foods": "food",
+    "helping": "help",
+    "helped": "help",
+    "thanks": "thanks",
+    "thankyou": "thanks",
+    "hi": "hello",
+    "hey": "hello",
+}
+
 def sanitize_sigml(sigml: str) -> str:
     if not sigml:
         return sigml
@@ -232,9 +259,14 @@ def reorder_tokens(tokens_with_pos: List[Tuple[str, str]], sign_language: str) -
 
 
 def process_text_to_gloss_list(text: str, language: str = "en", sign_language: str = "isl") -> List[str]:
-    text = (text or "").strip()
+    text = (text or "").strip().lower()
     if not text:
         return []
+
+    # Check phrase replacements
+    for phrase, replacement in COMMON_PHRASES.items():
+        if phrase in text:
+            text = text.replace(phrase, replacement)
 
     nlp = get_spacy_nlp()
     stopwords = STOPWORDS.get(language, STOPWORDS["default"])
@@ -246,41 +278,57 @@ def process_text_to_gloss_list(text: str, language: str = "en", sign_language: s
             t_lower = token.text.lower()
             if not t_lower.isalnum():
                 continue
-            if t_lower in stopwords:
+            if t_lower in stopwords and t_lower not in {"not", "no"}:
                 continue
             pos = token.pos_
             lemma = token.lemma_.lower() if pos == "VERB" else t_lower
+            lemma = SYNONYMS.get(lemma, lemma)
             tokens_with_pos.append((lemma, pos))
         
         reordered = reorder_tokens(tokens_with_pos, sign_language)
         return reordered
     else:
-        clean_words = re.findall(r"\b\w+\b", text.lower())
-        filtered = [w for w in clean_words if w not in stopwords]
-        return filtered
+        clean_words = re.findall(r"\b\w+\b", text)
+        filtered = [w for w in clean_words if w not in stopwords or w in {"not", "no"}]
+        synonym_mapped = [SYNONYMS.get(w, w) for w in filtered]
+        return synonym_mapped
 
 
-def plan_from_text(text: str, language: str = "en", sign_language: str = "isl") -> Dict[str, object]:
-    glosses = process_text_to_gloss_list(text, language=language, sign_language=sign_language)
+def plan_from_text(text: str, language: str = "en", sign_language: str = "isl", use_ai: bool = True) -> Dict[str, object]:
+    ai_plan = None
+    if use_ai:
+        ai_plan = translate_text_with_ai(text, sign_language=sign_language)
+
+    if ai_plan and ai_plan.get("glosses"):
+        glosses = [g.lower() for g in ai_plan["glosses"]]
+        source = ai_plan.get("source", "AI_WRAPPER")
+        facial_expression = ai_plan.get("facial_expression", "neutral")
+    else:
+        glosses = process_text_to_gloss_list(text, language=language, sign_language=sign_language)
+        source = "LOCAL_NLP_ENGINE"
+        facial_expression = "neutral"
+
     db = get_sign_database(sign_language)
+    asl_db = get_sign_database("asl")
 
     sign_breakdown = []
     sigml_blocks = []
 
     for gloss in glosses:
-        match_sigml = db.get(gloss)
+        gloss_clean = SYNONYMS.get(gloss, gloss)
+        match_sigml = db.get(gloss_clean) or db.get(gloss)
+        
         if match_sigml:
             sign_breakdown.append({
-                "word": gloss,
-                "gloss": gloss.upper(),
+                "word": gloss_clean,
+                "gloss": gloss_clean.upper(),
                 "isFingerspelled": False,
                 "sigml": match_sigml
             })
             sigml_blocks.append(match_sigml)
         else:
-            asl_db = get_sign_database("asl")
             char_blocks = []
-            for ch in gloss:
+            for ch in gloss_clean:
                 ch_match = db.get(ch) or asl_db.get(ch)
                 if ch_match:
                     char_blocks.append(ch_match)
@@ -297,10 +345,13 @@ def plan_from_text(text: str, language: str = "en", sign_language: str = "isl") 
 
     return {
         "raw": text,
-        "final": " ".join(glosses),
-        "glosses": glosses,
+        "final": " ".join(glosses).upper(),
+        "glosses": [g.upper() for g in glosses],
         "language": language,
         "sign_language": sign_language,
         "sigml": full_sigml,
         "signBreakdown": sign_breakdown,
+        "facial_expression": facial_expression,
+        "planner_source": source
     }
+

@@ -341,6 +341,8 @@ export interface ProcessedSignSequence {
     hamnosys?: string;
     sigml: string;
   }[];
+  facialExpression?: string;
+  plannerSource?: string;
 }
 
 export function sanitizeSigml(sigml: string): string {
@@ -365,7 +367,11 @@ class SignDictionaryService {
   /**
    * Fetch full NLP sign language plan from Kozha Backend microservice (Port 8001)
    */
-  public async fetchKozhaPlan(text: string, signLanguage: string = 'ISL'): Promise<ProcessedSignSequence> {
+  public async fetchKozhaPlan(
+    text: string, 
+    signLanguage: string = 'ISL',
+    useAi: boolean = true
+  ): Promise<ProcessedSignSequence> {
     if (!text || !text.trim()) {
       return { tokens: [], sigmlSequence: '', signBreakdown: [] };
     }
@@ -378,6 +384,7 @@ class SignDictionaryService {
           text,
           language: 'en',
           sign_language: signLanguage.toLowerCase(),
+          use_ai: useAi,
         }),
       });
 
@@ -393,6 +400,8 @@ class SignDictionaryService {
               isFingerspelled: sb.isFingerspelled,
               sigml: sanitizeSigml(sb.sigml),
             })),
+            facialExpression: data.facial_expression || 'neutral',
+            plannerSource: data.planner_source || 'LOCAL_ENGINE',
           };
         }
       }
@@ -412,16 +421,38 @@ class SignDictionaryService {
       return { tokens: [], sigmlSequence: '', signBreakdown: [] };
     }
 
-    const cleanTokens = text
-      .toLowerCase()
+    let cleanedText = text.toLowerCase();
+    
+    // Quick phrase replacements
+    cleanedText = cleanedText
+      .replace(/thank\s+you/g, 'thanks')
+      .replace(/good\s+morning/g, 'morning')
+      .replace(/how\s+are\s+you/g, 'how you')
+      .replace(/what\s+is\s+your\s+name/g, 'you name what');
+
+    const cleanTokens = cleanedText
       .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '')
       .split(/\s+/)
       .filter((t) => t.length > 0);
 
+    const synonymMap: Record<string, string> = {
+      doctors: 'doctor',
+      physician: 'doctor',
+      hospitals: 'hospital',
+      eating: 'eat',
+      foods: 'food',
+      helping: 'help',
+      helped: 'help',
+      thankyou: 'thanks',
+      hi: 'hello',
+      hey: 'hello',
+    };
+
     const signBreakdown: ProcessedSignSequence['signBreakdown'] = [];
     const sigmlBlocks: string[] = [];
 
-    cleanTokens.forEach((token) => {
+    cleanTokens.forEach((rawToken) => {
+      const token = synonymMap[rawToken] || rawToken;
       const match = CURATED_SIGN_DICTIONARY[token];
 
       if (match && match.sigml) {
@@ -461,6 +492,8 @@ class SignDictionaryService {
       tokens: cleanTokens,
       sigmlSequence: fullSigml,
       signBreakdown,
+      facialExpression: 'neutral',
+      plannerSource: 'LOCAL_FALLBACK',
     };
   }
 
@@ -481,4 +514,5 @@ class SignDictionaryService {
 }
 
 export const signDictionaryService = new SignDictionaryService();
+
 

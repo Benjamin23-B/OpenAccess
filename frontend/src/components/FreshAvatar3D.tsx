@@ -292,6 +292,110 @@ const GESTURE_TARGETS: Record<string, JointRotations[]> = {
       head: [0.15, 0, 0],
     },
   ],
+  doctor: [
+    {
+      leftShoulder: [0.4, 0.2, 0.3],
+      leftElbow: [1.2, 0, 0],
+      rightShoulder: [0.8, -0.4, 0.4],
+      rightElbow: [1.7, 0.2, 0],
+      rightWrist: [0.3, 0.4, -0.2],
+    },
+    {
+      rightShoulder: [0.8, -0.4, 0.4],
+      rightElbow: [1.5, 0.2, 0],
+      rightWrist: [0.2, 0.3, -0.2],
+    },
+  ],
+  hospital: [
+    {
+      leftShoulder: [0.7, 0.4, 0.3],
+      leftElbow: [1.6, -0.2, 0],
+      rightShoulder: [0.7, -0.4, -0.3],
+      rightElbow: [1.6, 0.2, 0],
+    },
+  ],
+  what: [
+    {
+      leftShoulder: [0.4, 0.3, 0.4],
+      leftElbow: [1.1, 0, 0],
+      rightShoulder: [0.4, -0.3, -0.4],
+      rightElbow: [1.1, 0, 0],
+      head: [0.1, 0.2, 0],
+    },
+    {
+      leftShoulder: [0.4, 0.3, 0.4],
+      leftElbow: [1.1, 0, 0],
+      rightShoulder: [0.4, -0.3, -0.4],
+      rightElbow: [1.1, 0, 0],
+      head: [0.1, -0.2, 0],
+    },
+  ],
+  where: [
+    {
+      rightShoulder: [0.8, -0.3, 0.2],
+      rightElbow: [1.4, 0, 0],
+      rightWrist: [0, 0.4, 0],
+      head: [0.1, 0.1, 0],
+    },
+    {
+      rightShoulder: [0.8, -0.3, 0.2],
+      rightElbow: [1.4, 0, 0],
+      rightWrist: [0, -0.4, 0],
+      head: [0.1, -0.1, 0],
+    },
+  ],
+  why: [
+    {
+      rightShoulder: [0.9, -0.3, -0.2],
+      rightElbow: [1.8, 0, 0],
+      rightWrist: [0.3, 0.2, 0],
+      head: [0.15, 0, 0],
+    },
+    {
+      rightShoulder: [0.4, -0.2, 0.2],
+      rightElbow: [0.8, 0, 0],
+      rightWrist: [0.1, 0, 0],
+    },
+  ],
+  how: [
+    {
+      leftShoulder: [0.5, 0.4, 0.3],
+      leftElbow: [1.3, 0, 0],
+      rightShoulder: [0.5, -0.4, -0.3],
+      rightElbow: [1.3, 0, 0],
+      head: [0.1, 0, 0],
+    },
+  ],
+  danger: [
+    {
+      rightShoulder: [0.9, -0.2, 0.3],
+      rightElbow: [1.6, 0, 0],
+      head: [0.2, 0, 0],
+    },
+  ],
+  safe: [
+    {
+      leftShoulder: [0.6, 0.5, 0.5],
+      leftElbow: [1.5, 0, 0],
+      rightShoulder: [0.6, -0.5, -0.5],
+      rightElbow: [1.5, 0, 0],
+    },
+  ],
+  water: [
+    {
+      rightShoulder: [0.8, -0.4, 0.2],
+      rightElbow: [1.7, 0, 0],
+      rightWrist: [0.3, 0.2, 0],
+    },
+  ],
+  eat: [
+    {
+      rightShoulder: [0.8, -0.4, 0.2],
+      rightElbow: [1.8, 0, 0],
+      rightWrist: [0.4, 0.2, 0],
+      head: [0.15, 0, 0],
+    },
+  ],
   // Digits 1-5
   '1': [{ rightShoulder: [0.7, -0.3, 0.3], rightElbow: [1.3, 0, 0] }],
   '2': [{ rightShoulder: [0.7, -0.3, 0.3], rightElbow: [1.3, 0, 0] }],

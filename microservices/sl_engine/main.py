@@ -42,6 +42,7 @@ class TextRequest(BaseModel):
     language: str = "en"
     sign_language: str = "isl"
     reviewed_only: bool = False
+    use_ai: bool = True
 
 class TranslateTextRequest(BaseModel):
     text: Optional[str] = None
@@ -49,17 +50,25 @@ class TranslateTextRequest(BaseModel):
     source_lang: str = "en"
     target_lang: str = "en"
     target_sign_lang: Optional[str] = "isl"
+    use_ai: bool = True
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "service": "Kozha SL Engine"}
+    return {"status": "ok", "service": "Kozha SL Engine with AI Wrapper"}
 
 @app.post("/api/plan")
 def api_plan(req: TextRequest):
     input_text = (req.text or "").strip()
     if not input_text:
         return {"error": "Empty text provided"}
-    return plan_from_text(input_text, language=req.language, sign_language=req.sign_language)
+    return plan_from_text(input_text, language=req.language, sign_language=req.sign_language, use_ai=req.use_ai)
+
+@app.post("/api/ai-plan")
+def api_ai_plan(req: TextRequest):
+    input_text = (req.text or "").strip()
+    if not input_text:
+        return {"error": "Empty text provided"}
+    return plan_from_text(input_text, language=req.language, sign_language=req.sign_language, use_ai=True)
 
 @app.post("/api/translate")
 def api_translate(req: TextRequest):
@@ -75,12 +84,14 @@ def api_translate_text(req: TranslateTextRequest):
     sign_lang = req.target_sign_lang or "isl"
     if not text:
         return {"translated": ""}
-    plan = plan_from_text(text, language=req.source_lang, sign_language=sign_lang)
+    plan = plan_from_text(text, language=req.source_lang, sign_language=sign_lang, use_ai=req.use_ai)
     return {
         "translated": plan.get("final", text),
         "glosses": plan.get("glosses", []),
         "sigml": plan.get("sigml", ""),
-        "signBreakdown": plan.get("signBreakdown", [])
+        "signBreakdown": plan.get("signBreakdown", []),
+        "facial_expression": plan.get("facial_expression", "neutral"),
+        "planner_source": plan.get("planner_source", "LOCAL_ENGINE")
     }
 
 @app.websocket("/ws/sign_ml")
@@ -91,26 +102,23 @@ async def websocket_endpoint(websocket: WebSocket):
             text_data = await websocket.receive_text()
             print(f"Received Text: {text_data}")
             
-            gloss_str = preprocessor.preprocess(text_data)
-            dummy_gloss_tokens = torch.randint(0, VOCAB_SIZE, (1, max(1, len(gloss_str.split()))))
+            plan = plan_from_text(text_data, use_ai=False)
+            num_glosses = max(1, len(plan.get("glosses", [])))
+            num_frames = num_glosses * 30
+
+            # Deterministic kinematic trajectory generation (interpolated wave)
+            t = np.linspace(0, num_glosses * np.pi * 2, num_frames)
             
-            with torch.no_grad():
-                raw_coordinates = motion_model(dummy_gloss_tokens)
-            
-            raw_coords_np = raw_coordinates.squeeze(0).numpy()
-            smoothed_coords = smoother.smooth_coordinates(raw_coords_np)
-            
-            for frame_idx in range(smoothed_coords.shape[0]):
-                frame_data = smoothed_coords[frame_idx]
-                formatted_frame = {
-                    "rightShoulder": frame_data[0].tolist(),
-                    "rightElbow": frame_data[1].tolist(),
-                    "leftShoulder": frame_data[2].tolist(),
-                    "leftElbow": frame_data[3].tolist(),
-                    "fingers": frame_data[4].tolist()
+            for f in range(num_frames):
+                frame_data = {
+                    "rightShoulder": [0.6, float(np.sin(t[f]) * 0.2), 0.2],
+                    "rightElbow": [1.4, float(np.cos(t[f]) * 0.15), 0.0],
+                    "leftShoulder": [0.5, -float(np.sin(t[f]) * 0.2), -0.2],
+                    "leftElbow": [1.2, float(np.cos(t[f]) * 0.15), 0.0],
+                    "fingers": [float(np.abs(np.sin(t[f])))]
                 }
                 
-                await websocket.send_json({"type": "frame", "data": formatted_frame})
+                await websocket.send_json({"type": "frame", "data": frame_data})
                 await asyncio.sleep(1/30)
                 
             await websocket.send_json({"type": "status", "data": "Idle"})
@@ -121,4 +129,5 @@ async def websocket_endpoint(websocket: WebSocket):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
+
 
