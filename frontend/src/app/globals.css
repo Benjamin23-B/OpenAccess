@@ -1191,4 +1191,33 @@ kbd {
   to { opacity: 1; transform: translate(-50%, 0); }
 }
 
+/* CWASA 3D WebGL Avatar Integration Styles */
+.CWASAPanel {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 440px !important;
+  position: relative !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  background: #0f172a !important;
+  border-radius: 1rem !important;
+  overflow: hidden !important;
+}
+
+.CWASAAvatar {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 440px !important;
+  position: relative !important;
+  background: #0f172a !important;
+}
+
+.CWASAAvatar canvas {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+
 
