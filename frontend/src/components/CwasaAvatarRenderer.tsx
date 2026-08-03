@@ -77,7 +77,7 @@ export default function CwasaAvatarRenderer({
               height: 384,
               avList: 'avsfull',
               initAv: avatarName || 'luna',
-              ambIdle: false,
+              ambIdle: true,
               allowFrameSteps: false,
               allowSiGMLText: false,
               audioEnabled: false,
@@ -90,6 +90,10 @@ export default function CwasaAvatarRenderer({
           onStatusChange?.('Kozha 3D Avatar Ready');
         };
 
+        const onIdle = () => {
+          onStatusChange?.('Idle');
+        };
+
         if (window.CWASA.ready && typeof window.CWASA.ready.then === 'function') {
           window.CWASA.ready.then(onReady).catch(() => setIsLoaded(true));
         } else {
@@ -98,6 +102,8 @@ export default function CwasaAvatarRenderer({
 
         if (typeof window.CWASA.addHook === 'function') {
           window.CWASA.addHook('avatarready', onReady, 0);
+          window.CWASA.addHook('stopped', onIdle, 0);
+          window.CWASA.addHook('idle', onIdle, 0);
         }
       } catch (e) {
         console.warn('CWASA init notice:', e);
@@ -158,7 +164,7 @@ export default function CwasaAvatarRenderer({
     document.body.appendChild(script);
   }, []);
 
-  // Play SiGML whenever sigmlText updates
+  // Play SiGML whenever sigmlText updates and transition to Idle on completion
   useEffect(() => {
     if (!sigmlText || sigmlText === lastPlayedSigml.current || !isLoaded) return;
     if (typeof sigmlText !== 'string' || !sigmlText.trim()) return;
@@ -171,6 +177,10 @@ export default function CwasaAvatarRenderer({
       try {
         lastPlayedSigml.current = sigmlText;
         onStatusChange?.('Signing Animation');
+
+        // Estimate duration based on sign count & speed
+        const signCount = (cleanSigml.match(/<hns_sign/g) || [1]).length;
+        const durationMs = Math.max(2500, Math.round((signCount * 2200) / (signingSpeed || 1.0)));
         
         setTimeout(() => {
           try {
@@ -186,11 +196,18 @@ export default function CwasaAvatarRenderer({
             console.warn('CWASA animation notice:', e);
           }
         }, 200);
+
+        // Schedule transition back to Idle pose after talking/signing completes
+        const timer = setTimeout(() => {
+          onStatusChange?.('Idle');
+        }, durationMs);
+
+        return () => clearTimeout(timer);
       } catch (err: any) {
         console.warn('CWASA Play Error:', err);
       }
     }
-  }, [sigmlText, isLoaded, onStatusChange]);
+  }, [sigmlText, isLoaded, signingSpeed, onStatusChange]);
 
   // Switch avatar character
   useEffect(() => {

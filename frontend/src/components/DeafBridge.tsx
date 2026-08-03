@@ -18,7 +18,7 @@ export default function DeafBridge() {
   const [rendererMode, setRendererMode] = useState<'cwasa' | 'r3f'>('cwasa');
   const [selectedAvatar, setSelectedAvatar] = useState<'anna' | 'marc' | 'francoise' | 'luna' | 'siggi'>('anna');
   const [signLanguage, setSignLanguage] = useState<'ISL' | 'BSL' | 'ASL' | 'DGS' | 'LSF'>('BSL');
-  const [useAiTranslator, setUseAiTranslator] = useState<boolean>(true);
+  const [useAiTranslator, setUseAiTranslator] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'translate' | 'dictionary' | 'inspector'>('translate');
   const [copiedSigml, setCopiedSigml] = useState(false);

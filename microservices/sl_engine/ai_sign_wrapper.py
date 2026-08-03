@@ -16,8 +16,9 @@ logger = logging.getLogger(__name__)
 def load_env_file():
     """Dynamically search and load key-value pairs from .env files into os.environ."""
     candidates = [
-        Path(__file__).resolve().parent / ".env",
         Path(__file__).resolve().parent.parent.parent / ".env",
+        Path(__file__).resolve().parent.parent / ".env",
+        Path(__file__).resolve().parent / ".env",
     ]
     for path in candidates:
         if path.exists():
@@ -29,7 +30,7 @@ def load_env_file():
                             k, v = line.split("=", 1)
                             k = k.strip()
                             v = v.strip().strip('"').strip("'")
-                            if k and k not in os.environ:
+                            if k and v and (not os.environ.get(k) or path == candidates[0]):
                                 os.environ[k] = v
             except Exception as e:
                 logger.warning(f"Failed to read .env file at {path}: {e}")
@@ -103,24 +104,28 @@ def translate_text_with_ai(text: str, sign_language: str = "bsl") -> Optional[Di
         ],
         "temperature": 0.2,
         "max_tokens": 300,
+        "stream": False,
     }
 
     url = f"{base_url}/chat/completions"
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {api_key}",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     }
 
     try:
         req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"), headers=headers, method="POST")
-        with urllib.request.urlopen(req, timeout=8) as response:
+        with urllib.request.urlopen(req, timeout=20) as response:
             res_body = response.read().decode("utf-8")
             res_json = json.loads(res_body)
 
             content = res_json["choices"][0]["message"]["content"].strip()
-            # Clean markdown codeblocks if returned
-            if content.startswith("```"):
-                content = content.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
+            # Extract JSON payload using regex to handle any surrounding markdown text
+            import re
+            json_match = re.search(r'\{.*\}', content, re.DOTALL)
+            if json_match:
+                content = json_match.group(0)
 
             parsed = json.loads(content)
             if isinstance(parsed, dict) and "glosses" in parsed:

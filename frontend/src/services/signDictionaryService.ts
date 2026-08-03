@@ -23,8 +23,8 @@ export const CURATED_SIGN_DICTIONARY: Record<string, SignDictionaryEntry> = {
     gloss: 'HELLO',
     language: 'ISL',
     category: 'Greetings',
-    hamnosys: 'hamflathand hamthumboutmod hamextfingeru hampalml hamforehead hamclose hamshoulders',
-    sigml: `<hns_sign gloss="HELLO"><hamnosys_manual><hamflathand/><hamextfingeru/><hamthumboutmod/><hampalml/><hamforehead/><hamclose/></hamnosys_manual></hns_sign>`,
+    hamnosys: 'hamflathand hamextfingeru hampalmd hamforehead hamlrat hammover',
+    sigml: `<hns_sign gloss="HELLO"><hamnosys_manual><hamflathand/><hamextfingeru/><hampalmd/><hamforehead/><hamlrat/><hammover/></hamnosys_manual></hns_sign>`,
     handshape: 'Open B Flat Hand',
     movement: 'Salute outward movement from forehead',
     location: 'Head / Forehead',
@@ -34,10 +34,43 @@ export const CURATED_SIGN_DICTIONARY: Record<string, SignDictionaryEntry> = {
     gloss: 'HI',
     language: 'ISL',
     category: 'Greetings',
-    hamnosys: 'hamflathand hamextfingeru hampalml hamshoulders hamclose',
-    sigml: `<hns_sign gloss="HI"><hamnosys_manual><hamflathand/><hamextfingeru/><hampalml/><hamshoulders/><hamclose/></hamnosys_manual></hns_sign>`,
+    hamnosys: 'hamflathand hamextfingeru hampalmd hamshoulders hammover',
+    sigml: `<hns_sign gloss="HI"><hamnosys_manual><hamflathand/><hamextfingeru/><hampalmd/><hamshoulders/><hammover/></hamnosys_manual></hns_sign>`,
     handshape: 'Open B Hand',
     movement: 'Wave right hand',
+    location: 'Neutral Space',
+  },
+  name: {
+    id: 'c-0001d',
+    gloss: 'NAME',
+    language: 'ISL',
+    category: 'Greetings',
+    hamnosys: 'hamsymmlr hamfinger23 hamextfingero hampalmd hamneutralspace hammoved hamsmallmod hamrepeatfromstart',
+    sigml: `<hns_sign gloss="NAME"><hamnosys_manual><hamsymmlr/><hamfinger23/><hamextfingero/><hampalmd/><hamneutralspace/><hammoved/><hamsmallmod/><hamrepeatfromstart/></hamnosys_manual></hns_sign>`,
+    handshape: 'H-Hand (Index & Middle)',
+    movement: 'Tap crossed H-hands downward in neutral space',
+    location: 'Neutral Space',
+  },
+  my: {
+    id: 'c-0001e',
+    gloss: 'MY',
+    language: 'ISL',
+    category: 'Greetings',
+    hamnosys: 'hamflathand hamextfingeru hampalml hamchest hamtouch',
+    sigml: `<hns_sign gloss="MY"><hamnosys_manual><hamflathand/><hamextfingeru/><hampalml/><hamchest/><hamtouch/></hamnosys_manual></hns_sign>`,
+    handshape: 'Flat hand',
+    movement: 'Press palm to chest',
+    location: 'Chest',
+  },
+  you: {
+    id: 'c-0001f',
+    gloss: 'YOU',
+    language: 'ISL',
+    category: 'Greetings',
+    hamnosys: 'hamfinger1 hamextfingero hampalmd hamchest hammoveo',
+    sigml: `<hns_sign gloss="YOU"><hamnosys_manual><hamfinger1/><hamextfingero/><hampalmd/><hamchest/><hammoveo/></hamnosys_manual></hns_sign>`,
+    handshape: 'Index finger pointing',
+    movement: 'Point forward',
     location: 'Neutral Space',
   },
   namaste: {
@@ -45,8 +78,8 @@ export const CURATED_SIGN_DICTIONARY: Record<string, SignDictionaryEntry> = {
     gloss: 'NAMASTE',
     language: 'ISL',
     category: 'Greetings',
-    hamnosys: 'hamsymmlr hamflathand hamextfingeru hampalml hamchest hamclose',
-    sigml: `<hns_sign gloss="NAMASTE"><hamnosys_manual><hamsymmlr/><hamflathand/><hamextfingeru/><hampalml/><hamchest/><hamclose/></hamnosys_manual></hns_sign>`,
+    hamnosys: 'hamsymmlr hamflathand hamextfingeru hampalml hamchest hamtouch',
+    sigml: `<hns_sign gloss="NAMASTE"><hamnosys_manual><hamsymmlr/><hamflathand/><hamextfingeru/><hampalml/><hamchest/><hamtouch/></hamnosys_manual></hns_sign>`,
     handshape: 'Both Open Flat Hands joined',
     movement: 'Pressed together at chest level with slight nod',
     location: 'Chest',
@@ -56,8 +89,8 @@ export const CURATED_SIGN_DICTIONARY: Record<string, SignDictionaryEntry> = {
     gloss: 'THANK-YOU',
     language: 'ISL',
     category: 'Greetings',
-    hamnosys: 'hamflathand hamthumboutmod hamextfingeru hampalml hamunderchin hamclose',
-    sigml: `<hns_sign gloss="THANK-YOU"><hamnosys_manual><hamflathand/><hamextfingeru/><hamthumboutmod/><hampalml/><hamunderchin/><hamclose/></hamnosys_manual></hns_sign>`,
+    hamnosys: 'hamflathand hamthumboutmod hamextfingeru hambetween hamextfingerul hampalml hamunderchin hamseqbegin hamtouch hamfingerpad hamseqend hamparbegin hammovedo hamsmallmod hamparend',
+    sigml: `<hns_sign gloss="THANK-YOU"><hamnosys_manual><hamflathand/><hamthumboutmod/><hamextfingeru/><hambetween/><hamextfingerul/><hampalml/><hamunderchin/><hamseqbegin/><hamtouch/><hamfingerpad/><hamseqend/><hamparbegin/><hammovedo/><hamsmallmod/><hamparend/></hamnosys_manual></hns_sign>`,
     handshape: 'Flat hand',
     movement: 'Fingertips touch chin then extend forward',
     location: 'Chin / Mouth',
@@ -67,8 +100,8 @@ export const CURATED_SIGN_DICTIONARY: Record<string, SignDictionaryEntry> = {
     gloss: 'THANK-YOU',
     language: 'ISL',
     category: 'Greetings',
-    hamnosys: 'hamflathand hamthumboutmod hamextfingeru hampalml hamunderchin hamclose',
-    sigml: `<hns_sign gloss="THANK-YOU"><hamnosys_manual><hamflathand/><hamextfingeru/><hamthumboutmod/><hampalml/><hamunderchin/><hamclose/></hamnosys_manual></hns_sign>`,
+    hamnosys: 'hamflathand hamthumboutmod hamextfingeru hambetween hamextfingerul hampalml hamunderchin hamseqbegin hamtouch hamfingerpad hamseqend hamparbegin hammovedo hamsmallmod hamparend',
+    sigml: `<hns_sign gloss="THANK-YOU"><hamnosys_manual><hamflathand/><hamthumboutmod/><hamextfingeru/><hambetween/><hamextfingerul/><hampalml/><hamunderchin/><hamseqbegin/><hamtouch/><hamfingerpad/><hamseqend/><hamparbegin/><hammovedo/><hamsmallmod/><hamparend/></hamnosys_manual></hns_sign>`,
     handshape: 'Flat hand',
     movement: 'Fingertips touch chin then extend forward',
     location: 'Chin / Mouth',
@@ -78,8 +111,8 @@ export const CURATED_SIGN_DICTIONARY: Record<string, SignDictionaryEntry> = {
     gloss: 'PLEASE',
     language: 'ISL',
     category: 'Greetings',
-    hamnosys: 'hamflathand hamextfingeru hampalml hamchest hamcircle',
-    sigml: `<hns_sign gloss="PLEASE"><hamnosys_manual><hamflathand/><hamextfingeru/><hampalml/><hamchest/><hamcircle/></hamnosys_manual></hns_sign>`,
+    hamnosys: 'hamflathand hamextfingeru hampalml hamchest hamcirclei',
+    sigml: `<hns_sign gloss="PLEASE"><hamnosys_manual><hamflathand/><hamextfingeru/><hampalml/><hamchest/><hamcirclei/></hamnosys_manual></hns_sign>`,
     handshape: 'Open B Hand',
     movement: 'Circular motion over chest',
     location: 'Chest',
@@ -89,8 +122,8 @@ export const CURATED_SIGN_DICTIONARY: Record<string, SignDictionaryEntry> = {
     gloss: 'SORRY',
     language: 'ISL',
     category: 'Greetings',
-    hamnosys: 'hamfist hamthumboutmod hamextfingeru hampalml hamchest hamcircle',
-    sigml: `<hns_sign gloss="SORRY"><hamnosys_manual><hamfist/><hamextfingeru/><hamthumboutmod/><hampalml/><hamchest/><hamcircle/></hamnosys_manual></hns_sign>`,
+    hamnosys: 'hamfist hamthumboutmod hamextfingeru hampalml hamchest hamcirclei',
+    sigml: `<hns_sign gloss="SORRY"><hamnosys_manual><hamfist/><hamextfingeru/><hamthumboutmod/><hampalml/><hamchest/><hamcirclei/></hamnosys_manual></hns_sign>`,
     handshape: 'Fist with thumb out (A-hand)',
     movement: 'Circular motion over chest',
     location: 'Chest',
@@ -113,8 +146,8 @@ export const CURATED_SIGN_DICTIONARY: Record<string, SignDictionaryEntry> = {
     gloss: 'DOCTOR',
     language: 'ISL',
     category: 'Emergency',
-    hamnosys: 'hamflathand hamextfingeru hampalml hamwrist hamclose',
-    sigml: `<hns_sign gloss="DOCTOR"><hamnosys_manual><hamflathand/><hamextfingeru/><hampalml/><hamwrist/><hamclose/></hamnosys_manual></hns_sign>`,
+    hamnosys: 'hamflathand hamextfingeru hampalml hamwristback hamtouch',
+    sigml: `<hns_sign gloss="DOCTOR"><hamnosys_manual><hamflathand/><hamextfingeru/><hampalml/><hamwristback/><hamtouch/></hamnosys_manual></hns_sign>`,
     handshape: 'M-hand / Curved fingers',
     movement: 'Tap fingertips on inner wrist twice (checking pulse)',
     location: 'Wrist',
@@ -124,8 +157,8 @@ export const CURATED_SIGN_DICTIONARY: Record<string, SignDictionaryEntry> = {
     gloss: 'HOSPITAL',
     language: 'ISL',
     category: 'Emergency',
-    hamnosys: 'hamfinger23 hamextfingeru hampalml hamupperarm hamclose',
-    sigml: `<hns_sign gloss="HOSPITAL"><hamnosys_manual><hamfinger23/><hamextfingeru/><hampalml/><hamupperarm/><hamclose/></hamnosys_manual></hns_sign>`,
+    hamnosys: 'hamfinger23 hamextfingeru hampalml hamupperarm hamtouch',
+    sigml: `<hns_sign gloss="HOSPITAL"><hamnosys_manual><hamfinger23/><hamextfingeru/><hampalml/><hamupperarm/><hamtouch/></hamnosys_manual></hns_sign>`,
     handshape: 'H-hand (Index & Middle)',
     movement: 'Draw a cross on upper arm',
     location: 'Upper Arm',
@@ -181,8 +214,8 @@ export const CURATED_SIGN_DICTIONARY: Record<string, SignDictionaryEntry> = {
     gloss: 'WHO',
     language: 'ISL',
     category: 'Questions',
-    hamnosys: 'hamfinger1 hamextfingeru hampalmo hamchin hamcircle',
-    sigml: `<hns_sign gloss="WHO"><hamnosys_manual><hamfinger1/><hamextfingeru/><hampalmo/><hamchin/><hamcircle/></hamnosys_manual></hns_sign>`,
+    hamnosys: 'hamfinger1 hamextfingeru hampalmo hamchin hamcirclei',
+    sigml: `<hns_sign gloss="WHO"><hamnosys_manual><hamfinger1/><hamextfingeru/><hampalmo/><hamchin/><hamcirclei/></hamnosys_manual></hns_sign>`,
     handshape: 'Index finger',
     movement: 'Small circle near chin',
     location: 'Chin',
@@ -192,8 +225,8 @@ export const CURATED_SIGN_DICTIONARY: Record<string, SignDictionaryEntry> = {
     gloss: 'WHY',
     language: 'ISL',
     category: 'Questions',
-    hamnosys: 'hamflathand hamforehead hamclose',
-    sigml: `<hns_sign gloss="WHY"><hamnosys_manual><hamflathand/><hamextfingeru/><hampalml/><hamforehead/><hamclose/></hamnosys_manual></hns_sign>`,
+    hamnosys: 'hamflathand hamforehead hamtouch',
+    sigml: `<hns_sign gloss="WHY"><hamnosys_manual><hamflathand/><hamextfingeru/><hampalml/><hamforehead/><hamtouch/></hamnosys_manual></hns_sign>`,
     handshape: 'Touch forehead then pull to Y-hand',
     movement: 'Downward pull from forehead',
     location: 'Forehead',
@@ -238,8 +271,8 @@ export const CURATED_SIGN_DICTIONARY: Record<string, SignDictionaryEntry> = {
     gloss: 'EAT',
     language: 'ISL',
     category: 'Daily',
-    hamnosys: 'hampinchall hamextfingeri hampalmd hamlips hamclose',
-    sigml: `<hns_sign gloss="EAT"><hamnosys_manual><hampinchall/><hamextfingeri/><hampalmd/><hamlips/><hamclose/></hamnosys_manual></hns_sign>`,
+    hamnosys: 'hampinchall hamextfingeri hampalmd hamlips hamtouch',
+    sigml: `<hns_sign gloss="EAT"><hamnosys_manual><hampinchall/><hamextfingeri/><hampalmd/><hamlips/><hamtouch/></hamnosys_manual></hns_sign>`,
     handshape: 'Flattened O-hand',
     movement: 'Move to mouth repeatedly',
     location: 'Mouth / Lips',
@@ -249,8 +282,8 @@ export const CURATED_SIGN_DICTIONARY: Record<string, SignDictionaryEntry> = {
     gloss: 'FOOD',
     language: 'ISL',
     category: 'Daily',
-    hamnosys: 'hampinchall hamextfingeri hampalmd hamlips hamclose',
-    sigml: `<hns_sign gloss="FOOD"><hamnosys_manual><hampinchall/><hamextfingeri/><hampalmd/><hamlips/><hamclose/></hamnosys_manual></hns_sign>`,
+    hamnosys: 'hampinchall hamextfingeri hampalmd hamlips hamtouch',
+    sigml: `<hns_sign gloss="FOOD"><hamnosys_manual><hampinchall/><hamextfingeri/><hampalmd/><hamlips/><hamtouch/></hamnosys_manual></hns_sign>`,
     handshape: 'Flattened O-hand',
     movement: 'Move to mouth repeatedly',
     location: 'Mouth / Lips',
@@ -260,8 +293,8 @@ export const CURATED_SIGN_DICTIONARY: Record<string, SignDictionaryEntry> = {
     gloss: 'WATER',
     language: 'ISL',
     category: 'Daily',
-    hamnosys: 'hamfinger345 hamthumboutmod hamextfingeru hampalml hamchin hamclose',
-    sigml: `<hns_sign gloss="WATER"><hamnosys_manual><hamfinger345/><hamthumboutmod/><hamextfingeru/><hampalml/><hamchin/><hamclose/></hamnosys_manual></hns_sign>`,
+    hamnosys: 'hamfinger2345 hamthumboutmod hamextfingeru hampalml hamchin hamtouch',
+    sigml: `<hns_sign gloss="WATER"><hamnosys_manual><hamfinger2345/><hamthumboutmod/><hamextfingeru/><hampalml/><hamchin/><hamtouch/></hamnosys_manual></hns_sign>`,
     handshape: 'W-hand (3 fingers open)',
     movement: 'Tap index finger on chin',
     location: 'Chin',
@@ -271,8 +304,8 @@ export const CURATED_SIGN_DICTIONARY: Record<string, SignDictionaryEntry> = {
     gloss: 'HOME',
     language: 'ISL',
     category: 'Daily',
-    hamnosys: 'hampinchall hamextfingeri hampalmd hamcheek hamclose',
-    sigml: `<hns_sign gloss="HOME"><hamnosys_manual><hampinchall/><hamextfingeri/><hampalmd/><hamcheek/><hamclose/></hamnosys_manual></hns_sign>`,
+    hamnosys: 'hampinchall hamextfingeri hampalmd hamcheek hamtouch',
+    sigml: `<hns_sign gloss="HOME"><hamnosys_manual><hampinchall/><hamextfingeri/><hampalmd/><hamcheek/><hamtouch/></hamnosys_manual></hns_sign>`,
     handshape: 'Flattened O-hand',
     movement: 'Touch cheek near mouth, then cheek near ear',
     location: 'Cheek',
@@ -282,8 +315,8 @@ export const CURATED_SIGN_DICTIONARY: Record<string, SignDictionaryEntry> = {
     gloss: 'LOVE',
     language: 'ISL',
     category: 'Daily',
-    hamnosys: 'hamsymmlr hamfist hamextfingeru hampalmu hamchest hamclose',
-    sigml: `<hns_sign gloss="LOVE"><hamnosys_manual><hamsymmlr/><hamfist/><hamextfingeru/><hampalmu/><hamchest/><hamclose/></hamnosys_manual></hns_sign>`,
+    hamnosys: 'hamsymmlr hamfist hamextfingeru hampalmu hamchest hamtouch',
+    sigml: `<hns_sign gloss="LOVE"><hamnosys_manual><hamsymmlr/><hamfist/><hamextfingeru/><hampalmu/><hamchest/><hamtouch/></hamnosys_manual></hns_sign>`,
     handshape: 'Crossed fists over heart',
     movement: 'Hug chest',
     location: 'Chest',
@@ -293,8 +326,8 @@ export const CURATED_SIGN_DICTIONARY: Record<string, SignDictionaryEntry> = {
     gloss: 'FRIEND',
     language: 'ISL',
     category: 'Daily',
-    hamnosys: 'hamsymmlr hamfinger1 hamextfingero hampalmd hamchest hamclose',
-    sigml: `<hns_sign gloss="FRIEND"><hamnosys_manual><hamsymmlr/><hamfinger1/><hamextfingero/><hampalmd/><hamchest/><hamclose/></hamnosys_manual></hns_sign>`,
+    hamnosys: 'hamsymmlr hamfinger1 hamextfingero hampalmd hamchest hamtouch',
+    sigml: `<hns_sign gloss="FRIEND"><hamnosys_manual><hamsymmlr/><hamfinger1/><hamextfingero/><hampalmd/><hamchest/><hamtouch/></hamnosys_manual></hns_sign>`,
     handshape: 'Hooked index fingers',
     movement: 'Interlock index fingers then reverse',
     location: 'Neutral Space',
@@ -323,7 +356,7 @@ export const ALPHABET_SIGML_MAP: Record<string, string> = {
   g: `<hns_sign gloss="G"><hamnosys_manual><hamfinger1/><hamextfingero/><hamthumboutmod/><hampalmd/></hamnosys_manual></hns_sign>`,
   h: `<hns_sign gloss="H"><hamnosys_manual><hamfinger23/><hamextfingero/><hamthumboutmod/><hampalmd/></hamnosys_manual></hns_sign>`,
   i: `<hns_sign gloss="I"><hamnosys_manual><hampinky/><hamextfingeru/><hampalml/></hamnosys_manual></hns_sign>`,
-  j: `<hns_sign gloss="J"><hamnosys_manual><hampinky/><hamextfingeru/><hampalml/><hamcircle/></hamnosys_manual></hns_sign>`,
+  j: `<hns_sign gloss="J"><hamnosys_manual><hampinky/><hamextfingeru/><hampalml/><hamcirclei/></hamnosys_manual></hns_sign>`,
   k: `<hns_sign gloss="K"><hamnosys_manual><hamfinger23/><hamextfingeru/><hamthumboutmod/><hampalml/></hamnosys_manual></hns_sign>`,
   l: `<hns_sign gloss="L"><hamnosys_manual><hamfinger1/><hamextfingeru/><hamthumboutmod/><hampalml/></hamnosys_manual></hns_sign>`,
   m: `<hns_sign gloss="M"><hamnosys_manual><hamfist/><hamextfingerd/><hamthumbacrossmod/><hampalml/></hamnosys_manual></hns_sign>`,
@@ -339,7 +372,7 @@ export const ALPHABET_SIGML_MAP: Record<string, string> = {
   w: `<hns_sign gloss="W"><hamnosys_manual><hamfinger234/><hamextfingeru/><hampalml/></hamnosys_manual></hns_sign>`,
   x: `<hns_sign gloss="X"><hamnosys_manual><hamfinger1/><hamextfingeru/><hampalml/></hamnosys_manual></hns_sign>`,
   y: `<hns_sign gloss="Y"><hamnosys_manual><hampinky/><hamextfingeru/><hamthumboutmod/><hampalml/></hamnosys_manual></hns_sign>`,
-  z: `<hns_sign gloss="Z"><hamnosys_manual><hamfinger1/><hamextfingero/><hampalmd/><hamcircle/></hamnosys_manual></hns_sign>`,
+  z: `<hns_sign gloss="Z"><hamnosys_manual><hamfinger1/><hamextfingero/><hampalmd/><hamcirclei/></hamnosys_manual></hns_sign>`,
 };
 
 export interface ProcessedSignSequence {
@@ -355,6 +388,40 @@ export interface ProcessedSignSequence {
   facialExpression?: string;
   plannerSource?: string;
 }
+
+// CWASA ANTLR Grammar Token Whitelist
+const VALID_HAMNOSYS_TOKENS = new Set([
+  'hamtab', 'hamlinefeed', 'hampagebreak', 'hamreturn', 'hamversion40', 'hamspace', 'hamexclaim', 'hamquery',
+  'hamfullstop', 'hamcomma', 'hamplus', 'hammetaalt', 'hamclocku', 'hamclockul', 'hamclockl', 'hamclockdl',
+  'hamclockd', 'hamclockdr', 'hamclockr', 'hamclockur', 'hamclockfull', 'hamsymmpar', 'hamsymmlr', 'hamfist',
+  'hamflathand', 'hamfinger2', 'hamfinger23', 'hamfinger23spread', 'hamfinger2345', 'hamthumboutmod',
+  'hamthumbacrossmod', 'hampinch12', 'hampinchall', 'hampinch12open', 'hamcee12', 'hamceeall', 'hamcee12open',
+  'hamthumbopenmod', 'hamfingerstraightmod', 'hamfingerbendmod', 'hamfingerhookedmod', 'hamnondominant',
+  'hamdoublebent', 'hamdoublehooked', 'hamextfingeru', 'hamextfingerur', 'hamextfingerr', 'hamextfingerdr',
+  'hamextfingerd', 'hamextfingerdl', 'hamextfingerl', 'hamextfingerul', 'hamextfingerol', 'hamextfingero',
+  'hamextfingeror', 'hamextfingeril', 'hamextfingeri', 'hamextfingerir', 'hamextfingerui', 'hamextfingerdi',
+  'hamextfingerdo', 'hamextfingeruo', 'hamearlobe', 'hamnostrils', 'hamshouldertop', 'hampalmu', 'hampalmur',
+  'hampalmr', 'hampalmdr', 'hampalmd', 'hampalmdl', 'hampalml', 'hampalmul', 'hamreplace', 'hamarmextended',
+  'hambehind', 'hametc', 'hamorirelative', 'hamtongue', 'hamteeth', 'hamstomach', 'hamneutralspace', 'hamhead',
+  'hamheadtop', 'hamforehead', 'hameyebrows', 'hameyes', 'hamnose', 'hamear', 'hamcheek', 'hamlips', 'hamchin',
+  'hamunderchin', 'hamneck', 'hamshoulders', 'hamchest', 'hambelowstomach', 'hamlrbeside', 'hamlrat', 'hamupperarm',
+  'hamelbow', 'hamelbowinside', 'hamlowerarm', 'hamwristback', 'hamwristpulse', 'hamthumbball', 'hampalm',
+  'hamhandback', 'hamthumb', 'hamindexfinger', 'hammiddlefinger', 'hamringfinger', 'hampinky', 'hamthumbside',
+  'hampinkyside', 'hambetween', 'hamfingertip', 'hamfingernail', 'hamfingerpad', 'hamfingermidjoint', 'hamfingerbase',
+  'hamfingerside', 'hamwristtopulse', 'hamwristtoback', 'hamwristtothumb', 'hamwristtopinky', 'hamcoreftag',
+  'hamcorefref', 'hamnomotion', 'hammoveu', 'hammoveur', 'hammover', 'hammovedr', 'hammoved', 'hammovedl',
+  'hammovel', 'hammoveul', 'hammoveol', 'hammoveo', 'hammoveor', 'hammoveil', 'hammovei', 'hammoveir',
+  'hammoveui', 'hammovedi', 'hammovedo', 'hammoveuo', 'hammovecross', 'hammovex', 'hamsmallmod', 'hamlargemod',
+  'hamarcl', 'hamarcu', 'hamarcr', 'hamarcd', 'hamwavy', 'hamzigzag', 'hamfingerplay', 'hamparbegin', 'hamparend',
+  'hamcircleo', 'hamcirclei', 'hamcircled', 'hamcircleu', 'hamcirclel', 'hamcircler', 'hamincreasing',
+  'hamdecreasing', 'hamclose', 'hamtouch', 'haminterlock', 'hamcross', 'hamfast', 'hamslow', 'hamtense',
+  'hamrest', 'hamhalt', 'hamrepeatfromstart', 'hamrepeatfromstartseveral', 'hamrepeatcontinue',
+  'hamrepeatcontinueseveral', 'hamseqbegin', 'hamseqend', 'hamalternatingmotion', 'hamrepeatreverse',
+  'hambrushing', 'hamnonipsi', 'hamellipseh', 'hamellipseur', 'hamellipsev', 'hamellipseul', 'hammime',
+  'hamaltbegin', 'hamaltend', 'hamnodding', 'hamswinging', 'hamtwisting', 'hamstircw', 'hamstirccw',
+  'hamfusionbegin', 'hamfusionend', 'hamcircleul', 'hamcircledr', 'hamcircleur', 'hamcircledl', 'hamcircleol',
+  'hamcircleir', 'hamcircleor', 'hamcircleil', 'hamcircledo', 'hamcircleui', 'hamcircledi', 'hamcircleuo'
+]);
 
 export function sanitizeSigml(sigml: any): string {
   if (!sigml) return '';
@@ -374,42 +441,99 @@ export function sanitizeSigml(sigml: any): string {
   }
   let cleaned = sigml;
 
-  // Clean orphan or invalid <hamreplace/> tags directly inside <hamparbegin> or before <hamparend>
+  // Replacements for common typos / invalid tokens
+  cleaned = cleaned.replace(/\bhamcircle\b/gi, 'hamcirclei');
+  cleaned = cleaned.replace(/\bhamwrist\b/gi, 'hamwristback');
+  cleaned = cleaned.replace(/\bhamfinger345\b/gi, 'hamfinger2345');
+
+  // Lowercase all HamNoSys tokens & tags (e.g. HamFlathand -> hamflathand, <HamFinger2/> -> <hamfinger2/>)
+  cleaned = cleaned.replace(/\b(ham[a-zA-Z0-9_]*)\b/gi, (m) => m.toLowerCase());
+
+  // Convert plain space-separated text tokens to self-closing XML elements if not already XML tags
+  cleaned = cleaned.replace(/(^|>|\s)(ham[a-z0-9_]+)(?=$|<|\s)/g, (match, prefix, token) => {
+    return `${prefix}<${token}/>`;
+  });
+
+  // Clean double initial handshape at start of <hamnosys_manual>
+  cleaned = cleaned.replace(
+    /(<hamnosys_manual\s*>)\s*<hamflathand\s*\/?>\s*(<ham(?:finger|fist|pinch|cee)[a-z0-9_]*\s*\/?>)/gi,
+    '$1$2'
+  );
+
+  // Clean orphan or invalid <hamreplace/> tags or bare hamreplace tags
   cleaned = cleaned.replace(/(<hamparbegin\s*\/?>\s*)<hamreplace\s*\/?>/gi, '$1');
   cleaned = cleaned.replace(/<hamreplace\s*\/?>\s*(?=<hamparend\s*\/?>)/gi, '');
-
-  // Convert all HamNoSys tokens (e.g. HamFlathand, HamFinger23spread, <HamFlathand/>) to lowercase
-  cleaned = cleaned.replace(/\b(ham[a-zA-Z0-9_]*)\b/gi, (m) => m.toLowerCase());
+  cleaned = cleaned.replace(/<hamreplace\s*\/?>/gi, '');
 
   // Clean duplicate hamsplit tags
   cleaned = cleaned.replace(/(?:<hamsplit\/>\s*)+/gi, '<hamsplit/>');
-  cleaned = cleaned.replace(/(?:hamsplit\s+)+/gi, 'hamsplit ');
 
-  // Automatically insert missing <hamsplit/> between two handshapes under two-handed symmetry
-  if (!cleaned.includes('<hamsplit/>') && !cleaned.includes('hamsplit')) {
-    cleaned = cleaned.replace(/(<hamfist\/>)\s*(<hamflathand\/>)/gi, '<hamsplit/>$1$2');
-    cleaned = cleaned.replace(/\bhamfist\s+hamflathand\b/gi, 'hamsplit hamfist hamflathand');
+  // Clean bare <hamplus/> outside <hamparbegin>
+  if (!cleaned.toLowerCase().includes('<hamparbegin')) {
+    cleaned = cleaned.replace(/<hamplus\s*\/?>/gi, '');
   }
 
+  // Automatically insert missing <hamsplit/> between two handshapes under two-handed symmetry
+  if (!cleaned.includes('<hamsplit/>')) {
+    cleaned = cleaned.replace(/(<hamfist\/>)\s*(<hamflathand\/>)/gi, '<hamsplit/>$1$2');
+  }
+
+  // Fix thumb modifier ordering (must follow extfinger)
   cleaned = cleaned.replace(
     /(<(?:hamthumboutmod|hamthumbacrossmod|hamthumbopenmod)\s*\/?>\s*)(<hamextfinger[a-z0-9]+\s*\/?>)/gi,
     '$2$1'
   );
-  cleaned = cleaned.replace(
-    /\b(hamthumboutmod|hamthumbacrossmod|hamthumbopenmod)\s+(hamextfinger[a-z0-9]+)\b/gi,
-    '$2 $1'
-  );
 
-  // Prepend default initial handshape if manual sequence begins directly with finger tokens without valid handshape
+  // Prepend default initial handshape if manual sequence begins without a valid initial handshape
   cleaned = cleaned.replace(
-    /(<hamnosys_manual\s*>)(?=\s*<(?:hamfinger23|hamfinger1|hamfinger2345|hamextfinger[a-z0-9]+)\s*\/?>)/gi,
+    /(<hamnosys_manual\s*>)(?=\s*<(?:hamextfinger|hampalm|hamchest|hamshoulders|hamchin|hamforehead|hamhead|hamface|hamunderchin|hamneck|hamwrist|hamtouch|hammove|hamcircle)[a-z0-9_]*\s*\/?>)/gi,
     '$1<hamflathand/>'
   );
 
+  // Strip non-standard finger AST tokens that trigger ANTLR parser errors in manual sequence
   cleaned = cleaned.replace(
-    /<(?:hammiddlefinger|hamringfinger|hampinky|hamthumb|hamindexfinger|hamfingerpad)\s*\/?>/gi,
+    /<(?:hammiddlefinger|hamringfinger|hampinky|hamthumb|hamindexfinger|hamfingerpad|hamfingertip|hamfingernail|hamfingermidjoint|hamfingerbase|hamfingerside)\s*\/?>/gi,
     ''
   );
+
+  const STRUCTURAL_TAGS = new Set(['hamnosys_manual', 'hamnosys_nonmanual', 'hns_sign', 'sigml', 'hnms_sign', 'hns_motion', 'hns_handshape']);
+  const ALIAS_MAP: Record<string, string> = {
+    fingerhookmod: 'hamfingerhookedmod',
+    split: 'hamsplit',
+    finger1: 'hamfinger1',
+    palmo: 'hampalmo',
+    ceeopen: 'hamceeallopen',
+    finger234: 'hamfinger2345',
+    hamfinger234: 'hamfinger2345',
+    finger345: 'hamfinger2345',
+    hamfinger345: 'hamfinger2345',
+  };
+
+  // Filter out any XML tag `<ham.../>` that is NOT in VALID_HAMNOSYS_TOKENS or STRUCTURAL_TAGS
+  cleaned = cleaned.replace(/<ham([a-z0-9_]+)\s*\/?>/gi, (fullTag, tokenName) => {
+    const lowerName = tokenName.toLowerCase();
+    const fullTname = `ham${lowerName}`;
+    if (STRUCTURAL_TAGS.has(fullTname) || STRUCTURAL_TAGS.has(lowerName)) {
+      return fullTag;
+    }
+    if (ALIAS_MAP[lowerName]) {
+      return `<${ALIAS_MAP[lowerName]}/>`;
+    }
+    if (ALIAS_MAP[fullTname]) {
+      return `<${ALIAS_MAP[fullTname]}/>`;
+    }
+    if (VALID_HAMNOSYS_TOKENS.has(fullTname)) {
+      return `<${fullTname}/>`;
+    }
+    if (VALID_HAMNOSYS_TOKENS.has(lowerName)) {
+      return `<${lowerName}/>`;
+    }
+    console.warn(`[SiGML Sanitizer] Stripped unrecognized HamNoSys token: <${tokenName}/>`);
+    return '';
+  });
+
+  // Clean inter-tag whitespace
+  cleaned = cleaned.replace(/>\s+</g, '><');
 
   // If input contains <hns_sign>, strip inner xml headers and ensure single root <sigml>
   if (cleaned.includes('<hns_sign')) {
