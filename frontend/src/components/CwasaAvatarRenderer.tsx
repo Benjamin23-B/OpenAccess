@@ -16,6 +16,8 @@ declare global {
   }
 }
 
+import SignLanguageTranslationR3F from './SignLanguageTranslationR3F';
+
 export default function CwasaAvatarRenderer({
   sigmlText = '',
   avatarName = 'anna',
@@ -24,48 +26,55 @@ export default function CwasaAvatarRenderer({
 }: CwasaAvatarRendererProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [useR3FFallback, setUseR3FFallback] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const lastPlayedSigml = useRef<string>('');
-  const initializedRef = useRef<boolean>(false);
 
-  // 1. Inject CWASA CSS and Script on mount, then initialize CWASA
   useEffect(() => {
     let scriptEl: HTMLScriptElement | null = null;
     let linkEl: HTMLLinkElement | null = null;
 
     const initCwasaEngine = () => {
       if (window.CWASA && typeof window.CWASA.init === 'function') {
-        if (!initializedRef.current) {
-          try {
-            window.CWASA.init({
-              jasBase: '/cwa/',
-              cwaBase: '/cwa/',
-              useClientConfig: false,
-              useCwaConfig: true,
-              avSettings: [
-                {
-                  width: 512,
-                  height: 384,
-                  avList: 'avs',
-                  initAv: avatarName || 'anna',
-                  ambIdle: false,
-                  allowFrameSteps: false,
-                  allowSiGMLText: true,
-                },
-              ],
-            });
-            initializedRef.current = true;
-          } catch (e) {
-            console.warn('CWASA init notice:', e);
-          }
+        try {
+          window.CWASA.init({
+            jasBase: '/cwa/',
+            cwaBase: '/cwa/',
+            useClientConfig: false,
+            useCwaConfig: true,
+            avSettings: [
+              {
+                width: 512,
+                height: 384,
+                avList: 'avsfull',
+                initAv: avatarName || 'anna',
+                ambIdle: false,
+                allowFrameSteps: false,
+                allowSiGMLText: true,
+              },
+            ],
+          });
+        } catch (e) {
+          console.warn('CWASA init notice:', e);
         }
-        setIsLoaded(true);
-        onStatusChange?.('3D Avatar Ready');
+
+        if (window.CWASA.ready && typeof window.CWASA.ready.then === 'function') {
+          window.CWASA.ready
+            .then(() => {
+              setIsLoaded(true);
+              onStatusChange?.('3D Avatar Ready');
+            })
+            .catch(() => {
+              setIsLoaded(true);
+            });
+        } else {
+          setIsLoaded(true);
+          onStatusChange?.('3D Avatar Ready');
+        }
       }
     };
 
     const loadAssets = () => {
-      // 1. Link stylesheet if missing
       if (!document.getElementById('cwasa-css')) {
         linkEl = document.createElement('link');
         linkEl.id = 'cwasa-css';
@@ -74,7 +83,6 @@ export default function CwasaAvatarRenderer({
         document.head.appendChild(linkEl);
       }
 
-      // 2. Check if script already loaded
       if (window.CWASA && typeof window.CWASA.init === 'function') {
         initCwasaEngine();
         return;
@@ -91,7 +99,6 @@ export default function CwasaAvatarRenderer({
         return;
       }
 
-      // 3. Inject JS Script
       scriptEl = document.createElement('script');
       scriptEl.id = 'cwasa-js';
       scriptEl.src = '/cwa/allcsa.js';
@@ -104,7 +111,7 @@ export default function CwasaAvatarRenderer({
           if (window.CWASA && typeof window.CWASA.init === 'function') {
             clearInterval(check);
             initCwasaEngine();
-          } else if (attempts > 40) {
+          } else if (attempts > 30) {
             clearInterval(check);
             setIsLoaded(true);
           }
@@ -112,17 +119,28 @@ export default function CwasaAvatarRenderer({
       };
 
       scriptEl.onerror = () => {
-        setErrorMsg('Failed to load Kozha 3D Avatar script');
-        onStatusChange?.('Engine Error');
+        setUseR3FFallback(true);
+        setIsLoaded(true);
       };
 
       document.body.appendChild(scriptEl);
     };
 
     loadAssets();
+
+    // Watchdog fallback after 5 seconds
+    const watchdog = setTimeout(() => {
+      const canvas = containerRef.current?.querySelector('canvas');
+      if (!canvas && !window.CWASA) {
+        setUseR3FFallback(true);
+        setIsLoaded(true);
+      }
+    }, 5000);
+
+    return () => clearTimeout(watchdog);
   }, []);
 
-  // 2. Play SiGML whenever sigmlText updates
+  // Play SiGML whenever sigmlText updates
   useEffect(() => {
     if (!sigmlText || sigmlText === lastPlayedSigml.current || !isLoaded) return;
 
@@ -131,7 +149,6 @@ export default function CwasaAvatarRenderer({
         lastPlayedSigml.current = sigmlText;
         onStatusChange?.('Signing Animation');
         
-        // Delay play call slightly to ensure avatar mesh & skeleton are bound
         setTimeout(() => {
           try {
             if (window.CWASA && typeof window.CWASA.playSiGMLText === 'function') {
@@ -147,7 +164,7 @@ export default function CwasaAvatarRenderer({
     }
   }, [sigmlText, isLoaded, onStatusChange]);
 
-  // 3. Switch avatar if requested
+  // Switch avatar if requested
   useEffect(() => {
     if (window.CWASA && typeof window.CWASA.setAvatar === 'function') {
       try {
@@ -158,27 +175,48 @@ export default function CwasaAvatarRenderer({
     }
   }, [avatarName]);
 
+  if (useR3FFallback) {
+    return (
+      <SignLanguageTranslationR3F
+        textToSign={sigmlText}
+        signingSpeed={signingSpeed}
+        onStatusChange={onStatusChange}
+      />
+    );
+  }
+
   return (
     <div
       ref={containerRef}
       className="cwasa-avatar-container relative w-full h-full min-h-[480px] bg-slate-900 rounded-2xl overflow-hidden border border-cyan-500/30 shadow-2xl flex flex-col items-center justify-center"
       style={{ minHeight: '480px', position: 'relative' }}
     >
+      <style jsx global>{`
+        .CWASAAvatar.av0 {
+          width: 100% !important;
+          height: 100% !important;
+          min-height: 460px !important;
+          position: relative !important;
+          background: #0f172a !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-center: center !important;
+        }
+        .CWASAAvatar.av0 canvas,
+        .CWASAAvatar.av0 .divAv {
+          width: 100% !important;
+          height: 100% !important;
+          min-height: 460px !important;
+          object-fit: contain !important;
+        }
+      `}</style>
+
       {/* Loading Overlay */}
       {!isLoaded && !errorMsg && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/80 z-20 text-cyan-400 p-6 text-center">
           <div className="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mb-4" />
           <p className="font-semibold text-lg">Initializing 3D Sign Language Avatar Engine...</p>
           <p className="text-sm text-slate-400 mt-1">Loading WebGL shaders and Kozha sign dictionaries</p>
-        </div>
-      )}
-
-      {/* Error Fallback */}
-      {errorMsg && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-red-950/80 z-20 text-red-200 p-6 text-center">
-          <span className="text-4xl mb-2">⚠️</span>
-          <p className="font-semibold text-lg">{errorMsg}</p>
-          <p className="text-sm opacity-80 mt-1">Please check WebGL availability in your browser</p>
         </div>
       )}
 

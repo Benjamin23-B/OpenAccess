@@ -345,7 +345,49 @@ export interface ProcessedSignSequence {
 
 class SignDictionaryService {
   /**
-   * Process raw text into a full SiGML markup stream and detailed gesture breakdown
+   * Fetch full NLP sign language plan from Kozha Backend microservice (Port 8001)
+   */
+  public async fetchKozhaPlan(text: string, signLanguage: string = 'ISL'): Promise<ProcessedSignSequence> {
+    if (!text || !text.trim()) {
+      return { tokens: [], sigmlSequence: '', signBreakdown: [] };
+    }
+
+    try {
+      const response = await fetch('http://localhost:8001/api/plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text,
+          language: 'en',
+          sign_language: signLanguage.toLowerCase(),
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.sigml) {
+          return {
+            tokens: data.glosses || [],
+            sigmlSequence: data.sigml,
+            signBreakdown: (data.signBreakdown || []).map((sb: any) => ({
+              word: sb.word,
+              gloss: sb.gloss,
+              isFingerspelled: sb.isFingerspelled,
+              sigml: sb.sigml,
+            })),
+          };
+        }
+      }
+    } catch (err) {
+      console.warn('Kozha SL Engine server offline, using local fallback:', err);
+    }
+
+    // Fallback to local processTextToSign if server unreachable
+    return this.processTextToSign(text, signLanguage);
+  }
+
+  /**
+   * Synchronous local process raw text into SiGML sequence
    */
   public processTextToSign(text: string, language: string = 'ISL'): ProcessedSignSequence {
     if (!text || !text.trim()) {
@@ -365,7 +407,6 @@ class SignDictionaryService {
       const match = CURATED_SIGN_DICTIONARY[token];
 
       if (match && match.sigml) {
-        // Direct word gloss match
         signBreakdown.push({
           word: token,
           gloss: match.gloss,
@@ -375,7 +416,6 @@ class SignDictionaryService {
         });
         sigmlBlocks.push(match.sigml);
       } else {
-        // Fallback: Fingerspell individual characters
         const charSigmlBlocks: string[] = [];
         for (const char of token.split('')) {
           if (ALPHABET_SIGML_MAP[char]) {
@@ -421,3 +461,4 @@ class SignDictionaryService {
 }
 
 export const signDictionaryService = new SignDictionaryService();
+

@@ -34,9 +34,35 @@ export default function DeafBridge() {
     clearTranscript,
   } = useSpeechRecognition(selectedLanguage);
 
-  // Process input text through signDictionaryService for SiGML generation
-  const processedSequence: ProcessedSignSequence = useMemo(() => {
-    return signDictionaryService.processTextToSign(activeSignText, signLanguage);
+  // Async Kozha NLP Plan state
+  const [processedSequence, setProcessedSequence] = useState<ProcessedSignSequence>({
+    tokens: [],
+    sigmlSequence: '',
+    signBreakdown: [],
+  });
+
+  // Process input text through signDictionaryService (Kozha Backend + Local Fallback)
+  useEffect(() => {
+    let isMounted = true;
+    if (!activeSignText.trim()) {
+      setProcessedSequence({ tokens: [], sigmlSequence: '', signBreakdown: [] });
+      return;
+    }
+
+    // Set immediate local processing so responsive UI isn't blocked
+    const initialLocal = signDictionaryService.processTextToSign(activeSignText, signLanguage);
+    setProcessedSequence(initialLocal);
+
+    // Fetch async NLP plan from Kozha Engine on port 8001
+    signDictionaryService.fetchKozhaPlan(activeSignText, signLanguage).then((plan) => {
+      if (isMounted && plan && plan.sigmlSequence) {
+        setProcessedSequence(plan);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
   }, [activeSignText, signLanguage]);
 
   // Watch for new voice transcripts and forward them to the avatar
@@ -59,6 +85,7 @@ export default function DeafBridge() {
     setActiveSignText('');
     clearTranscript();
     setSigningStatus('Idle');
+    setProcessedSequence({ tokens: [], sigmlSequence: '', signBreakdown: [] });
   }, [clearTranscript]);
 
   // Fast preset phrases triggers
@@ -85,8 +112,8 @@ export default function DeafBridge() {
             </p>
           </div>
 
-          {/* Renderer & Sign Language Controls */}
-          <div className="flex flex-wrap items-center gap-3 bg-slate-950 p-2 rounded-xl border border-slate-800">
+          {/* Renderer & Sign Language & Avatar Model Controls */}
+          <div className="flex flex-wrap items-center gap-3 bg-slate-950 p-2.5 rounded-xl border border-slate-800 shadow-md">
             {/* Renderer Switcher */}
             <div className="flex items-center bg-slate-900 rounded-lg p-1 border border-slate-800">
               <button
@@ -111,11 +138,31 @@ export default function DeafBridge() {
               </button>
             </div>
 
+            {/* Avatar Model Choice (Anna, Marc, Francoise, Luna, Siggi) */}
+            {rendererMode === 'cwasa' && (
+              <div className="flex items-center gap-2 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800">
+                <span className="text-xs text-slate-400 font-semibold flex items-center gap-1">
+                  👤 Avatar Model:
+                </span>
+                <select
+                  value={selectedAvatar}
+                  onChange={(e) => setSelectedAvatar(e.target.value as any)}
+                  className="bg-slate-950 text-cyan-300 font-bold border border-cyan-500/40 rounded-md px-2.5 py-1 text-xs outline-none focus:ring-2 focus:ring-cyan-500 cursor-pointer"
+                >
+                  <option value="anna">Anna (Female)</option>
+                  <option value="marc">Marc (Male)</option>
+                  <option value="francoise">Francoise (Female)</option>
+                  <option value="luna">Luna (Stylized)</option>
+                  <option value="siggi">Siggi (Male)</option>
+                </select>
+              </div>
+            )}
+
             {/* Sign Language Selector */}
             <select
               value={signLanguage}
               onChange={(e) => setSignLanguage(e.target.value as any)}
-              className="bg-slate-900 text-cyan-400 border border-cyan-500/30 rounded-lg px-3 py-1.5 text-xs font-semibold outline-none focus:ring-2 focus:ring-cyan-500"
+              className="bg-slate-900 text-cyan-400 border border-cyan-500/30 rounded-lg px-3 py-1.5 text-xs font-semibold outline-none focus:ring-2 focus:ring-cyan-500 cursor-pointer"
             >
               <option value="ISL">Indian Sign Language (ISL)</option>
               <option value="ASL">American Sign Language (ASL)</option>

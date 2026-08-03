@@ -12,7 +12,7 @@ import {
 } from '@/components';
 
 export default function Home() {
-  const [activeModule, setActiveModule] = useState<BridgeType>('blind'); // Default to blind module as requested
+  const [activeModule, setActiveModule] = useState<BridgeType>('deaf'); // Default to deaf 3D sign module
   const [liveMsg, setLiveMsg] = useState('');
   const [progressMsg, setProgressMsg] = useState('');
 

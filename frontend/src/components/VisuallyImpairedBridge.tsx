@@ -86,11 +86,13 @@ export default function VisuallyImpairedBridge({ onLiveMessage }: VisuallyImpair
   }, [selectedLanguage, voices, setSelectedVoice]);
 
 
-  // Update timestamp when transcript changes during render (avoids synchronous useEffect warnings)
-  if (transcript !== prevTranscript) {
-    setPrevTranscript(transcript);
-    setTimestamp(transcript ? new Date().toLocaleTimeString() : null);
-  }
+  // Update timestamp when transcript changes
+  useEffect(() => {
+    if (transcript !== prevTranscript) {
+      setPrevTranscript(transcript);
+      setTimestamp(transcript ? new Date().toLocaleTimeString() : null);
+    }
+  }, [transcript, prevTranscript]);
 
   // Notify parent of live messages for screen reader
   useEffect(() => {
