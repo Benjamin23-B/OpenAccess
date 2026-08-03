@@ -42,8 +42,8 @@ export default function CwasaAvatarRenderer({
           window.CWASA.init({
             jasBase: '/cwa/',
             cwaBase: '/cwa/',
-            sigmlBase: '/cwa/sigml/',
-            avJARBase: '/cwa/avatars/',
+            sigmlBase: 'sigml',
+            avJARBase: 'avatars',
             useClientConfig: false,
             useCwaConfig: true,
             avSettings: [
@@ -212,10 +212,10 @@ export default function CwasaAvatarRenderer({
 
   // Switch avatar if requested
   useEffect(() => {
-    const validAvatar = (Boolean(avatarName) && (avatarName as string) !== 'null') ? avatarName : 'anna';
-    if (isLoaded && window.CWASA && typeof window.CWASA.setAvatar === 'function') {
+    if (!avatarName || (avatarName as string) === 'null' || !isLoaded) return;
+    if (window.CWASA && typeof window.CWASA.setAvatar === 'function') {
       try {
-        window.CWASA.setAvatar(validAvatar, 0);
+        window.CWASA.setAvatar(avatarName, 0);
       } catch (e) {
         // Ignore if unsupported in active mode
       }
