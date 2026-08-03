@@ -43,7 +43,7 @@ except Exception as e:
 class TextRequest(BaseModel):
     text: str
     language: str = "en"
-    sign_language: str = "isl"
+    sign_language: str = "bsl"
     reviewed_only: bool = False
     use_ai: bool = True
 
@@ -52,7 +52,7 @@ class TranslateTextRequest(BaseModel):
     source_text: Optional[str] = None
     source_lang: str = "en"
     target_lang: str = "en"
-    target_sign_lang: Optional[str] = "isl"
+    target_sign_lang: Optional[str] = "bsl"
     use_ai: bool = True
 
 @app.get("/api/health")

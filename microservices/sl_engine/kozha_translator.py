@@ -299,7 +299,7 @@ def reorder_tokens(tokens_with_pos: List[Tuple[str, str]], sign_language: str) -
     return result
 
 
-def process_text_to_gloss_list(text: str, language: str = "en", sign_language: str = "isl") -> List[str]:
+def process_text_to_gloss_list(text: str, language: str = "en", sign_language: str = "bsl") -> List[str]:
     text = (text or "").strip().lower()
     if not text:
         return []
@@ -335,7 +335,7 @@ def process_text_to_gloss_list(text: str, language: str = "en", sign_language: s
         return synonym_mapped
 
 
-def plan_from_text(text: str, language: str = "en", sign_language: str = "isl", use_ai: bool = True) -> Dict[str, object]:
+def plan_from_text(text: str, language: str = "en", sign_language: str = "bsl", use_ai: bool = True) -> Dict[str, object]:
     ai_plan = None
     if use_ai:
         ai_plan = translate_text_with_ai(text, sign_language=sign_language)

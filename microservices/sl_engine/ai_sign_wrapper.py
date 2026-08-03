@@ -69,7 +69,7 @@ Output ONLY valid JSON matching this structure without markdown fences:
   "grammar_note": "Explanation"
 }"""
 
-def translate_text_with_ai(text: str, sign_language: str = "isl") -> Optional[Dict[str, Any]]:
+def translate_text_with_ai(text: str, sign_language: str = "bsl") -> Optional[Dict[str, Any]]:
     """
     Call OpenAI-compatible endpoint to translate text into Sign Language Gloss plan.
     Returns None if API key is unconfigured or call fails, triggering local fallback.

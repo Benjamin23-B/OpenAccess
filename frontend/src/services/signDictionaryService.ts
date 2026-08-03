@@ -407,7 +407,7 @@ class SignDictionaryService {
    */
   public async fetchKozhaPlan(
     text: string, 
-    signLanguage: string = 'ISL',
+    signLanguage: string = 'BSL',
     useAi: boolean = true
   ): Promise<ProcessedSignSequence> {
     if (!text || !text.trim()) {
@@ -454,7 +454,7 @@ class SignDictionaryService {
   /**
    * Synchronous local process raw text into SiGML sequence
    */
-  public processTextToSign(text: string, language: string = 'ISL'): ProcessedSignSequence {
+  public processTextToSign(text: string, language: string = 'BSL'): ProcessedSignSequence {
     if (!text || !text.trim()) {
       return { tokens: [], sigmlSequence: '', signBreakdown: [] };
     }
