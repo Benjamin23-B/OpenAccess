@@ -96,17 +96,28 @@ export default function CwasaAvatarRenderer({
 
       // Intercept uncaught CWASA WebGL viewport errors gracefully
       const handleGlobalError = (event: ErrorEvent) => {
-        if (event?.message?.includes('viewport') || event?.filename?.includes('allcsa.js')) {
-          console.warn('Handled CWASA WebGL viewport error:', event.message);
+        if (event?.message?.includes('viewport') || event?.message?.includes('Context Lost') || event?.filename?.includes('allcsa.js')) {
+          console.warn('Handled CWASA WebGL notice:', event.message);
           event.preventDefault();
           setIsLoaded(true);
         }
       };
       window.addEventListener('error', handleGlobalError);
 
+      const handleContextLost = (e: Event) => {
+        e.preventDefault();
+        console.warn('Prevented WebGL Context Lost on avatar canvas');
+      };
+      if (containerRef.current) {
+        containerRef.current.addEventListener('webglcontextlost', handleContextLost, false);
+      }
+
       if (window.CWASA && typeof window.CWASA.init === 'function') {
         setTimeout(initCwasaEngine, 100);
-        return () => window.removeEventListener('error', handleGlobalError);
+        return () => {
+          window.removeEventListener('error', handleGlobalError);
+          if (containerRef.current) containerRef.current.removeEventListener('webglcontextlost', handleContextLost);
+        };
       }
 
       const existingScript = document.getElementById('cwasa-js') as HTMLScriptElement;
@@ -237,7 +248,7 @@ export default function CwasaAvatarRenderer({
           background: #0f172a !important;
           display: flex !important;
           align-items: center !important;
-          justify-center: center !important;
+          justify-content: center !important;
         }
         .CWASAAvatar.av0 canvas,
         .CWASAAvatar.av0 .divAv {

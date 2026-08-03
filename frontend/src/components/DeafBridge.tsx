@@ -17,7 +17,7 @@ export default function DeafBridge() {
   const [selectedLanguage, setSelectedLanguage] = useState<'en-IN' | 'ta-IN' | 'thanglish'>('en-IN');
 
   // Kozha Integration State
-  const [rendererMode, setRendererMode] = useState<'cwasa' | 'r3f'>('r3f');
+  const [rendererMode, setRendererMode] = useState<'cwasa' | 'r3f'>('cwasa');
   const [selectedAvatar, setSelectedAvatar] = useState<'anna' | 'marc' | 'francoise' | 'luna' | 'siggi'>('anna');
   const [signLanguage, setSignLanguage] = useState<'ISL' | 'BSL' | 'ASL' | 'DGS' | 'LSF'>('ISL');
   const [useAiTranslator, setUseAiTranslator] = useState<boolean>(true);
