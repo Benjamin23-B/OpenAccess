@@ -29,7 +29,47 @@ interface SignLanguageTranslationR3FProps {
   onStatusChange?: (status: string) => void;
 }
 
-// Main Component rendering procedural 3D Skeletal Body
+// Check if browser has hardware WebGL support enabled
+function checkWebGLSupport(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    const canvas = document.createElement('canvas');
+    return !!(
+      window.WebGLRenderingContext &&
+      (canvas.getContext('webgl') || canvas.getContext('experimental-webgl'))
+    );
+  } catch (e) {
+    return false;
+  }
+}
+
+// React Error Boundary to catch R3F / Three.js WebGL context creation failures
+class WebGLErrorBoundary extends React.Component<
+  { fallback: React.ReactNode; children: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: any, errorInfo: any) {
+    console.warn('Caught WebGL Canvas error in boundary:', error);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback;
+    }
+    return this.props.children;
+  }
+}
+
+// Main Component rendering procedural 3D Skeletal Body or 2D Fallback
 export default function SignLanguageTranslationR3F({
   textToSign = '',
   signingSpeed = 1.0,
@@ -37,8 +77,7 @@ export default function SignLanguageTranslationR3F({
 }: SignLanguageTranslationR3FProps) {
   const [isSigning, setIsSigning] = useState(false);
   const [currentWord, setCurrentWord] = useState('');
-  const [showGrid, setShowGrid] = useState(false);
-  const [glowMode, setGlowMode] = useState(true);
+  const [hasWebGL, setHasWebGL] = useState(true);
   const queueRef = useRef<string[]>([]);
   const timeoutRef = useRef<any>(null);
   const orbitControlsRef = useRef<any>(null);
@@ -51,6 +90,10 @@ export default function SignLanguageTranslationR3F({
     'teacher', 'toilet', 'food', 'home',
     '1', '2', '3', '4', '5'
   ]);
+
+  useEffect(() => {
+    setHasWebGL(checkWebGLSupport());
+  }, []);
 
   useEffect(() => {
     if (textToSign) {
@@ -113,11 +156,32 @@ export default function SignLanguageTranslationR3F({
     };
   }, []);
 
-  const handleResetCamera = () => {
-    if (orbitControlsRef.current) {
-      orbitControlsRef.current.reset();
-    }
-  };
+  // 2D / CSS Animated Assistive Card Fallback when browser WebGL is disabled
+  const Fallback2DView = (
+    <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-slate-950/90 text-cyan-300">
+      <div className="bg-slate-900 border border-cyan-500/40 rounded-2xl p-6 max-w-md w-full shadow-2xl flex flex-col items-center gap-3">
+        <div className="text-4xl animate-bounce">🤟</div>
+        <h3 className="font-bold text-lg text-white">Sign Language Active</h3>
+        
+        {currentWord ? (
+          <div className="my-3 py-3 px-6 bg-slate-950 border border-cyan-500/50 rounded-xl">
+            <span className="text-2xl font-black text-cyan-400 font-mono tracking-widest uppercase">
+              {currentWord}
+            </span>
+            <p className="text-xs text-slate-400 mt-1 font-semibold">
+              {currentWord.length === 1 ? 'Fingerspelling Letter' : 'Gloss Word'}
+            </p>
+          </div>
+        ) : (
+          <p className="text-xs text-slate-400 italic">Waiting for text input to sign...</p>
+        )}
+
+        <div className="text-[11px] text-slate-500 bg-slate-950/60 px-3 py-1.5 rounded-lg border border-slate-800">
+          💡 Note: WebGL hardware acceleration is disabled in your browser. Displaying 2D Sign Assistive View.
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div
@@ -125,36 +189,42 @@ export default function SignLanguageTranslationR3F({
       style={{ minHeight: '480px', height: '100%' }}
       aria-label="3D Avatar Viewport Container"
     >
-      <Canvas camera={{ position: [0, 0.2, 1.85], fov: 44 }}>
-        {/* Ambient Lighting */}
-        <ambientLight intensity={0.7} />
+      {!hasWebGL ? (
+        Fallback2DView
+      ) : (
+        <WebGLErrorBoundary fallback={Fallback2DView}>
+          <Canvas camera={{ position: [0, 0.2, 1.85], fov: 44 }}>
+            {/* Ambient Lighting */}
+            <ambientLight intensity={0.7} />
 
-        {/* Key Cyberpunk Blue Light */}
-        <directionalLight position={[2, 3, 4]} intensity={1.2} color="#e6f7ff" castShadow />
+            {/* Key Cyberpunk Blue Light */}
+            <directionalLight position={[2, 3, 4]} intensity={1.2} color="#e6f7ff" castShadow />
 
-        {/* Emerald Backlight */}
-        <directionalLight position={[-2, 1, -2]} intensity={0.9} color="#00ffaa" />
+            {/* Emerald Backlight */}
+            <directionalLight position={[-2, 1, -2]} intensity={0.9} color="#00ffaa" />
 
-        {/* Soft Bottom Glow */}
-        <pointLight position={[0, -1, 1]} intensity={0.8} color="#00ccff" />
+            {/* Soft Bottom Glow */}
+            <pointLight position={[0, -1, 1]} intensity={0.8} color="#00ccff" />
 
-        {/* Fresh 3D Head, Body & Hands Humanoid Avatar Model */}
-        <FreshAvatar3D
-          currentWord={currentWord}
-          isSigning={isSigning}
-          signingSpeed={signingSpeed}
-        />
+            {/* Fresh 3D Head, Body & Hands Humanoid Avatar Model */}
+            <FreshAvatar3D
+              currentWord={currentWord}
+              isSigning={isSigning}
+              signingSpeed={signingSpeed}
+            />
 
-        {/* Interactive Camera Orbit Controls */}
-        <OrbitControls
-          ref={orbitControlsRef}
-          target={[0, 0.2, 0]}
-          enableZoom={true}
-          enablePan={true}
-          maxPolarAngle={Math.PI / 1.7}
-          minPolarAngle={Math.PI / 3.5}
-        />
-      </Canvas>
+            {/* Interactive Camera Orbit Controls */}
+            <OrbitControls
+              ref={orbitControlsRef}
+              target={[0, 0.2, 0]}
+              enableZoom={true}
+              enablePan={true}
+              maxPolarAngle={Math.PI / 1.7}
+              minPolarAngle={Math.PI / 3.5}
+            />
+          </Canvas>
+        </WebGLErrorBoundary>
+      )}
     </div>
   );
 }

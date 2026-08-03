@@ -6,7 +6,7 @@ import torch
 import cv2
 
 try:
-    from ultralytics import YOLO, YOLOWorld
+    from ultralytics import YOLO
     HAS_YOLO = True
 except ImportError:
     HAS_YOLO = False
@@ -181,38 +181,22 @@ class VLMEngine:
             self.mock_mode = True
             return
             
-        print("Loading lightweight open-vocabulary YOLO-World Model...")
-        model_path = Path(__file__).parent.parent / "yolov8s-worldv2.pt"
+        print("Loading local YOLO Model...")
+        model_path = Path(__file__).parent.parent / "yolo26n.pt"
         if not model_path.exists():
-            model_path = "yolov8s-worldv2.pt"
+            model_path = Path(__file__).parent.parent / "yolov8n.pt"
+        if not model_path.exists():
+            model_path = "yolov8n.pt"
 
         try:
-            # Load open-vocabulary YOLO-World model
-            self.model = YOLOWorld(str(model_path))
-            
-            # Set a rich list of everyday object classes to recognize
-            self.model.set_classes([
-                "person", "backpack", "umbrella", "handbag", "tie", "suitcase", 
-                "bottle", "wine glass", "cup", "fork", "knife", "spoon", "bowl", 
-                "banana", "apple", "orange", "sandwich", "broccoli", "carrot", 
-                "pizza", "donut", "cake", "chair", "couch", "potted plant", "bed", 
-                "dining table", "toilet", "tv", "laptop", "mouse", "remote", 
-                "keyboard", "cell phone", "microwave", "oven", "toaster", "sink", 
-                "refrigerator", "book", "clock", "vase", "scissors", "teddy bear", 
-                "hair drier", "toothbrush", "pen", "pencil", "wallet", "keys", 
-                "glasses", "notebook", "desk", "coffee mug"
-            ])
-            print("YOLO-World Model Loaded and Configured.")
+            self.model = YOLO(str(model_path))
+            print(f"Local YOLO Model loaded successfully from {model_path}.")
         except Exception as e:
-            print(f"YOLO-World load error: {e}. Falling back to standard YOLO...")
-            fallback_path = Path(__file__).parent.parent / "yolo26n.pt"
-            if not fallback_path.exists():
-                fallback_path = "yolov8n.pt"
+            print(f"YOLO model load notice ({e}). Trying fallback YOLOWorld...")
             try:
-                self.model = YOLO(str(fallback_path))
-                print("Fallback standard YOLO loaded successfully.")
+                self.model = YOLOWorld("yolov8s-worldv2.pt")
             except Exception as fe:
-                print(f"Fallback YOLO load error: {fe}. Falling back to mock mode.")
+                print(f"Model load error: {fe}. Falling back to mock mode.")
                 self.mock_mode = True
                 return
 

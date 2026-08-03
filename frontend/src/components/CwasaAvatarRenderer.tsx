@@ -14,6 +14,7 @@ declare global {
   interface Window {
     CWASA?: any;
     CWASA_READY?: boolean;
+    CWASA_INITIALIZED?: boolean;
   }
 }
 
@@ -33,9 +34,16 @@ export default function CwasaAvatarRenderer({
     let linkEl: HTMLLinkElement | null = null;
 
     const initCwasaEngine = () => {
-      if (window.CWASA && typeof window.CWASA.init === 'function') {
+      if (!window.CWASA || typeof window.CWASA.init !== 'function') return;
+
+      if (!window.CWASA_INITIALIZED) {
+        window.CWASA_INITIALIZED = true;
         try {
           window.CWASA.init({
+            jasBase: '/cwa/',
+            cwaBase: '/cwa/',
+            sigmlBase: '/cwa/sigml/',
+            avJARBase: '/cwa/avatars/',
             useClientConfig: false,
             useCwaConfig: true,
             avSettings: [
@@ -50,23 +58,30 @@ export default function CwasaAvatarRenderer({
               },
             ],
           });
-        } catch (e) {
-          console.warn('CWASA init notice:', e);
+        } catch (e: any) {
+          console.warn('CWASA WebGL init warning:', e);
+          if (e?.message?.includes('viewport') || e?.message?.includes('WebGL')) {
+            setErrorMsg('WebGL Avatar initialization failed. Please switch to Three.js R3F Avatar mode.');
+            onStatusChange?.('WebGL Init Error');
+            return;
+          }
         }
+      }
 
-        if (window.CWASA.ready && typeof window.CWASA.ready.then === 'function') {
-          window.CWASA.ready
-            .then(() => {
-              setIsLoaded(true);
-              onStatusChange?.('Kozha 3D Avatar Ready');
-            })
-            .catch(() => {
-              setIsLoaded(true);
-            });
-        } else {
-          setIsLoaded(true);
-          onStatusChange?.('Kozha 3D Avatar Ready');
-        }
+      if (window.CWASA.ready && typeof window.CWASA.ready.then === 'function') {
+        window.CWASA.ready
+          .then(() => {
+            setIsLoaded(true);
+            setErrorMsg(null);
+            onStatusChange?.('Kozha 3D Avatar Ready');
+          })
+          .catch((err: any) => {
+            console.warn('CWASA ready error:', err);
+            setIsLoaded(true);
+          });
+      } else {
+        setIsLoaded(true);
+        onStatusChange?.('Kozha 3D Avatar Ready');
       }
     };
 
@@ -79,9 +94,19 @@ export default function CwasaAvatarRenderer({
         document.head.appendChild(linkEl);
       }
 
+      // Intercept uncaught CWASA WebGL viewport errors gracefully
+      const handleGlobalError = (event: ErrorEvent) => {
+        if (event?.message?.includes('viewport') || event?.filename?.includes('allcsa.js')) {
+          console.warn('Handled CWASA WebGL viewport error:', event.message);
+          event.preventDefault();
+          setIsLoaded(true);
+        }
+      };
+      window.addEventListener('error', handleGlobalError);
+
       if (window.CWASA && typeof window.CWASA.init === 'function') {
-        initCwasaEngine();
-        return;
+        setTimeout(initCwasaEngine, 100);
+        return () => window.removeEventListener('error', handleGlobalError);
       }
 
       const existingScript = document.getElementById('cwasa-js') as HTMLScriptElement;
@@ -92,7 +117,10 @@ export default function CwasaAvatarRenderer({
             initCwasaEngine();
           }
         }, 150);
-        return;
+        return () => {
+          clearInterval(poll);
+          window.removeEventListener('error', handleGlobalError);
+        };
       }
 
       scriptEl = document.createElement('script');
@@ -120,9 +148,16 @@ export default function CwasaAvatarRenderer({
       };
 
       document.body.appendChild(scriptEl);
+
+      return () => {
+        window.removeEventListener('error', handleGlobalError);
+      };
     };
 
-    loadAssets();
+    const cleanup = loadAssets();
+    return () => {
+      if (cleanup) cleanup();
+    };
   }, []);
 
   const playTimerRef = useRef<any>(null);

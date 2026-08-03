@@ -11,6 +11,10 @@ FRONTEND_DIR = os.path.join(ROOT_DIR, "frontend")
 BACKEND_MAIN = os.path.join(ROOT_DIR, "backend", "object_detection", "main.py")
 SL_ENGINE_MAIN = os.path.join(ROOT_DIR, "microservices", "sl_engine", "main.py")
 
+# Auto-detect .venv Python interpreter
+VENV_PYTHON = os.path.join(ROOT_DIR, ".venv", "bin", "python")
+PYTHON_EXE = VENV_PYTHON if os.path.exists(VENV_PYTHON) else sys.executable
+
 FRONTEND_URL = "http://localhost:3000"
 BACKEND_URL = "http://localhost:8000/api/status"
 SL_ENGINE_URL = "http://localhost:8001/api/health"
@@ -46,6 +50,7 @@ def main():
     print(" Niral Thiruvizha - Combined Project Launcher")
     print(" Includes: Deaf, Blind, AAC, Object Detection AI & Kozha SL Engine")
     print("=" * 60)
+    print(f"Using Python Interpreter: {PYTHON_EXE}")
 
     # 1. Start Object Detection Backend (FastAPI on Port 8000)
     if is_server_running(BACKEND_URL):
@@ -53,7 +58,7 @@ def main():
     else:
         print("[Backend] Starting Object Detection AI server (Port 8000)...")
         backend_proc = subprocess.Popen(
-            [sys.executable, BACKEND_MAIN],
+            [PYTHON_EXE, BACKEND_MAIN],
             cwd=ROOT_DIR
         )
         processes.append(backend_proc)
@@ -64,7 +69,7 @@ def main():
     else:
         print("[SL Engine] Starting Kozha 3D Sign Engine (Port 8001)...")
         sl_proc = subprocess.Popen(
-            [sys.executable, SL_ENGINE_MAIN],
+            [PYTHON_EXE, SL_ENGINE_MAIN],
             cwd=ROOT_DIR
         )
         processes.append(sl_proc)
