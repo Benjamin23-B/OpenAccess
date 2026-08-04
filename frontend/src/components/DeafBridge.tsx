@@ -115,135 +115,144 @@ export default function DeafBridge() {
   ];
 
   return (
-    <div className="deaf-bridge flex flex-col gap-6 w-full max-w-7xl mx-auto p-4 md:p-6 text-slate-100">
-      
-      {/* Header Banner */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-xl">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <div className="deaf-bridge flex flex-col gap-6 md:gap-7 w-full max-w-[1340px] mx-auto p-4 md:p-6 text-[#1E293B] dark:text-[#F8FAFC]">
+
+      {/* Section 1: Header Banner Card */}
+      <div className="bg-white dark:bg-[#1E293B] border border-[#D8E2EC] dark:border-[#334155] rounded-2xl p-6 md:p-8 shadow-[0_4px_12px_rgba(15,23,42,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.35)] hover:shadow-md transition-all duration-200 flex flex-col gap-6 mb-2 overflow-hidden">
+        {/* Top Title & Badges Row */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 flex-wrap">
-              <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight flex items-center gap-2.5">
-                <span className="text-3xl">🤟</span> Deaf / HoH Assistive Bridge
+              <h2 className="text-[24px] md:text-[26px] font-bold text-[#16324F] dark:text-white tracking-tight flex items-center gap-2.5">
+                <svg className="w-6.5 h-6.5 text-[#0F4C81] dark:text-[#3B82F6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5a1.5 1.5 0 013 0v5.5m0 0V8a1.5 1.5 0 013 0v4.5" />
+                </svg>
+                Deaf / HoH Assistive Bridge
               </h2>
-              <span className="bg-cyan-950 text-cyan-400 border border-cyan-800 text-xs font-semibold px-2.5 py-1 rounded-full">
+              <span className="bg-[#EFF6FF] dark:bg-[#1E3A8A]/50 text-[#0F4C81] dark:text-[#93C5FD] border border-[#BFDBFE] dark:border-[#3B82F6]/40 text-[13px] font-semibold px-3.5 py-1.5 rounded-full whitespace-nowrap">
                 Kozha 3D v2.0
               </span>
-              <span className="bg-indigo-950 text-indigo-300 border border-indigo-800 text-xs font-semibold px-2.5 py-1 rounded-full">
+              <span className="bg-[#E8F5E9] dark:bg-[#166534]/40 text-[#198754] dark:text-[#86EFAC] border border-[#A5D6A7] dark:border-[#22C55E]/40 text-[13px] font-semibold px-3.5 py-1.5 rounded-full whitespace-nowrap">
                 {signLanguage}
               </span>
             </div>
-            <p className="text-slate-400 mt-1.5 text-sm md:text-base max-w-2xl">
+            <p className="text-[#475569] dark:text-[#CBD5E1] mt-1.5 text-[15px] leading-relaxed">
               Real-time Speech & Text to 3D Sign Language with Kozha AI Translation, SiGML Parser & HamNoSys Inspector.
             </p>
           </div>
+        </div>
 
-          {/* Unified Global Control Toolbar (No Duplicates) */}
-          <div className="flex flex-wrap items-center gap-2.5 bg-slate-950 p-3 rounded-xl border border-slate-800">
+        {/* Dedicated Global Control Bar */}
+        <div className="flex flex-wrap items-center justify-between gap-4 bg-[#F4F7FB] dark:bg-[#0F172A] p-5 rounded-xl border border-[#D8E2EC] dark:border-[#334155] transition-colors duration-200 mt-1">
+
+          <div className="flex flex-wrap items-center gap-4">
             {/* AI Sign Mode Toggle */}
             <button
               onClick={() => setUseAiTranslator(!useAiTranslator)}
-              className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-all flex items-center gap-1.5 ${
-                useAiTranslator
-                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 border-indigo-400 text-white shadow-md'
-                  : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-slate-200'
-              }`}
+              className={`h-[44px] px-5 py-2.5 text-[13px] font-bold rounded-xl border transition-all duration-200 flex items-center gap-2 cursor-pointer whitespace-nowrap shrink-0 ${useAiTranslator
+                  ? 'bg-[#0F4C81] dark:bg-[#2563EB] border-[#0F4C81] dark:border-[#2563EB] text-white shadow-sm'
+                  : 'bg-white dark:bg-[#1E293B] border-[#D8E2EC] dark:border-[#334155] text-[#64748B] dark:text-[#CBD5E1] hover:text-[#0F4C81]'
+                }`}
               title="Toggle Kozha AI LLM Gloss Translation"
             >
-              <span>✨ AI Sign Mode:</span>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              </svg>
+              <span>AI Sign Mode:</span>
               <span className="font-extrabold uppercase">{useAiTranslator ? 'ON' : 'OFF'}</span>
             </button>
 
             {/* Renderer Switcher */}
-            <div className="flex items-center bg-slate-900 rounded-lg p-1 border border-slate-800">
+            <div className="flex items-center gap-2 bg-white dark:bg-[#1E293B] rounded-xl p-1.5 border border-[#D8E2EC] dark:border-[#334155] shrink-0">
               <button
                 onClick={() => setRendererMode('cwasa')}
-                className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${
-                  rendererMode === 'cwasa'
-                    ? 'bg-cyan-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
+                className={`h-[36px] px-4 py-2 text-[13px] font-bold rounded-lg transition-all duration-200 cursor-pointer whitespace-nowrap ${rendererMode === 'cwasa'
+                    ? 'bg-[#0F4C81] dark:bg-[#2563EB] text-white shadow-sm'
+                    : 'text-[#64748B] dark:text-[#CBD5E1] hover:text-[#0F4C81]'
+                  }`}
               >
                 CWASA 3D WebGL
               </button>
               <button
                 onClick={() => setRendererMode('r3f')}
-                className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${
-                  rendererMode === 'r3f'
-                    ? 'bg-cyan-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
+                className={`h-[36px] px-4 py-2 text-[13px] font-bold rounded-lg transition-all duration-200 cursor-pointer whitespace-nowrap ${rendererMode === 'r3f'
+                    ? 'bg-[#0F4C81] dark:bg-[#2563EB] text-white shadow-sm'
+                    : 'text-[#64748B] dark:text-[#CBD5E1] hover:text-[#0F4C81]'
+                  }`}
               >
                 Three.js R3F
               </button>
             </div>
+          </div>
 
-            {/* Avatar Selection (Shown when CWASA mode is active) */}
+          <div className="flex flex-wrap items-center gap-4">
+            {/* Avatar Selection */}
             {rendererMode === 'cwasa' && (
-              <div className="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">
-                <label className="text-xs text-slate-400 font-medium">Character:</label>
+              <div className="flex items-center gap-3 bg-white dark:bg-[#1E293B] px-4 py-2 rounded-xl border border-[#CBD5E1] dark:border-[#475569] h-[44px] shrink-0">
+                <label className="text-[13px] text-[#475569] dark:text-[#CBD5E1] font-bold whitespace-nowrap">Character:</label>
                 <select
                   value={selectedAvatar}
                   onChange={(e) => setSelectedAvatar(e.target.value as any)}
-                  className="bg-slate-950 text-cyan-300 font-bold border border-slate-700 rounded-md px-2 py-0.5 text-xs outline-none focus:border-cyan-500 cursor-pointer"
+                  className="bg-transparent text-[#0F4C81] dark:text-[#60A5FA] font-bold border-none text-[13px] outline-none cursor-pointer pr-2 py-1"
                 >
-                  <option value="anna">Anna (Female)</option>
-                  <option value="marc">Marc (Male)</option>
-                  <option value="francoise">Francoise (Female)</option>
-                  <option value="luna">Luna (Stylized)</option>
-                  <option value="siggi">Siggi (Male)</option>
+                  <option value="anna" className="bg-white dark:bg-[#1E293B] text-[#1E293B] dark:text-[#F8FAFC]">Anna (Female)</option>
+                  <option value="marc" className="bg-white dark:bg-[#1E293B] text-[#1E293B] dark:text-[#F8FAFC]">Marc (Male)</option>
+                  <option value="francoise" className="bg-white dark:bg-[#1E293B] text-[#1E293B] dark:text-[#F8FAFC]">Francoise (Female)</option>
+                  <option value="luna" className="bg-white dark:bg-[#1E293B] text-[#1E293B] dark:text-[#F8FAFC]">Luna (Stylized)</option>
+                  <option value="siggi" className="bg-white dark:bg-[#1E293B] text-[#1E293B] dark:text-[#F8FAFC]">Siggi (Male)</option>
                 </select>
               </div>
             )}
 
             {/* Sign Language Selection */}
-            <div className="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">
-              <label className="text-xs text-slate-400 font-medium">Sign System:</label>
+            <div className="flex items-center gap-3 bg-white dark:bg-[#1E293B] px-4 py-2 rounded-xl border border-[#CBD5E1] dark:border-[#475569] h-[44px] shrink-0">
+              <label className="text-[13px] text-[#475569] dark:text-[#CBD5E1] font-bold whitespace-nowrap">System:</label>
               <select
                 value={signLanguage}
                 onChange={(e) => setSignLanguage(e.target.value as any)}
-                className="bg-slate-950 text-cyan-400 font-bold border border-slate-700 rounded-md px-2 py-0.5 text-xs outline-none focus:border-cyan-500 cursor-pointer"
+                className="bg-transparent text-[#0F4C81] dark:text-[#60A5FA] font-bold border-none text-[13px] outline-none cursor-pointer pr-2 py-1"
               >
-                <option value="ISL">Indian (ISL)</option>
-                <option value="BSL">British (BSL)</option>
-                <option value="ASL">American (ASL)</option>
-                <option value="DGS">German (DGS)</option>
-                <option value="LSF">French (LSF)</option>
+                <option value="ISL" className="bg-white dark:bg-[#1E293B] text-[#1E293B] dark:text-[#F8FAFC]">Indian (ISL)</option>
+                <option value="BSL" className="bg-white dark:bg-[#1E293B] text-[#1E293B] dark:text-[#F8FAFC]">British (BSL)</option>
+                <option value="ASL" className="bg-white dark:bg-[#1E293B] text-[#1E293B] dark:text-[#F8FAFC]">American (ASL)</option>
+                <option value="DGS" className="bg-white dark:bg-[#1E293B] text-[#1E293B] dark:text-[#F8FAFC]">German (DGS)</option>
+                <option value="LSF" className="bg-white dark:bg-[#1E293B] text-[#1E293B] dark:text-[#F8FAFC]">French (LSF)</option>
               </select>
             </div>
           </div>
+
         </div>
       </div>
 
-      {/* Main Grid: Left Studio Viewport + Right Controls Pane */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      {/* Main Dashboard Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-7 items-start">
 
-        {/* LEFT COLUMN: 3D Viewport Studio Frame (7 Columns) */}
+        {/* LEFT HERO COLUMN: 3D Viewport Studio Frame (7 Columns) */}
         <div className="lg:col-span-7 flex flex-col gap-4">
-          
-          {/* Studio Container Box */}
-          <div className="relative w-full rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 shadow-2xl flex flex-col min-h-[500px]">
-            
-            {/* Viewport Header Bar inside Studio */}
-            <div className="bg-slate-900/90 border-b border-slate-800 px-4 py-2.5 flex items-center justify-between z-10">
-              <div className="flex items-center gap-2 text-xs">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="font-semibold text-slate-300">
-                  {rendererMode === 'cwasa' ? `CWASA 3D (${selectedAvatar.toUpperCase()})` : 'Three.js R3F Avatar'}
+
+          {/* Hero Studio Container Box (16px Radius) */}
+          <div className="relative w-full rounded-2xl overflow-hidden border border-[#D8E2EC] dark:border-[#334155] bg-[#16324F] dark:bg-[#0F172A] shadow-[0_4px_12px_rgba(15,23,42,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.35)] transition-all duration-200 flex flex-col min-h-[520px] mb-4">
+
+            {/* Studio Header Bar */}
+            <div className="bg-[#16324F] dark:bg-[#111827] border-b border-slate-700/80 px-6 py-3.5 flex items-center justify-between z-10 text-white">
+              <div className="flex items-center gap-2.5 text-[13px]">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#198754] animate-pulse" />
+                <span className="font-semibold text-slate-200">
+                  {rendererMode === 'cwasa' ? `CWASA 3D Studio (${selectedAvatar.toUpperCase()})` : 'Three.js R3F Avatar Studio'}
                 </span>
               </div>
 
-              {/* Speed Controls (0.5x, 0.75x, 1x, 1.25x, 1.5x) */}
-              <div className="flex items-center gap-1.5">
-                <span className="text-[11px] text-slate-400 font-medium">Speed:</span>
+              {/* Speed Controls Segmented Pills */}
+              <div className="flex items-center gap-2">
+                <span className="text-[13px] text-slate-300 font-medium">Speed:</span>
                 {[0.5, 0.75, 1.0, 1.25, 1.5].map((speed) => (
                   <button
                     key={speed}
                     onClick={() => setSigningSpeed(speed)}
-                    className={`px-2 py-0.5 text-[11px] font-bold rounded transition-all ${
-                      signingSpeed === speed
-                        ? 'bg-cyan-600 text-white'
-                        : 'bg-slate-950 text-slate-400 hover:text-slate-200 border border-slate-800'
-                    }`}
+                    className={`px-3.5 py-1.5 text-[13px] font-bold rounded-md transition-all duration-150 cursor-pointer ${signingSpeed === speed
+                        ? 'bg-[#0F4C81] dark:bg-[#2563EB] text-white shadow-sm'
+                        : 'bg-slate-800 text-slate-300 hover:text-white border border-slate-700'
+                      }`}
                   >
                     {speed}x
                   </button>
@@ -251,8 +260,8 @@ export default function DeafBridge() {
               </div>
             </div>
 
-            {/* 3D Renderer Canvas Area */}
-            <div className="relative flex-1 w-full bg-slate-950 min-h-[440px]">
+            {/* 3D Renderer Canvas Frame */}
+            <div className="relative flex-1 w-full bg-[#16324F] dark:bg-[#0F172A] min-h-[440px]">
               {rendererMode === 'cwasa' ? (
                 <CwasaAvatarRenderer
                   sigmlText={processedSequence.sigmlSequence}
@@ -269,28 +278,28 @@ export default function DeafBridge() {
               )}
             </div>
 
-            {/* Viewport Bottom Status Bar */}
-            <div className="bg-slate-900 border-t border-slate-800 p-3.5 flex items-center justify-between gap-3 text-xs">
+            {/* Viewport Footer Status Bar */}
+            <div className="bg-[#16324F] dark:bg-[#111827] border-t border-slate-700/80 px-6 py-3.5 flex items-center justify-between gap-3 text-[13px] text-white">
               <div className="flex items-center gap-2 min-w-0">
                 <StatusIndicator
                   state={listeningState}
                   error={speechError ? { type: 'unknown', message: speechError.message } : null}
                 />
                 <div className="truncate">
-                  <span className="text-slate-400 font-medium">Status: </span>
-                  <span className={`font-bold ${signingStatus !== 'Idle' ? 'text-cyan-400' : 'text-slate-300'}`}>
+                  <span className="text-slate-300 font-medium">Status: </span>
+                  <span className={`font-bold ${signingStatus !== 'Idle' ? 'text-sky-300' : 'text-slate-200'}`}>
                     {signingStatus}
                   </span>
                 </div>
               </div>
 
               {activeSignText && (
-                <div className="hidden sm:flex items-center gap-2 bg-slate-950 px-3 py-1 rounded-lg border border-slate-800 truncate">
-                  <span className="text-slate-400 font-medium">Signing:</span>
-                  <span className="text-cyan-300 font-bold truncate max-w-[200px]">{activeSignText}</span>
+                <div className="hidden sm:flex items-center gap-2 bg-slate-800 dark:bg-slate-900 px-4 py-2 rounded-lg border border-slate-700 truncate">
+                  <span className="text-slate-300 font-medium">Signing:</span>
+                  <span className="text-sky-300 font-bold truncate max-w-[220px]">{activeSignText}</span>
                   <button
                     onClick={handleClear}
-                    className="text-slate-500 hover:text-rose-400 font-bold ml-1 text-xs"
+                    className="text-slate-400 hover:text-rose-400 font-bold ml-1 text-xs px-1.5 py-0.5 rounded cursor-pointer"
                     title="Stop and clear active phrase"
                   >
                     ✕
@@ -302,60 +311,69 @@ export default function DeafBridge() {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Interactive Tabs & Inputs (5 Columns) */}
-        <div className="lg:col-span-5 flex flex-col gap-4">
+        {/* RIGHT WORKFLOW COLUMN: Interactive Controls (5 Columns) */}
+        <div className="lg:col-span-5 flex flex-col gap-6">
 
-          {/* Sub-Navigation Tab Buttons */}
-          <div className="grid grid-cols-3 bg-slate-900 p-1.5 rounded-xl border border-slate-800 gap-1 text-center">
+          {/* Sub-Navigation Tab Segmented Control */}
+          <div className="grid grid-cols-3 bg-[#F4F7FB] dark:bg-[#0F172A] p-2 rounded-2xl border border-[#D8E2EC] dark:border-[#334155] gap-2 text-center shadow-sm transition-colors duration-200 mb-1">
             <button
               onClick={() => setActiveTab('translate')}
-              className={`py-2 text-xs font-bold rounded-lg transition-all ${
-                activeTab === 'translate'
-                  ? 'bg-cyan-600 text-white shadow-md'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
+              className={`h-[44px] px-4 py-2.5 text-[13px] font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer ${activeTab === 'translate'
+                  ? 'bg-[#0F4C81] dark:bg-[#2563EB] text-white shadow-sm'
+                  : 'text-[#64748B] dark:text-[#CBD5E1] hover:text-[#0F4C81]'
+                }`}
             >
-              ⌨️ Translator
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5L6 9H2v6h4l5 4V5z" />
+              </svg>
+              Translator
             </button>
             <button
               onClick={() => setActiveTab('dictionary')}
-              className={`py-2 text-xs font-bold rounded-lg transition-all ${
-                activeTab === 'dictionary'
-                  ? 'bg-cyan-600 text-white shadow-md'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
+              className={`h-[44px] px-4 py-2.5 text-[13px] font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer ${activeTab === 'dictionary'
+                  ? 'bg-[#0F4C81] dark:bg-[#2563EB] text-white shadow-sm'
+                  : 'text-[#64748B] dark:text-[#CBD5E1] hover:text-[#0F4C81]'
+                }`}
             >
-              📖 Sign Library
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+              Sign Library
             </button>
             <button
               onClick={() => setActiveTab('inspector')}
-              className={`py-2 text-xs font-bold rounded-lg transition-all ${
-                activeTab === 'inspector'
-                  ? 'bg-cyan-600 text-white shadow-md'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
+              className={`h-[44px] px-4 py-2.5 text-[13px] font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer ${activeTab === 'inspector'
+                  ? 'bg-[#0F4C81] dark:bg-[#2563EB] text-white shadow-sm'
+                  : 'text-[#64748B] dark:text-[#CBD5E1] hover:text-[#0F4C81]'
+                }`}
             >
-              🔬 Inspector
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              Inspector
             </button>
           </div>
 
-          {/* TAB 1: Live Translator */}
+          {/* TAB 1: Live Translator Workflow */}
           {activeTab === 'translate' && (
-            <div className="flex flex-col gap-4">
-              
-              {/* Text Translation Card */}
-              <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg flex flex-col gap-3">
+            <div className="flex flex-col gap-6">
+
+              {/* Card 1: Text Translation */}
+              <div className="bg-white dark:bg-[#1E293B] border border-[#D8E2EC] dark:border-[#334155] rounded-2xl p-6 md:p-8 shadow-[0_4px_12px_rgba(15,23,42,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.35)] hover:shadow-md transition-all duration-200 flex flex-col gap-5 overflow-hidden">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                    <span>⌨️</span> Text-to-Sign Input
+                  <h3 className="text-[20px] font-semibold text-[#16324F] dark:text-white flex items-center gap-2.5">
+                    <svg className="w-5 h-5 text-[#0F4C81] dark:text-[#3B82F6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5L6 9H2v6h4l5 4V5z" />
+                    </svg>
+                    Text-to-Sign Input
                   </h3>
-                  <span className="text-[11px] text-slate-500 font-mono">
+                  <span className="text-[13px] text-[#64748B] dark:text-[#94A3B8] font-mono font-semibold">
                     {inputText.length} chars
                   </span>
                 </div>
 
                 <textarea
-                  className="w-full bg-slate-950 text-slate-100 border border-slate-800 rounded-xl p-3 text-sm focus:outline-none focus:border-cyan-500 resize-none h-24 placeholder-slate-500 font-sans"
+                  className="w-full bg-[#FFFFFF] dark:bg-[#0F172A] text-[#16324F] dark:text-[#F8FAFC] border border-[#CBD5E1] dark:border-[#334155] rounded-xl p-4.5 text-[15px] leading-relaxed focus:outline-none focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/30 resize-none h-32 placeholder-[#64748B] dark:placeholder-[#94A3B8] font-sans transition-all duration-200"
                   placeholder="Type text or sentence here (e.g. 'namaste hello doctor help'). Press Enter to sign..."
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
@@ -367,16 +385,16 @@ export default function DeafBridge() {
                   }}
                 />
 
-                <div className="flex gap-2">
+                <div className="flex flex-wrap items-center gap-3.5 mt-1 w-full">
                   <button
-                    className="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-md"
+                    className="flex-1 min-w-[200px] h-[48px] bg-[#0F4C81] dark:bg-[#2563EB] hover:bg-[#0B3D66] dark:hover:bg-[#1D4ED8] text-white font-semibold px-6 rounded-xl text-[15px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-sm cursor-pointer whitespace-nowrap flex items-center justify-center"
                     onClick={handleTranslate}
                     disabled={!inputText.trim()}
                   >
                     Translate to 3D Sign
                   </button>
                   <button
-                    className="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-4 rounded-xl text-xs transition-all disabled:opacity-40"
+                    className="h-[48px] min-w-[110px] bg-white dark:bg-[#1E293B] hover:bg-[#EFF6FF] dark:hover:bg-[#334155] text-[#0F4C81] dark:text-white border border-[#CBD5E1] dark:border-[#475569] font-semibold px-6 rounded-xl text-[15px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none cursor-pointer shrink-0 whitespace-nowrap flex items-center justify-center"
                     onClick={handleClear}
                     disabled={!inputText && !activeSignText && !transcript}
                   >
@@ -385,78 +403,83 @@ export default function DeafBridge() {
                 </div>
               </div>
 
-              {/* Real-time Speech Input Card */}
-              <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg flex flex-col gap-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                    <span>🎙️</span> Voice Speech Input
+              {/* Card 2: Voice Speech Input */}
+              <div className="bg-white dark:bg-[#1E293B] border border-[#D8E2EC] dark:border-[#334155] rounded-2xl p-6 md:p-8 shadow-[0_4px_12px_rgba(15,23,42,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.35)] hover:shadow-md transition-all duration-200 flex flex-col gap-5 overflow-hidden">
+                <div className="flex items-center justify-between flex-wrap gap-3">
+                  <h3 className="text-[20px] font-semibold text-[#16324F] dark:text-white flex items-center gap-2.5">
+                    <svg className="w-5 h-5 text-[#0F4C81] dark:text-[#3B82F6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                    </svg>
+                    Voice Speech Input
                   </h3>
-                  
+
                   {/* Voice Language Selector */}
                   <select
                     value={selectedLanguage}
                     onChange={(e) => setSelectedLanguage(e.target.value as any)}
-                    className="bg-slate-950 text-slate-300 border border-slate-800 rounded-lg px-2 py-1 text-xs outline-none focus:border-cyan-500 cursor-pointer"
+                    className="bg-white dark:bg-[#0F172A] text-[#16324F] dark:text-[#F8FAFC] border border-[#CBD5E1] dark:border-[#475569] rounded-xl px-4 py-2.5 text-[13.5px] font-bold outline-none focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/30 cursor-pointer shadow-xs"
                   >
-                    <option value="en-IN">English (IN)</option>
-                    <option value="ta-IN">Tamil (India)</option>
-                    <option value="thanglish">Tanglish</option>
+                    <option value="en-IN" className="bg-white dark:bg-[#0F172A] text-[#16324F] dark:text-[#F8FAFC]">English (IN)</option>
+                    <option value="ta-IN" className="bg-white dark:bg-[#0F172A] text-[#16324F] dark:text-[#F8FAFC]">Tamil (India)</option>
+                    <option value="thanglish" className="bg-white dark:bg-[#0F172A] text-[#16324F] dark:text-[#F8FAFC]">Tanglish</option>
                   </select>
                 </div>
 
-                <p className="text-xs text-slate-400">
+                <p className="text-[14px] text-[#334155] dark:text-[#CBD5E1] leading-relaxed">
                   Speak clearly into your microphone. Spoken words are converted directly to 3D sign glosses.
                 </p>
 
-                <div className="flex gap-2">
+                <div className="flex flex-wrap items-center gap-3.5 mt-1 w-full">
                   <button
                     onClick={startListening}
                     disabled={listeningState === 'listening' || listeningState === 'processing' || !isSTTSupported}
-                    className={`flex-1 font-bold py-2.5 px-4 rounded-xl text-xs transition-all ${
-                      listeningState === 'listening'
-                        ? 'bg-rose-600 text-white animate-pulse'
-                        : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-md'
-                    } disabled:opacity-40 disabled:cursor-not-allowed`}
+                    className={`flex-1 min-w-[180px] h-[48px] font-semibold px-6 rounded-xl text-[15px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-pointer whitespace-nowrap flex items-center justify-center ${listeningState === 'listening'
+                        ? 'bg-[#C0392B] dark:bg-[#DC2626] text-white animate-pulse'
+                        : 'bg-[#198754] dark:bg-[#16A34A] hover:bg-[#146c43] text-white shadow-sm'
+                      } disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none`}
                   >
-                    🎤 {listeningState === 'listening' ? 'Listening...' : 'Start Listening'}
+                    Start Dictation
                   </button>
                   <button
                     onClick={stopListening}
                     disabled={listeningState !== 'listening' && listeningState !== 'processing'}
-                    className="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-4 rounded-xl text-xs transition-all disabled:opacity-40"
+                    className="h-[48px] min-w-[100px] bg-[#C0392B] dark:bg-[#DC2626] hover:bg-[#A93226] text-white font-semibold px-6 rounded-xl text-[15px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none cursor-pointer shrink-0 whitespace-nowrap flex items-center justify-center shadow-sm"
                   >
-                    ⏹️ Stop
+                    Stop
                   </button>
                 </div>
 
                 {transcript && (
-                  <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs">
-                    <span className="text-cyan-400 font-bold">Speech Transcript:</span>{' '}
-                    <span className="text-slate-200">{transcript}</span>
+                  <div className="bg-[#F4F7FB] dark:bg-[#0F172A] p-4.5 rounded-xl border border-[#D8E2EC] dark:border-[#334155] text-[14px] mt-1">
+                    <span className="text-[#0F4C81] dark:text-[#3B82F6] font-bold">Speech Transcript:</span>{' '}
+                    <span className="text-[#1E293B] dark:text-[#F8FAFC]">{transcript}</span>
                   </div>
                 )}
               </div>
 
-              {/* Categorized Quick Sign Presets Card */}
-              <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg flex flex-col gap-3">
-                <h3 className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                  <span>⚡</span> Quick Sign Presets
+              {/* Card 3: Quick Sign Presets Chips */}
+              <div className="bg-white dark:bg-[#1E293B] border border-[#D8E2EC] dark:border-[#334155] rounded-2xl p-6 md:p-8 shadow-[0_4px_12px_rgba(15,23,42,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.35)] hover:shadow-md transition-all duration-200 flex flex-col gap-5 overflow-hidden">
+                <h3 className="text-[20px] font-semibold text-[#16324F] dark:text-white flex items-center gap-2.5">
+                  <svg className="w-5 h-5 text-[#0F4C81] dark:text-[#3B82F6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Quick Sign Presets
                 </h3>
-                
-                <div className="flex flex-col gap-2.5">
+
+                <div className="flex flex-col gap-4">
                   {presetCategories.map((cat) => (
-                    <div key={cat.title} className="flex flex-col gap-1.5">
-                      <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                    <div key={cat.title} className="flex flex-col gap-2.5">
+                      <span className="text-[13px] font-bold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">
                         {cat.title}
                       </span>
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-3">
                         {cat.items.map((phrase) => (
                           <button
                             key={phrase}
                             onClick={() => handlePresetTrigger(phrase)}
-                            className="bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/40 text-slate-200 hover:text-cyan-300 py-1.5 px-3 rounded-lg text-xs font-medium transition-all"
+                            className="bg-[#EFF6FF] dark:bg-[#1E3A8A]/40 hover:bg-[#0F4C81] dark:hover:bg-[#3B82F6] border border-[#BFDBFE] dark:border-[#3B82F6]/40 text-[#0F4C81] dark:text-[#93C5FD] hover:text-white dark:hover:text-white py-2.5 px-5 rounded-full text-[14px] font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md shadow-sm cursor-pointer"
                           >
-                            {phrase}
+                            [ {phrase} ]
                           </button>
                         ))}
                       </div>
@@ -470,11 +493,11 @@ export default function DeafBridge() {
 
           {/* TAB 2: Sign Library */}
           {activeTab === 'dictionary' && (
-            <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg flex flex-col gap-4 max-h-[560px]">
-              <div className="flex flex-col gap-2">
+            <div className="bg-white dark:bg-[#1E293B] border border-[#D8E2EC] dark:border-[#334155] rounded-2xl p-6 md:p-8 shadow-[0_4px_12px_rgba(15,23,42,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.35)] hover:shadow-md transition-all duration-200 flex flex-col gap-5">
+              <div className="flex flex-col gap-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-white">📖 Sign Library ({signLanguage})</h3>
-                  <span className="text-xs bg-slate-950 text-cyan-400 border border-slate-800 px-2.5 py-0.5 rounded-full font-mono">
+                  <h3 className="text-[20px] font-semibold text-[#16324F] dark:text-white">Sign Library ({signLanguage})</h3>
+                  <span className="text-[13px] bg-[#EFF6FF] dark:bg-[#1E3A8A]/50 text-[#0F4C81] dark:text-[#93C5FD] border border-[#BFDBFE] dark:border-[#3B82F6]/40 px-3.5 py-1.5 rounded-full font-mono font-bold">
                     {dictionaryEntries.length} Signs
                   </span>
                 </div>
@@ -483,28 +506,28 @@ export default function DeafBridge() {
                   placeholder="Search sign dictionary (e.g. 'help', 'doctor', 'thanks')..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-slate-950 text-slate-100 border border-slate-800 rounded-xl px-3 py-2 text-xs outline-none focus:border-cyan-500"
+                  className="w-full bg-[#FFFFFF] dark:bg-[#0F172A] text-[#16324F] dark:text-[#F8FAFC] border border-[#CBD5E1] dark:border-[#334155] rounded-xl px-5 py-3.5 text-[15px] outline-none focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/25 transition-all duration-200"
                 />
               </div>
 
-              <div className="flex-1 overflow-y-auto pr-1 flex flex-col gap-2 min-h-[340px]">
+              <div className="flex flex-col gap-3">
                 {dictionaryEntries.map((entry) => (
                   <div
                     key={entry.id}
-                    className="bg-slate-950 hover:bg-slate-950/80 border border-slate-800 rounded-xl p-3 flex items-center justify-between gap-3 transition-all"
+                    className="bg-[#F4F7FB] dark:bg-[#0F172A] hover:bg-[#EFF6FF] dark:hover:bg-[#1E3A8A]/30 border border-[#D8E2EC] dark:border-[#334155] rounded-xl p-4.5 flex items-center justify-between gap-3 transition-all duration-200"
                   >
                     <div className="flex flex-col gap-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-bold text-sm text-cyan-300">{entry.gloss}</span>
-                        <span className="text-[10px] bg-cyan-950 text-cyan-400 border border-cyan-800 px-2 py-0.5 rounded font-semibold">
+                        <span className="font-bold text-[15px] text-[#0F4C81] dark:text-[#60A5FA]">{entry.gloss}</span>
+                        <span className="text-[12px] bg-[#EEF3F8] dark:bg-[#334155] text-[#1E293B] dark:text-[#F8FAFC] border border-[#CBD5E1] dark:border-[#475569] px-3 py-1 rounded-md font-semibold">
                           {entry.category}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-400 truncate">{entry.movement} ({entry.location})</p>
+                      <p className="text-[13px] text-[#64748B] dark:text-[#CBD5E1] truncate">{entry.movement} ({entry.location})</p>
                     </div>
                     <button
                       onClick={() => handlePresetTrigger(entry.gloss)}
-                      className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition-all shrink-0 shadow"
+                      className="bg-[#0F4C81] dark:bg-[#2563EB] hover:bg-[#0B3D66] dark:hover:bg-[#1D4ED8] text-white font-semibold px-4.5 py-2.5 rounded-xl text-[13px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md shrink-0 shadow-sm cursor-pointer"
                     >
                       Sign 3D
                     </button>
@@ -512,8 +535,8 @@ export default function DeafBridge() {
                 ))}
 
                 {dictionaryEntries.length === 0 && (
-                  <div className="text-center py-8 text-slate-500 text-xs italic">
-                    No matching sign entries found for "{searchQuery}".
+                  <div className="text-center py-8 text-[#64748B] dark:text-[#94A3B8] text-[15px] italic">
+                    No matching sign entries found for &quot;{searchQuery}&quot;.
                   </div>
                 )}
               </div>
@@ -522,75 +545,77 @@ export default function DeafBridge() {
 
           {/* TAB 3: Notation Inspector */}
           {activeTab === 'inspector' && (
-            <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg flex flex-col gap-4 max-h-[560px] overflow-y-auto">
+            <div className="bg-white dark:bg-[#1E293B] border border-[#D8E2EC] dark:border-[#334155] rounded-2xl p-6 md:p-8 shadow-[0_4px_12px_rgba(15,23,42,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.35)] hover:shadow-md transition-all duration-200 flex flex-col gap-5">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                  <span>🔬</span> Notation & SiGML Inspector
+                <h3 className="text-[20px] font-semibold text-[#16324F] dark:text-white flex items-center gap-2.5">
+                  <svg className="w-5 h-5 text-[#0F4C81] dark:text-[#3B82F6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  Notation & SiGML Inspector
                 </h3>
                 {processedSequence.sigmlSequence && (
                   <button
                     onClick={handleCopySigml}
-                    className="bg-slate-950 hover:bg-slate-800 border border-slate-800 text-cyan-400 px-2.5 py-1 rounded-lg text-xs font-bold transition-all"
+                    className="bg-[#F4F7FB] dark:bg-[#0F172A] hover:bg-[#EFF6FF] border border-[#D8E2EC] dark:border-[#334155] text-[#0F4C81] dark:text-[#60A5FA] px-4 py-2 rounded-xl text-[13px] font-bold transition-all duration-200 cursor-pointer"
                   >
                     {copiedSigml ? '✓ Copied!' : '📋 Copy SiGML'}
                   </button>
                 )}
               </div>
 
-              <div className="flex flex-col gap-3">
-                
+              <div className="flex flex-col gap-4">
+
                 {/* Active Sentence & Engine Info */}
-                <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 flex flex-col gap-1.5">
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="font-bold text-cyan-400">Active Sentence:</span>
+                <div className="bg-[#F4F7FB] dark:bg-[#0F172A] p-4.5 rounded-xl border border-[#D8E2EC] dark:border-[#334155] flex flex-col gap-1.5">
+                  <div className="flex justify-between items-center text-[13px]">
+                    <span className="font-bold text-[#0F4C81] dark:text-[#60A5FA]">Active Sentence:</span>
                     {processedSequence.plannerSource && (
-                      <span className="bg-indigo-950 text-indigo-300 border border-indigo-800 px-2 py-0.5 rounded text-[10px] font-mono">
+                      <span className="bg-[#EFF6FF] dark:bg-[#1E3A8A]/50 text-[#0F4C81] dark:text-[#93C5FD] border border-[#BFDBFE] dark:border-[#3B82F6]/40 px-3 py-1 rounded text-[11px] font-mono font-bold">
                         {processedSequence.plannerSource}
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-slate-200 font-medium">
+                  <p className="text-[15px] text-[#1E293B] dark:text-[#F8FAFC] font-semibold">
                     {activeSignText || '(No active input sentence)'}
                   </p>
                   {processedSequence.facialExpression && processedSequence.facialExpression !== 'neutral' && (
-                    <p className="text-[11px] text-purple-300 font-semibold mt-1">
-                      😊 Non-Manual Expression: {processedSequence.facialExpression}
+                    <p className="text-[13px] text-[#0F4C81] dark:text-[#60A5FA] font-semibold mt-1">
+                      Non-Manual Expression: {processedSequence.facialExpression}
                     </p>
                   )}
                 </div>
 
                 {/* Token Breakdown List */}
-                <div className="bg-slate-950 p-3 rounded-xl border border-slate-800">
-                  <p className="text-xs font-bold text-cyan-400 mb-2">Gloss Sequence Breakdown:</p>
-                  <div className="flex flex-col gap-2">
+                <div className="bg-[#F4F7FB] dark:bg-[#0F172A] p-4.5 rounded-xl border border-[#D8E2EC] dark:border-[#334155]">
+                  <p className="text-[13px] font-bold text-[#0F4C81] dark:text-[#60A5FA] mb-2">Gloss Sequence Breakdown:</p>
+                  <div className="flex flex-col gap-2.5">
                     {processedSequence.signBreakdown.map((item, idx) => (
-                      <div key={idx} className="bg-slate-900 p-2.5 rounded-lg border border-slate-800 text-xs flex flex-col gap-1">
+                      <div key={idx} className="bg-white dark:bg-[#1E293B] p-3.5 rounded-lg border border-[#D8E2EC] dark:border-[#334155] text-[13px] flex flex-col gap-1">
                         <div className="flex justify-between items-center">
-                          <span className="font-bold text-white">{item.word}</span>
-                          <span className={`text-[10px] px-2 py-0.5 rounded font-semibold ${
-                            item.isFingerspelled 
-                              ? 'bg-amber-950 text-amber-300 border border-amber-800' 
-                              : 'bg-emerald-950 text-emerald-300 border border-emerald-800'
-                          }`}>
+                          <span className="font-bold text-[#1E293B] dark:text-white">{item.word}</span>
+                          <span className={`text-[11px] px-3 py-1 rounded font-semibold ${item.isFingerspelled
+                              ? 'bg-[#FEF3C7] dark:bg-[#78350F]/40 text-[#D97706] dark:text-[#FDE68A] border border-[#FDE68A] dark:border-[#D97706]'
+                              : 'bg-[#E8F5E9] dark:bg-[#166534]/40 text-[#198754] dark:text-[#86EFAC] border border-[#A5D6A7] dark:border-[#22C55E]/40'
+                            }`}>
                             {item.isFingerspelled ? 'Fingerspelled' : 'Gloss Match'}
                           </span>
                         </div>
                         {item.hamnosys && (
-                          <p className="text-[11px] text-slate-400 font-mono">HamNoSys: {item.hamnosys}</p>
+                          <p className="text-[12px] text-[#64748B] dark:text-[#CBD5E1] font-mono">HamNoSys: {item.hamnosys}</p>
                         )}
                       </div>
                     ))}
 
                     {processedSequence.signBreakdown.length === 0 && (
-                      <p className="text-xs text-slate-500 italic">No token breakdown available yet.</p>
+                      <p className="text-[13px] text-[#64748B] dark:text-[#94A3B8] italic">No token breakdown available yet.</p>
                     )}
                   </div>
                 </div>
 
                 {/* SiGML XML Output Box */}
-                <div className="bg-slate-950 p-3 rounded-xl border border-slate-800">
-                  <p className="text-xs font-bold text-cyan-400 mb-1.5">Generated SiGML XML Output:</p>
-                  <pre className="bg-slate-900 p-3 rounded-lg text-[10px] text-emerald-400 font-mono overflow-x-auto max-h-40 border border-slate-800">
+                <div className="bg-[#F4F7FB] dark:bg-[#0F172A] p-4.5 rounded-xl border border-[#D8E2EC] dark:border-[#334155]">
+                  <p className="text-[13px] font-bold text-[#0F4C81] dark:text-[#60A5FA] mb-2">Generated SiGML XML Output:</p>
+                  <pre className="bg-[#16324F] dark:bg-[#0F172A] p-4 rounded-xl text-[12px] text-[#86EFAC] font-mono overflow-x-auto max-h-40 border border-slate-700">
                     {processedSequence.sigmlSequence || '<!-- Waiting for input to generate SiGML -->'}
                   </pre>
                 </div>

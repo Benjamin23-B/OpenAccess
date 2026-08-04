@@ -118,11 +118,33 @@ def translate_text_with_ai(text: str, sign_language: str = "bsl") -> Optional[Di
             res_json = json.loads(res_body)
 
             content = res_json["choices"][0]["message"]["content"].strip()
-            # Clean markdown codeblocks if returned
+
+            # --- Robust JSON extraction ---
+            # 1. Strip markdown code fences (```json ... ``` or ``` ... ```)
             if content.startswith("```"):
                 content = content.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
 
-            parsed = json.loads(content)
+            # 2. Extract the first JSON object via brace matching (handles leading/trailing prose)
+            brace_start = content.find("{")
+            brace_end = content.rfind("}")
+            if brace_start != -1 and brace_end != -1 and brace_end > brace_start:
+                content = content[brace_start:brace_end + 1]
+
+            # 3. Attempt to parse; if it still fails try to recover a truncated object
+            parsed = None
+            try:
+                parsed = json.loads(content)
+            except json.JSONDecodeError:
+                # Try to recover partial / unterminated JSON by closing open brackets
+                try:
+                    open_braces = content.count("{") - content.count("}")
+                    open_brackets = content.count("[") - content.count("]")
+                    recovery = content.rstrip().rstrip(",")
+                    recovery += "]" * max(open_brackets, 0) + "}" * max(open_braces, 0)
+                    parsed = json.loads(recovery)
+                except Exception:
+                    logger.warning("[AI Wrapper] JSON recovery failed; falling back to local engine.")
+
             if isinstance(parsed, dict) and "glosses" in parsed:
                 return {
                     "glosses": [str(g).upper().strip() for g in parsed.get("glosses", []) if g],

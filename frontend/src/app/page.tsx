@@ -23,45 +23,55 @@ export default function Home() {
 
   return (
     <AccessibilityWrapper liveMessage={liveMsg} progressMessage={progressMsg}>
-      <div className="app-container">
-        {/* Accessibility Header with Skip Link */}
+      <div className="app-container w-full bg-[#F5F7FA] dark:bg-[#0F172A] text-[#1E293B] dark:text-[#F8FAFC] transition-colors duration-300">
+        {/* Government Accessibility Header with Theme Switcher */}
         <AccessibilityHeader />
-        
-        {/* Bridge Navigation Tabs */}
-        <BridgeTabs 
-          activeModule={activeModule} 
-          onModuleChange={setActiveModule} 
+
+        {/* Top Horizontal Navigation Dock for Accessibility Services */}
+        <BridgeTabs
+          activeModule={activeModule}
+          onModuleChange={setActiveModule}
         />
 
-        {/* Main Content Area */}
-        <main id="main-content" className="main-content" tabIndex={-1}>
+        {/* Main Workspace Area Container */}
+        <main id="main-content" className="max-w-[1340px] mx-auto px-4 md:px-6 pb-8 min-w-0" tabIndex={-1}>
           
-          {/* Module 1: Deaf / HoH Bridge */}
+          {/* Module 1: Deaf / HoH 3D Sign Language Bridge */}
           {activeModule === 'deaf' && (
             <div 
               id="bridge-panel-deaf"
               role="tabpanel"
               aria-labelledby="tab-deaf"
               tabIndex={0}
+              className="w-full"
             >
               <DeafBridge />
             </div>
           )}
 
-          {/* Module 2: Visually Impaired Bridge - FULLY FUNCTIONAL */}
+          {/* Module 2: Visually Impaired Speech Interface */}
           {activeModule === 'blind' && (
-            <VisuallyImpairedBridge 
-              onLiveMessage={handleLiveMessage}
-            />
+            <div
+              id="bridge-panel-blind"
+              role="tabpanel"
+              aria-labelledby="tab-blind"
+              tabIndex={0}
+              className="w-full"
+            >
+              <VisuallyImpairedBridge 
+                onLiveMessage={handleLiveMessage}
+              />
+            </div>
           )}
 
-          {/* Module 3: Object Detection & Multimodal Scene AI */}
+          {/* Module 3: Object Detection & Spatial Scene AI */}
           {activeModule === 'object_detection' && (
             <div 
               id="bridge-panel-object-detection"
               role="tabpanel"
               aria-labelledby="tab-object-detection"
               tabIndex={0}
+              className="w-full"
             >
               <ObjectDetectionBridge />
             </div>
@@ -72,4 +82,3 @@ export default function Home() {
     </AccessibilityWrapper>
   );
 }
-

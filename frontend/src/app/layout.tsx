@@ -27,8 +27,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#0d1117",
-  colorScheme: "dark",
+  themeColor: "#0F4C81",
+  colorScheme: "light dark",
 };
 
 export default function RootLayout({
@@ -39,10 +39,12 @@ export default function RootLayout({
   return (
     <html 
       lang="en" 
-      className={`${geistSans.variable} ${geistMono.variable}`}
+      className={`${geistSans.variable} ${geistMono.variable} bg-[#F5F7FA] dark:bg-[#0F172A] min-h-screen`}
       dir="ltr"
     >
-      <body>{children}</body>
+      <body className="bg-[#F5F7FA] dark:bg-[#0F172A] text-[#1E293B] dark:text-[#F8FAFC] min-h-screen antialiased transition-colors duration-300">
+        {children}
+      </body>
     </html>
   );
 }

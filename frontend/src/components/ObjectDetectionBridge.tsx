@@ -347,75 +347,80 @@ export default function ObjectDetectionBridge() {
 
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '100%', maxWidth: '1200px', margin: '0 auto', padding: '1rem' }}>
-      
-      {/* Header Banner */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(15, 23, 42, 0.7)', padding: '1rem 1.5rem', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(12px)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <span style={{ fontSize: '1.75rem' }}>📷</span>
+    <div className="flex flex-col gap-6 md:gap-7 w-full max-w-[1340px] mx-auto p-4 md:p-6 text-[#1E293B] dark:text-[#F8FAFC]">
+
+      {/* Header Banner Card */}
+      <div className="bg-white dark:bg-[#1E293B] border border-[#D8E2EC] dark:border-[#334155] rounded-2xl p-6 md:p-7 shadow-[0_4px_12px_rgba(15,23,42,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.35)] hover:shadow-md transition-all duration-200 flex items-center justify-between flex-wrap gap-4 mb-2">
+        <div className="flex items-center gap-3">
+          <svg className="w-7 h-7 text-[#0F4C81] dark:text-[#3B82F6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
           <div>
-            <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#f3f4f6' }}>Object Detection & Spatial Scene AI</h2>
-            <p style={{ margin: 0, fontSize: '0.85rem', color: '#9ca3af' }}>Real-Time Object Detection, OCR & Visual Question Answering</p>
+            <h2 className="text-[24px] font-bold text-[#16324F] dark:text-white tracking-tight">Object Detection & Spatial Scene AI</h2>
+            <p className="text-[15px] text-[#475569] dark:text-[#CBD5E1] mt-0.5">Real-Time Object Detection, OCR & Visual Scene Narration</p>
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255, 255, 255, 0.05)', padding: '0.4rem 0.85rem', borderRadius: '9999px', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
-          <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: isConnected ? '#10b981' : '#ef4444', boxShadow: isConnected ? '0 0 10px #10b981' : '0 0 10px #ef4444' }} />
-          <span style={{ fontSize: '0.85rem', color: '#f3f4f6', fontWeight: 500 }}>{isConnected ? 'Backend Connected' : 'Disconnected'}</span>
+        <div className="flex items-center gap-2 bg-[#F4F7FB] dark:bg-[#0F172A] px-3.5 py-1.5 rounded-full border border-[#D8E2EC] dark:border-[#334155]">
+          <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-[#198754] dark:bg-[#16A34A] animate-pulse' : 'bg-[#C0392B] dark:bg-[#DC2626]'}`} />
+          <span className="text-[13px] text-[#1E293B] dark:text-[#F8FAFC] font-semibold">{isConnected ? 'Backend Connected' : 'Disconnected'}</span>
         </div>
       </div>
 
       {/* Main Grid: Video + Sidebar */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '1.5rem', alignItems: 'start' }}>
-        
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-7 items-start">
+
         {/* Left Column: Video Feed & Controls */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          
-          <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9', background: '#090d16', borderRadius: '20px', border: `2px solid ${isHapticActive ? '#6366f1' : 'rgba(255, 255, 255, 0.1)'}`, overflow: 'hidden', boxShadow: isHapticActive ? '0 0 30px rgba(99, 102, 241, 0.5)' : '0 8px 32px rgba(0,0,0,0.37)', transition: 'all 0.3s ease' }}>
-            <video ref={videoRef} autoPlay playsInline muted style={{ display: 'none' }} />
-            <canvas ref={displayCanvasRef} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div className="lg:col-span-8 flex flex-col gap-6">
+
+          <div className={`relative w-full aspect-video bg-[#16324F] dark:bg-[#0F172A] rounded-2xl overflow-hidden border ${isHapticActive ? 'border-[#0F4C81] dark:border-[#3B82F6] shadow-[0_0_20px_rgba(15,76,129,0.4)]' : 'border-[#D8E2EC] dark:border-[#334155] shadow-sm'} transition-all duration-200 mb-2`}>
+            <video ref={videoRef} autoPlay playsInline muted className="hidden" />
+            <canvas ref={displayCanvasRef} className="w-full h-full object-cover" />
 
             {/* HUD Overlay */}
-            <div style={{ position: 'absolute', top: '1rem', left: '1rem', right: '1rem', display: 'flex', justifyContent: 'space-between', pointerEvents: 'none' }}>
-              <div style={{ background: 'rgba(15, 23, 42, 0.75)', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', color: '#d1d5db', fontSize: '0.8rem' }}>
+            <div className="absolute top-4 left-4 right-4 flex justify-between pointer-events-none">
+              <div className="bg-[#16324F]/90 dark:bg-[#0F172A]/90 px-3 py-1 rounded-md border border-white/20 text-[#F8FAFC] text-[13px] font-semibold">
                 FPS: {fps}
               </div>
-              <div style={{ background: 'rgba(15, 23, 42, 0.75)', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', color: useMockCamera ? '#f59e0b' : '#34d399', fontSize: '0.8rem' }}>
+              <div className={`bg-[#16324F]/90 dark:bg-[#0F172A]/90 px-3 py-1 rounded-md border border-white/20 text-[13px] font-semibold ${useMockCamera ? 'text-[#D97706]' : 'text-[#86EFAC]'}`}>
                 {cameraStatus}
               </div>
             </div>
           </div>
 
-          {/* Controls Bar */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', background: 'rgba(18, 24, 38, 0.75)', padding: '1rem 1.25rem', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-            <div style={{ display: 'flex', gap: '0.75rem' }}>
+          {/* Controls Bar Card */}
+          <div className="bg-white dark:bg-[#1E293B] border border-[#D8E2EC] dark:border-[#334155] rounded-2xl p-6 md:p-7 shadow-[0_4px_12px_rgba(15,23,42,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.35)] flex items-center justify-between flex-wrap gap-4 transition-colors duration-200 mb-2">
+            <div className="flex gap-4">
               <button
                 onClick={handleToggleNarration}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  padding: '0.65rem 1.25rem',
-                  borderRadius: '10px',
-                  fontWeight: 600,
-                  fontSize: '0.9rem',
-                  cursor: 'pointer',
-                  border: 'none',
-                  background: isNarrating ? 'rgba(16, 185, 129, 0.2)' : 'linear-gradient(135deg, #6366f1, #4f46e5)',
-                  color: isNarrating ? '#34d399' : 'white',
-                  boxShadow: isNarrating ? '0 0 12px rgba(16, 185, 129, 0.3)' : '0 4px 14px rgba(99, 102, 241, 0.35)'
-                }}
+                className={`h-[48px] px-6 py-3.5 rounded-xl font-semibold text-[15px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-pointer flex items-center gap-2 text-white shadow-sm ${isNarrating ? 'bg-[#C0392B] dark:bg-[#DC2626] hover:bg-[#A93226]' : 'bg-[#0F4C81] dark:bg-[#2563EB] hover:bg-[#0B3D66] dark:hover:bg-[#1D4ED8]'
+                  }`}
               >
-                {isNarrating ? '⏸ Pause Narration' : '▶ Start Narration'}
+                {isNarrating ? (
+                  <>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6" />
+                    </svg>
+                    Pause Narration
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    </svg>
+                    Start Narration
+                  </>
+                )}
               </button>
             </div>
 
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', color: '#9ca3af', cursor: 'pointer' }}>
+            <label className="flex items-center gap-2 text-[15px] text-[#1E293B] dark:text-[#F8FAFC] font-semibold cursor-pointer">
               <input
                 type="checkbox"
                 checked={highResMode}
                 onChange={e => setHighResMode(e.target.checked)}
-                style={{ accentColor: '#6366f1', width: '16px', height: '16px' }}
+                className="w-4.5 h-4.5 accent-[#0F4C81] dark:accent-[#3B82F6] rounded border-[#CBD5E1] cursor-pointer"
               />
               High-Res (OCR) Mode
             </label>
@@ -423,30 +428,33 @@ export default function ObjectDetectionBridge() {
 
         </div>
 
-        {/* Right Column: Scene Description Transcript & VQA Prompt */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', background: 'rgba(18, 24, 38, 0.75)', padding: '1.25rem', borderRadius: '20px', border: '1px solid rgba(255, 255, 255, 0.08)', minHeight: '440px' }}>
-          
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '0.75rem' }}>
-            <h3 style={{ margin: 0, fontSize: '1rem', color: '#f3f4f6' }}>Scene Analysis Log</h3>
-            <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>{transcripts.length} entries</span>
+        {/* Right Column: Scene Description Transcript & VQA Prompt Card */}
+        <div className="lg:col-span-4 bg-white dark:bg-[#1E293B] border border-[#D8E2EC] dark:border-[#334155] rounded-2xl p-6 md:p-7 shadow-[0_4px_12px_rgba(15,23,42,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.35)] flex flex-col gap-4 min-h-[460px] transition-colors duration-200">
+
+          <div className="flex justify-between items-center border-b border-[#D8E2EC] dark:border-[#334155] pb-3">
+            <h3 className="text-[20px] font-semibold text-[#16324F] dark:text-white flex items-center gap-2">
+              <svg className="w-5 h-5 text-[#0F4C81] dark:text-[#3B82F6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Scene Analysis Log
+            </h3>
+            <span className="text-[13px] text-[#64748B] dark:text-[#94A3B8] font-semibold">{transcripts.length} entries</span>
           </div>
 
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.75rem', overflowY: 'auto', maxHeight: '300px', paddingRight: '0.25rem' }}>
+          <div className="flex flex-col gap-3 pr-1">
             {transcripts.length === 0 ? (
-              <p style={{ fontSize: '0.85rem', color: '#6b7280', textAlign: 'center', marginTop: '2rem' }}>
+              <p className="text-[15px] text-[#64748B] dark:text-[#94A3B8] text-center my-auto italic">
                 Click &quot;Start Narration&quot; or ask a question below to detect objects.
               </p>
             ) : (
               transcripts.map(t => (
-                <div key={t.id} style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.05)', borderLeft: '3px solid #6366f1', padding: '0.75rem 1rem', borderRadius: '8px', fontSize: '0.875rem' }}>
-                  <div style={{ fontSize: '0.7rem', color: '#9ca3af', marginBottom: '0.25rem' }}>{t.timestamp}</div>
-                  <div style={{ color: '#f3f4f6' }}>{t.text}</div>
+                <div key={t.id} className="bg-[#F4F7FB] dark:bg-[#0F172A] border border-[#D8E2EC] dark:border-[#334155] border-l-4 border-l-[#0F4C81] dark:border-l-[#3B82F6] p-3.5 rounded-lg text-[15px]">
+                  <div className="text-[13px] text-[#64748B] dark:text-[#94A3B8] font-semibold mb-1">{t.timestamp}</div>
+                  <div className="text-[#1E293B] dark:text-[#F8FAFC]">{t.text}</div>
                 </div>
               ))
             )}
           </div>
-
-
 
         </div>
 

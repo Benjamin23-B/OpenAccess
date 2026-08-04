@@ -209,7 +209,7 @@ export default function CwasaAvatarRenderer({
   return (
     <div
       ref={containerRef}
-      className="cwasa-avatar-container relative w-full h-[480px] min-h-[480px] bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex flex-col items-center justify-center"
+      className="cwasa-avatar-container relative w-full h-[480px] min-h-[480px] bg-[#0F172A] rounded-xl overflow-hidden border border-[#1F3A5F] shadow-sm flex flex-col items-center justify-center"
       style={{ width: '100%', height: '480px', minHeight: '480px', position: 'relative' }}
     >
       <style jsx global>{`
@@ -219,7 +219,7 @@ export default function CwasaAvatarRenderer({
           height: 480px !important;
           min-height: 480px !important;
           position: relative !important;
-          background: #020617 !important;
+          background: #0F172A !important;
           display: block !important;
         }
         .CWASAAvatar.av0 canvas,
@@ -236,26 +236,26 @@ export default function CwasaAvatarRenderer({
 
       {/* Loading Overlay */}
       {!isLoaded && !errorMsg && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950 z-20 text-cyan-400 p-6 text-center">
-          <div className="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mb-4" />
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0F172A] z-20 text-[#0B5CAD] p-6 text-center">
+          <div className="w-12 h-12 border-4 border-[#0B5CAD] border-t-transparent rounded-full animate-spin mb-4" />
           <p className="font-semibold text-lg text-white">Initializing Kozha 3D Avatar ({avatarName.toUpperCase()})...</p>
-          <p className="text-sm text-slate-400 mt-1">Loading Kozha WebGL engine & avatar models</p>
+          <p className="text-sm text-slate-300 mt-1">Loading Kozha WebGL engine & avatar models</p>
         </div>
       )}
 
       {/* Error Fallback */}
       {errorMsg && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950 z-30 text-cyan-200 p-6 text-center">
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0F172A] z-30 text-sky-200 p-6 text-center">
           <span className="text-4xl mb-3">⚠️</span>
           <p className="font-bold text-lg text-white">CWASA WebGL Avatar Notice</p>
-          <p className="text-xs text-slate-400 mt-1 max-w-sm">{errorMsg}</p>
+          <p className="text-xs text-slate-300 mt-1 max-w-sm">{errorMsg}</p>
         </div>
       )}
 
       {/* CWASA WebGL Canvas Container - Exact Kozha app.html DOM structure */}
       <div
         className="CWASAAvatar av0 w-full h-[480px] block"
-        style={{ width: '100%', height: '480px', minHeight: '480px', background: '#020617', display: 'block' }}
+        style={{ width: '100%', height: '480px', minHeight: '480px', background: '#0F172A', display: 'block' }}
       />
       <div className="CWASAAvMenu av0" style={{ display: 'none' }} aria-hidden="true" />
       <div className="CWASAGUI av0" style={{ display: 'none' }} aria-hidden="true" />

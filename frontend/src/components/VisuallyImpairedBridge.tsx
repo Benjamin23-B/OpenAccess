@@ -50,7 +50,7 @@ export default function VisuallyImpairedBridge({ onLiveMessage }: VisuallyImpair
   // Automatically update active synthesis voice when language changes
   useEffect(() => {
     if (voices.length === 0) return;
-    
+
     if (selectedLanguage === 'thanglish') {
       const thanglishVoice = voices.find(v => v.voiceURI === 'thanglish-virtual-voice');
       if (thanglishVoice) setSelectedVoice(thanglishVoice);
@@ -59,7 +59,7 @@ export default function VisuallyImpairedBridge({ onLiveMessage }: VisuallyImpair
       const tamilVoices = voices.filter(v => v.lang.toLowerCase().replace('_', '-').startsWith('ta'));
       const googleTamil = tamilVoices.find(v => v.name.toLowerCase().includes('google'));
       const tamilVoice = googleTamil || tamilVoices[0];
-      
+
       if (tamilVoice) {
         setSelectedVoice(tamilVoice);
       } else {
@@ -72,19 +72,18 @@ export default function VisuallyImpairedBridge({ onLiveMessage }: VisuallyImpair
       const enINVoices = voices.filter(v => v.lang.toLowerCase().replace('_', '-').startsWith('en-in'));
       const googleEnIN = enINVoices.find(v => v.name.toLowerCase().includes('google'));
       const enINVoice = googleEnIN || enINVoices[0];
-      
+
       if (enINVoice) {
         setSelectedVoice(enINVoice);
       } else {
         // Fallback to any English voice
         const fallbackEnglish = voices.find(v => v.lang.toLowerCase().startsWith('en') && v.name.toLowerCase().includes('google')) ||
-                                voices.find(v => v.lang.toLowerCase().startsWith('en')) || 
-                                voices[0];
+          voices.find(v => v.lang.toLowerCase().startsWith('en')) ||
+          voices[0];
         setSelectedVoice(fallbackEnglish);
       }
     }
   }, [selectedLanguage, voices, setSelectedVoice]);
-
 
   // Update timestamp when transcript changes
   useEffect(() => {
@@ -149,109 +148,132 @@ export default function VisuallyImpairedBridge({ onLiveMessage }: VisuallyImpair
   const displayError = recognitionError || (synthesisError ? { type: 'unknown', message: synthesisError } : null);
 
   return (
-    <div 
+    <div
       id="bridge-panel-blind"
-      className="visually-impaired-bridge"
+      className="visually-impaired-bridge flex flex-col gap-6 md:gap-7 w-full max-w-[1340px] mx-auto p-4 md:p-6 text-[#1E293B] dark:text-[#F8FAFC]"
       role="tabpanel"
       aria-labelledby="tab-blind"
       tabIndex={0}
     >
-      <div className="bridge-header">
-        <h2 className="bridge-title">
-          <span aria-hidden="true">👁️</span> Speech / Audio Interface
+      {/* Header Banner Card */}
+      <div className="bg-white dark:bg-[#1E293B] border border-[#D8E2EC] dark:border-[#334155] rounded-2xl p-6 md:p-7 shadow-[0_4px_12px_rgba(15,23,42,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.35)] hover:shadow-md transition-all duration-200 mb-2">
+        <h2 className="text-[24px] font-bold text-[#16324F] dark:text-white tracking-tight flex items-center gap-2.5">
+          <svg className="w-6 h-6 text-[#0F4C81] dark:text-[#3B82F6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+          Speech / Audio Interface
         </h2>
-        <p className="bridge-description">
-          Speech-to-text and text-to-speech for visually impaired users. 
-          All controls are keyboard accessible.
+        <p className="text-[15px] text-[#475569] dark:text-[#CBD5E1] mt-1.5 leading-relaxed">
+          Speech-to-text and text-to-speech for visually impaired users. All controls are keyboard accessible.
         </p>
       </div>
 
       {/* Status & Error Display */}
-      <StatusIndicator state={listeningState} error={displayError} />
-      
+      <div className="mb-2">
+        <StatusIndicator state={listeningState} error={displayError} />
+      </div>
+
       {displayError && (
-        <div 
-          className="error-banner" 
-          role="alert" 
-          aria-live="assertive"
-        >
-          <span className="error-icon" aria-hidden="true">⚠️</span>
-          <span className="error-message">{displayError.message}</span>
+        <div className="bg-[#FEF2F2] dark:bg-[#451A1A] border border-[#FCA5A5] dark:border-[#DC2626] text-[#991B1B] dark:text-[#FCA5A5] p-4.5 rounded-xl flex items-center gap-3 text-[15px] font-medium mb-4" role="alert" aria-live="assertive">
+          <svg className="w-5 h-5 text-[#C0392B] dark:text-[#DC2626] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <span>{displayError.message}</span>
         </div>
       )}
 
       {copiedMessage && (
-        <div 
-          className="success-banner" 
-          role="status" 
-          aria-live="polite"
-        >
-          <span className="success-icon" aria-hidden="true">✅</span>
+        <div className="bg-[#E8F5E9] dark:bg-[#166534]/40 border border-[#A5D6A7] dark:border-[#22C55E]/40 text-[#198754] dark:text-[#86EFAC] p-4.5 rounded-xl flex items-center gap-3 text-[15px] font-medium mb-4" role="status" aria-live="polite">
+          <svg className="w-5 h-5 text-[#198754] dark:text-[#16A34A] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
           <span>{copiedMessage}</span>
         </div>
       )}
 
       {/* Feature Not Supported Warnings */}
       {!isSTTSupported && (
-        <div className="warning-banner" role="alert">
-          <span aria-hidden="true">🚫</span>
-          <strong>Speech recognition not supported:</strong> Please use Chrome, Edge, or Safari for voice input.
+        <div className="bg-[#FFFBEB] dark:bg-[#78350F]/30 border border-[#FCD34D] dark:border-[#D97706] text-[#D97706] dark:text-[#FDE68A] p-4.5 rounded-xl flex items-center gap-3 text-[15px] font-medium mb-4" role="alert">
+          <svg className="w-5 h-5 text-[#D97706] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <span><strong>Speech recognition not supported:</strong> Please use Chrome, Edge, or Safari for voice input.</span>
         </div>
       )}
-      
+
       {!isTTSSupported && (
-        <div className="warning-banner" role="alert">
-          <span aria-hidden="true">🚫</span>
-          <strong>Text-to-speech not supported:</strong> Your browser does not support speech synthesis.
+        <div className="bg-[#FFFBEB] dark:bg-[#78350F]/30 border border-[#FCD34D] dark:border-[#D97706] text-[#D97706] dark:text-[#FDE68A] p-4.5 rounded-xl flex items-center gap-3 text-[15px] font-medium mb-4" role="alert">
+          <svg className="w-5 h-5 text-[#D97706] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <span><strong>Text-to-speech not supported:</strong> Your browser does not support speech synthesis.</span>
         </div>
       )}
 
-      {/* Speech Controls */}
-      <SpeechControls
-        listeningState={listeningState}
-        isSTTSupported={isSTTSupported}
-        onStartListening={handleStartListening}
-        onStopListening={handleStopListening}
-        speechState={speechState}
-        isTTSSupported={isTTSSupported}
-        transcript={transcript}
-        onSpeak={handleSpeak}
-        onPause={pause}
-        onResume={resume}
-        onStop={stop}
-        selectedLanguage={selectedLanguage}
-        onLanguageChange={setSelectedLanguage}
-        rate={rate}
-        onRateChange={setRate}
-        pitch={pitch}
-        onPitchChange={setPitch}
-      />
+      {/* Speech Controls Card */}
+      <div className="mb-2">
+        <SpeechControls
+          listeningState={listeningState}
+          isSTTSupported={isSTTSupported}
+          onStartListening={handleStartListening}
+          onStopListening={handleStopListening}
+          speechState={speechState}
+          isTTSSupported={isTTSSupported}
+          transcript={transcript}
+          onSpeak={handleSpeak}
+          onPause={pause}
+          onResume={resume}
+          onStop={stop}
+          selectedLanguage={selectedLanguage}
+          onLanguageChange={setSelectedLanguage}
+          rate={rate}
+          onRateChange={setRate}
+          pitch={pitch}
+          onPitchChange={setPitch}
+        />
+      </div>
 
-      {/* Transcription Display */}
-      <TranscriptionPanel
-        transcript={transcript}
-        interimTranscript={interimTranscript}
-        timestamp={timestamp}
-        onClear={handleClear}
-        onCopy={handleCopy}
-      />
+      {/* Transcription Display Card */}
+      <div className="mb-2">
+        <TranscriptionPanel
+          transcript={transcript}
+          interimTranscript={interimTranscript}
+          timestamp={timestamp}
+          onClear={handleClear}
+          onCopy={handleCopy}
+        />
+      </div>
 
-      {/* Scene Narration — reuses existing camera stream */}
-      <EnvDetector
-        streamRef={streamRef}
-        onAnnouncement={onLiveMessage}
-      />
+      {/* Scene Narration Card */}
+      <div className="mb-2">
+        <EnvDetector
+          streamRef={streamRef}
+          onAnnouncement={onLiveMessage}
+        />
+      </div>
 
-      {/* Keyboard Shortcuts Help */}
-      <section className="keyboard-help" aria-labelledby="shortcuts-heading">
-        <h3 id="shortcuts-heading" className="help-title">
-          <span aria-hidden="true">⌨️</span> Keyboard Shortcuts
+      {/* Keyboard Shortcuts Help Card */}
+      <section className="bg-white dark:bg-[#1E293B] border border-[#D8E2EC] dark:border-[#334155] rounded-2xl p-6 md:p-7 shadow-[0_4px_12px_rgba(15,23,42,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.35)] hover:shadow-md transition-all duration-200" aria-labelledby="shortcuts-heading">
+        <h3 id="shortcuts-heading" className="text-[20px] font-semibold text-[#16324F] dark:text-white flex items-center gap-2 mb-3">
+          <svg className="w-5 h-5 text-[#0F4C81] dark:text-[#3B82F6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+          Keyboard Shortcuts Cheatsheet
         </h3>
-        <ul className="shortcuts-list">
-          <li><kbd>Tab</kbd> Navigate between controls</li>
-          <li><kbd>Enter</kbd> or <kbd>Space</kbd> Activate buttons</li>
-          <li><kbd>Shift + Tab</kbd> Navigate backwards</li>
-          <li><kbd>Esc</kbd> Stop listening or speaking</li>
+        <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5">
+          <li className="bg-[#F4F7FB] dark:bg-[#0F172A] border border-[#D8E2EC] dark:border-[#334155] p-3.5 rounded-xl flex items-center gap-2.5 text-[13px] text-[#475569] dark:text-[#CBD5E1]">
+            <kbd className="bg-white dark:bg-[#1E293B] border border-[#CBD5E1] dark:border-[#475569] px-2 py-1 rounded text-[12px] font-bold font-mono text-[#16324F] dark:text-white">Tab</kbd> Navigate controls
+          </li>
+          <li className="bg-[#F4F7FB] dark:bg-[#0F172A] border border-[#D8E2EC] dark:border-[#334155] p-3.5 rounded-xl flex items-center gap-2.5 text-[13px] text-[#475569] dark:text-[#CBD5E1]">
+            <kbd className="bg-white dark:bg-[#1E293B] border border-[#CBD5E1] dark:border-[#475569] px-2 py-1 rounded text-[12px] font-bold font-mono text-[#16324F] dark:text-white">Enter / Space</kbd> Activate CTA
+          </li>
+          <li className="bg-[#F4F7FB] dark:bg-[#0F172A] border border-[#D8E2EC] dark:border-[#334155] p-3.5 rounded-xl flex items-center gap-2.5 text-[13px] text-[#475569] dark:text-[#CBD5E1]">
+            <kbd className="bg-white dark:bg-[#1E293B] border border-[#CBD5E1] dark:border-[#475569] px-2 py-1 rounded text-[12px] font-bold font-mono text-[#16324F] dark:text-white">Shift + Tab</kbd> Backwards
+          </li>
+          <li className="bg-[#F4F7FB] dark:bg-[#0F172A] border border-[#D8E2EC] dark:border-[#334155] p-3.5 rounded-xl flex items-center gap-2.5 text-[13px] text-[#475569] dark:text-[#CBD5E1]">
+            <kbd className="bg-white dark:bg-[#1E293B] border border-[#CBD5E1] dark:border-[#475569] px-2 py-1 rounded text-[12px] font-bold font-mono text-[#16324F] dark:text-white">Esc</kbd> Stop Audio / Mic
+          </li>
         </ul>
       </section>
     </div>

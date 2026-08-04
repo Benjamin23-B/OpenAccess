@@ -1,6 +1,6 @@
 'use client';
 
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode } from 'react';
 
 interface AccessibilityWrapperProps {
   children: ReactNode;
@@ -9,13 +9,9 @@ interface AccessibilityWrapperProps {
 }
 
 export default function AccessibilityWrapper({ children, liveMessage, progressMessage }: AccessibilityWrapperProps) {
-  // We use aria-live regions for screen reader announcements
-  // assertive: interrupts whatever the screen reader is currently saying
-  // polite: waits until the screen reader finishes current sentence
-  
   return (
-    <div className="accessibility-wrapper">
-      {/* Screen Reader Only Live Region for Assertive Updates (e.g., immediate sign-to-text translation) */}
+    <div className="accessibility-wrapper w-full bg-[#F5F7FA] dark:bg-[#0F172A] text-[#1E293B] dark:text-[#F8FAFC] transition-colors duration-300">
+      {/* Screen Reader Only Live Region for Assertive Updates */}
       <div 
         aria-live="assertive" 
         className="sr-only" 
@@ -24,7 +20,7 @@ export default function AccessibilityWrapper({ children, liveMessage, progressMe
         {liveMessage}
       </div>
 
-      {/* Screen Reader Only Live Region for Status Updates (e.g., loading models) */}
+      {/* Screen Reader Only Live Region for Status Updates */}
       <div 
         role="status" 
         aria-live="polite" 
@@ -35,9 +31,9 @@ export default function AccessibilityWrapper({ children, liveMessage, progressMe
       </div>
 
       {/* Main Content Area */}
-      <main role="main">
+      <div role="main" className="w-full">
         {children}
-      </main>
+      </div>
     </div>
   );
 }
