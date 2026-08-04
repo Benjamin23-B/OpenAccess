@@ -2,11 +2,22 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
+// Camera capture resolution presets. Values are "ideal" constraints, so a
+// device that can't hit them exactly falls back to its closest supported size.
+const CAMERA_RESOLUTIONS: Record<string, { label: string; width: number; height: number }> = {
+  low:  { label: '640×480 (Low)',     width: 640,  height: 480 },
+  sd:   { label: '854×480 (480p)',    width: 854,  height: 480 },
+  hd:   { label: '1280×720 (720p)',   width: 1280, height: 720 },
+  fhd:  { label: '1920×1080 (1080p)', width: 1920, height: 1080 },
+};
+const DEFAULT_RESOLUTION = 'hd';
+
 export default function ObjectDetectionBridge() {
   const [isConnected, setIsConnected] = useState(false);
   const [isNarrating, setIsNarrating] = useState(false);
   const [useMockCamera, setUseMockCamera] = useState(false);
   const [highResMode, setHighResMode] = useState(false);
+  const [resolutionKey, setResolutionKey] = useState<string>(DEFAULT_RESOLUTION);
   const [transcripts, setTranscripts] = useState<Array<{ id: string; text: string; timestamp: string }>>([]);
 
   const [fps, setFps] = useState<number>(0);
@@ -22,6 +33,7 @@ export default function ObjectDetectionBridge() {
   const isNarratingRef = useRef<boolean>(false);
   const highResModeRef = useRef<boolean>(false);
   const useMockCameraRef = useRef<boolean>(false);
+  const resolutionKeyRef = useRef<string>(DEFAULT_RESOLUTION);
 
   // Sync refs with state for use inside animation/socket callbacks
   useEffect(() => {
@@ -35,6 +47,10 @@ export default function ObjectDetectionBridge() {
   useEffect(() => {
     useMockCameraRef.current = useMockCamera;
   }, [useMockCamera]);
+
+  useEffect(() => {
+    resolutionKeyRef.current = resolutionKey;
+  }, [resolutionKey]);
 
   const addTranscript = useCallback((text: string) => {
     const time = new Date().toLocaleTimeString();
@@ -89,8 +105,9 @@ export default function ObjectDetectionBridge() {
         tracks.forEach(track => track.stop());
       }
 
+      const res = CAMERA_RESOLUTIONS[resolutionKeyRef.current] || CAMERA_RESOLUTIONS[DEFAULT_RESOLUTION];
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'environment' }
+        video: { width: { ideal: res.width }, height: { ideal: res.height }, facingMode: 'environment' }
       });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -328,6 +345,18 @@ export default function ObjectDetectionBridge() {
     return () => clearInterval(interval);
   }, [captureAndSendFrame]);
 
+  const handleResolutionChange = (key: string) => {
+    if (!(key in CAMERA_RESOLUTIONS)) return;
+    setResolutionKey(key);
+    resolutionKeyRef.current = key; // update ref now so a live restart uses it
+    // Re-open the webcam with the new size if narration is already running.
+    if (isNarratingRef.current) {
+      stopWebcam();
+      setCameraStatus('Initializing camera...');
+      setupWebcam();
+    }
+  };
+
   const handleToggleNarration = async () => {
     const nextState = !isNarrating;
     setIsNarrating(nextState);
@@ -410,15 +439,30 @@ export default function ObjectDetectionBridge() {
               </button>
             </div>
 
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', color: '#9ca3af', cursor: 'pointer' }}>
-              <input
-                type="checkbox"
-                checked={highResMode}
-                onChange={e => setHighResMode(e.target.checked)}
-                style={{ accentColor: '#6366f1', width: '16px', height: '16px' }}
-              />
-              High-Res (OCR) Mode
-            </label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', color: '#9ca3af' }}>
+                  Camera
+                  <select
+                    value={resolutionKey}
+                    onChange={e => handleResolutionChange(e.target.value)}
+                    style={{ background: '#0f172a', color: '#f3f4f6', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px', padding: '0.4rem 0.6rem', fontSize: '0.85rem', cursor: 'pointer' }}
+                  >
+                    {Object.entries(CAMERA_RESOLUTIONS).map(([key, res]) => (
+                      <option key={key} value={key}>{res.label}</option>
+                    ))}
+                  </select>
+                </label>
+
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', color: '#9ca3af', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={highResMode}
+                    onChange={e => setHighResMode(e.target.checked)}
+                    style={{ accentColor: '#6366f1', width: '16px', height: '16px' }}
+                  />
+                  High-Res (OCR) Mode
+                </label>
+              </div>
           </div>
 
         </div>
