@@ -162,37 +162,61 @@ def detect_fruits(image_cv) -> list:
     return fruits
 
 class VLMEngine:
-    def __init__(self, mock_mode: bool = False, conf_threshold: float = 0.75):
+    def __init__(self, mock_mode: bool = False, conf_threshold: float = 0.5,
+                 imgsz: int = 640, iou_threshold: float = 0.5):
         self.mock_mode = mock_mode
         self.conf_threshold = conf_threshold
+        self.imgsz = imgsz
+        self.iou_threshold = iou_threshold
         self.model = None
         self.reader = None
-        
+
         if not self.mock_mode:
             self._initialize_model()
 
     def _initialize_model(self):
         """
-        Initializes a lightweight open-vocabulary YOLO-World model.
+        Initializes a YOLO model (yolov8m preferred for accuracy).
+        A named weights file is auto-downloaded by Ultralytics on the target
+        machine at first run, so no weights need to ship with the repo.
+        Smaller local files are used as a fallback if yolov8m can't load.
         Also initializes EasyOCR for text reading.
         """
         if not HAS_YOLO:
             print("Ultralytics not installed. Falling back to mock mode.")
             self.mock_mode = True
             return
-            
-        print("Loading local YOLO Model...")
-        model_path = Path(__file__).parent.parent / "yolo26n.pt"
-        if not model_path.exists():
-            model_path = Path(__file__).parent.parent / "yolov8n.pt"
-        if not model_path.exists():
-            model_path = "yolov8n.pt"
 
-        try:
-            self.model = YOLO(str(model_path))
-            print(f"Local YOLO Model loaded successfully from {model_path}.")
-        except Exception as e:
-            print(f"YOLO model load notice ({e}). Trying fallback YOLOWorld...")
+        print("Loading YOLO Model...")
+        model_dir = Path(__file__).parent.parent
+        env_model = os.environ.get("YOLO_MODEL", "").strip()
+
+        # Preferred weights: yolov8m by default (override via YOLO_MODEL).
+        # Reuse a local file if present to avoid re-downloading, otherwise
+        # pass the bare name so Ultralytics fetches it on the target.
+        preferred = env_model or "yolov8m.pt"
+        candidates = []
+        local_preferred = model_dir / preferred
+        if local_preferred.exists():
+            candidates.append(str(local_preferred))
+        candidates.append(preferred)
+
+        # Smaller local fallbacks, only used if the preferred model can't load.
+        for name in ("yolov8s.pt", "yolov8n.pt", "yolo26n.pt"):
+            local = model_dir / name
+            if local.exists():
+                candidates.append(str(local))
+
+        for candidate in candidates:
+            try:
+                self.model = YOLO(candidate)
+                print(f"YOLO Model loaded: {candidate}")
+                break
+            except Exception as e:
+                print(f"YOLO load notice ({candidate}): {e}")
+
+        if self.model is None:
+            print("YOLO model load failed. Trying fallback YOLOWorld...")
             try:
                 self.model = YOLOWorld("yolov8s-worldv2.pt")
             except Exception as fe:
@@ -267,8 +291,17 @@ class VLMEngine:
 - text reading "10:30 AM": [490, 120, 570, 160]
 """
             
-        # Actual Inference Logic using YOLO (imgsz=320 drastically improves latency)
-        results = self.model(image, conf=self.conf_threshold, iou=0.45, imgsz=320, verbose=False)
+        # Run inference. imgsz=640 (YOLO's native training resolution) yields
+        # markedly better detection than 320; use GPU automatically if available.
+        device = 0 if torch.cuda.is_available() else "cpu"
+        results = self.model(
+            image,
+            conf=self.conf_threshold,
+            iou=self.iou_threshold,
+            imgsz=self.imgsz,
+            device=device,
+            verbose=False,
+        )
         
         markdown_lines = ["# Scene Analysis\n", "## Objects Detected"]
         detected_boxes = []

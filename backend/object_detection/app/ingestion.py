@@ -4,14 +4,18 @@ from PIL import Image
 import io
 
 class IngestionPipeline:
-    def __init__(self, delta_threshold: float = 0.85):
+    def __init__(self, delta_threshold: float = 0.85, max_dim: int = 640):
         """
         Initializes the data ingestion layer.
-        :param delta_threshold: SSIM-like structural similarity threshold. 
+        :param delta_threshold: SSIM-like structural similarity threshold.
                                 Frames more similar than this are ignored.
+        :param max_dim: Longest edge that frames are downscaled to before
+                        inference. Higher keeps more detail (better small-object
+                        detection) at a cost to latency.
         """
         self.last_frame = None
         self.delta_threshold = delta_threshold
+        self.max_dim = max_dim
 
     def _calculate_similarity(self, frame1: np.ndarray, frame2: np.ndarray) -> float:
         """
@@ -50,7 +54,7 @@ class IngestionPipeline:
         self.last_frame = frame.copy()
 
         # Dynamic Token Budgeting (Resize based on high_res_mode flag)
-        max_dim = 1024 if high_res_mode else 512
+        max_dim = 1024 if high_res_mode else self.max_dim
         
         h, w = frame.shape[:2]
         if max(h, w) > max_dim:
