@@ -103,7 +103,7 @@ html {
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  min-height: 100%;
+  min-height: 100vh;
   margin: 0;
   padding: 0;
   overflow: visible !important;
@@ -112,7 +112,7 @@ body {
 }
 
 /* Strictly prevent any inner container from rendering a secondary vertical scrollbar */
-#__next, .accessibility-wrapper, .app-container, main, #main-content, .visually-impaired-bridge, #bridge-panel-blind {
+#__next, .accessibility-wrapper, .app-container, main, #main-content, .visually-impaired-bridge, #bridge-panel-blind, [role="tabpanel"] {
   overflow: visible !important;
   overflow-y: visible !important;
   overflow-x: hidden !important;

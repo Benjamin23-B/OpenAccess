@@ -42,8 +42,8 @@ export default function Home() {
               id="bridge-panel-deaf"
               role="tabpanel"
               aria-labelledby="tab-deaf"
-              tabIndex={0}
-              className="w-full"
+              tabIndex={-1}
+              className="w-full focus:outline-none"
             >
               <DeafBridge />
             </div>
@@ -55,8 +55,8 @@ export default function Home() {
               id="bridge-panel-blind"
               role="tabpanel"
               aria-labelledby="tab-blind"
-              tabIndex={0}
-              className="w-full"
+              tabIndex={-1}
+              className="w-full focus:outline-none"
             >
               <VisuallyImpairedBridge 
                 onLiveMessage={handleLiveMessage}
@@ -70,8 +70,8 @@ export default function Home() {
               id="bridge-panel-object-detection"
               role="tabpanel"
               aria-labelledby="tab-object-detection"
-              tabIndex={0}
-              className="w-full"
+              tabIndex={-1}
+              className="w-full focus:outline-none"
             >
               <ObjectDetectionBridge />
             </div>
