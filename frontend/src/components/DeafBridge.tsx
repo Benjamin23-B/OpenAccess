@@ -12,6 +12,7 @@ export default function DeafBridge() {
   const [signingStatus, setSigningStatus] = useState('Idle');
   const [signingSpeed, setSigningSpeed] = useState(1.0);
   const [selectedLanguage, setSelectedLanguage] = useState<'en-IN' | 'ta-IN' | 'thanglish'>('en-IN');
+  const [playNonce, setPlayNonce] = useState(0);
 
   // Kozha Integration State (BSL + ISL only)
   const [selectedAvatar, setSelectedAvatar] = useState<'anna' | 'marc' | 'francoise' | 'luna' | 'siggi'>('anna');
@@ -69,6 +70,7 @@ export default function DeafBridge() {
   useEffect(() => {
     if (transcript) {
       setActiveSignText(transcript);
+      setPlayNonce((prev) => prev + 1);
     }
   }, [transcript]);
 
@@ -76,6 +78,7 @@ export default function DeafBridge() {
   const handleTranslate = useCallback(() => {
     if (inputText.trim()) {
       setActiveSignText(inputText);
+      setPlayNonce((prev) => prev + 1);
     }
   }, [inputText]);
 
@@ -91,6 +94,7 @@ export default function DeafBridge() {
   const handlePresetTrigger = useCallback((phrase: string) => {
     setInputText(phrase);
     setActiveSignText(phrase);
+    setPlayNonce((prev) => prev + 1);
   }, []);
 
   // Filtered dictionary entries for dictionary tab
@@ -215,6 +219,7 @@ export default function DeafBridge() {
                 avatarName={selectedAvatar}
                 signingSpeed={signingSpeed}
                 onStatusChange={setSigningStatus}
+                playNonce={playNonce}
               />
             </div>
 

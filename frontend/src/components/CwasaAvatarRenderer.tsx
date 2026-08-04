@@ -7,6 +7,7 @@ interface CwasaAvatarRendererProps {
   avatarName?: 'anna' | 'marc' | 'francoise' | 'luna' | 'siggi';
   signingSpeed?: number;
   onStatusChange?: (status: string) => void;
+  playNonce?: number;
 }
 
 declare global {
@@ -22,11 +23,13 @@ export default function CwasaAvatarRenderer({
   avatarName = 'luna',
   signingSpeed = 1.0,
   onStatusChange,
+  playNonce = 0,
 }: CwasaAvatarRendererProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const lastPlayedSigml = useRef<string>('');
+  const lastPlayNonce = useRef<number>(0);
   const initializedRef = useRef(false);
 
   useEffect(() => {
@@ -182,20 +185,26 @@ export default function CwasaAvatarRenderer({
   // `CWASA.stop(0)` after a guessed timeout — that freezes the WebGL bone meshes
   // at the last-applied frame, leaving the model in a skewed "weird" pose.
   useEffect(() => {
-    if (!sigmlText || sigmlText === lastPlayedSigml.current || !isLoaded) return;
+    if (!sigmlText || !isLoaded) return;
     if (typeof sigmlText !== 'string' || !sigmlText.trim()) return;
     if (sigmlText.includes('[object Object]')) return;
+
+    const isNewSigml = sigmlText !== lastPlayedSigml.current;
+    const isNewNonce = playNonce !== 0 && playNonce !== lastPlayNonce.current;
+
+    if (!isNewSigml && !isNewNonce) return;
 
     if (window.CWASA && typeof window.CWASA.playSiGMLText === 'function') {
       try {
         lastPlayedSigml.current = sigmlText;
+        lastPlayNonce.current = playNonce;
         onStatusChange?.('Signing Animation');
         window.CWASA.playSiGMLText(sigmlText, 0);
       } catch (err: any) {
         console.warn('CWASA Play Error:', err);
       }
     }
-  }, [sigmlText, isLoaded, onStatusChange]);
+  }, [sigmlText, isLoaded, playNonce, onStatusChange]);
 
   // Switch avatar character
   useEffect(() => {

@@ -63,7 +63,7 @@ class SignDictionaryService {
     const code = toCode(signLanguage);
 
     try {
-      const response = await fetch('http://localhost:8001/api/plan', {
+      const response = await fetch('/api/plan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text, language: 'en', sign_language: code }),

@@ -32,6 +32,7 @@ export interface EnvDetectorState {
   webnnAvailable: boolean;
   lastAnnouncement: string;
   detectionCount: number;
+  workerError: string | null;
   toggle: () => void;
 }
 
@@ -43,6 +44,7 @@ export function useEnvDetector(
   const [webnnAvailable, setWebnn]      = useState(false);
   const [lastAnnouncement, setLast]     = useState('');
   const [detectionCount, setCount]      = useState(0);
+  const [workerError, setWorkerError]   = useState<string | null>(null);
 
   const workerRef     = useRef<Worker | null>(null);
   const canvasRef     = useRef<HTMLCanvasElement | null>(null);
@@ -65,6 +67,10 @@ export function useEnvDetector(
       if (type === 'READY') {
         setIsModelReady(payload.modelReady ?? false);
         setWebnn(payload.webnnAvailable ?? false);
+        setWorkerError(null);
+      } else if (type === 'ERROR') {
+        console.warn('[useEnvDetector] Worker error:', payload);
+        setWorkerError(String(payload));
       } else if (type === 'DETECTIONS') {
         const rawList = payload as RawDetection[];
 
@@ -221,5 +227,5 @@ export function useEnvDetector(
     });
   }, [streamRef]);
 
-  return { isActive, isModelReady, webnnAvailable, lastAnnouncement, detectionCount, toggle };
+  return { isActive, isModelReady, webnnAvailable, lastAnnouncement, detectionCount, workerError, toggle };
 }

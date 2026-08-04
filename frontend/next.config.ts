@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
+        source: '/api/plan',
+        destination: 'http://127.0.0.1:8001/api/plan',
+      },
+      {
         source: '/api/:path*',
         destination: 'http://127.0.0.1:8889/api/:path*',
       },

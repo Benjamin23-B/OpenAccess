@@ -27,6 +27,7 @@ export default function EnvDetector({ streamRef, onAnnouncement }: EnvDetectorPr
     webnnAvailable,
     lastAnnouncement,
     detectionCount,
+    workerError,
     toggle,
   } = useEnvDetector(streamRef);
 
@@ -39,7 +40,9 @@ export default function EnvDetector({ streamRef, onAnnouncement }: EnvDetectorPr
     }
   }, [lastAnnouncement, onAnnouncement]);
 
-  const statusText = !isModelReady
+  const statusText = workerError
+    ? 'Model initialization error'
+    : !isModelReady
     ? 'Loading detection model…'
     : isActive
     ? detectionCount > 0
@@ -120,15 +123,22 @@ export default function EnvDetector({ streamRef, onAnnouncement }: EnvDetectorPr
         </p>
       )}
 
-      {/* ── Model unavailable warning ── */}
-      {!isModelReady && (
+      {/* ── Model unavailable / error warning ── */}
+      {workerError ? (
+        <div className="bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 p-3.5 rounded-xl text-xs flex items-center gap-2.5" role="alert">
+          <svg className="w-5 h-5 text-rose-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>Detection model load notice: {workerError}</span>
+        </div>
+      ) : !isModelReady ? (
         <div className="warning-banner" role="alert">
           <svg className="w-5 h-5 text-[#F59E0B] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <span> Loading EfficientDet-Lite0 model… first load may take a moment.</span>
         </div>
-      )}
+      ) : null}
 
       {/* ── ARIA live region for screen readers ── */}
       <div
