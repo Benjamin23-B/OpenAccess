@@ -65,10 +65,17 @@ async def websocket_stream(websocket: WebSocket):
                     continue
 
                 # B. Multimodal Perception Layer
-                markdown_result = vlm_engine.process_image(pil_image, text_prompt=command)
+                markdown_result, detections = vlm_engine.process_image_detailed(pil_image, text_prompt=command)
+                
+                # Send structured bounding box detections to frontend
+                await websocket.send_text(json.dumps({
+                    "type": "detections",
+                    "objects": detections
+                }))
                 
                 # C. Reasoning Layer
                 narrative_payload = reasoning.generate_speech_payload(markdown_result)
+
                 
                 for sentence in narrative_payload.get("narrative", []):
                     await websocket.send_text(json.dumps({"type": "narrative_text", "text": sentence}))

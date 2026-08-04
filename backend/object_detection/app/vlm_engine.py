@@ -376,3 +376,34 @@ class VLMEngine:
             
         output_text = "\n".join(markdown_lines)
         return output_text
+
+    def process_image_detailed(self, image: Image.Image, text_prompt: str = None):
+        """
+        Processes image and returns both (markdown_text, detected_objects_list).
+        Each object in detected_objects_list is a dict:
+        {"label": str, "box": [x1, y1, x2, y2], "confidence": float, "is_text": bool}
+        Coordinates are normalized 0-1000 scale.
+        """
+        markdown_text = self.process_image(image, text_prompt=text_prompt)
+        detections = []
+        
+        import re
+        pattern = re.compile(r'- (.*?):\s*(\[\d+,\s*\d+,\s*\d+,\s*\d+\])')
+        matches = pattern.findall(markdown_text)
+        
+        for label, box_str in matches:
+            try:
+                coords = [int(x.strip()) for x in box_str.strip("[]").split(",")]
+                is_text = label.startswith("text reading")
+                clean_label = label.replace('text reading "', '').rstrip('"') if is_text else label
+                detections.append({
+                    "label": clean_label,
+                    "box": coords,
+                    "confidence": 0.88 if not is_text else 0.95,
+                    "is_text": is_text
+                })
+            except Exception:
+                pass
+
+        return markdown_text, detections
+
