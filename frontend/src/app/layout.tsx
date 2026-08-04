@@ -27,8 +27,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#0d1117",
-  colorScheme: "dark",
+  themeColor: "#0F4C81",
+  colorScheme: "light dark",
 };
 
 export default function RootLayout({
@@ -42,7 +42,9 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable}`}
       dir="ltr"
     >
-      <body>{children}</body>
+      <body className="antialiased transition-colors duration-300">
+        {children}
+      </body>
     </html>
   );
 }

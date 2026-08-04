@@ -14,4 +14,4 @@ export { default as SignLanguageTranslationR3F } from './SignLanguageTranslation
 export { default as SkeletalBody3D } from './SkeletalBody3D';
 export { default as ObjectDetectionBridge } from './ObjectDetectionBridge';
 export { default as CwasaAvatarRenderer } from './CwasaAvatarRenderer';
-
+export { default as DashboardSidebar } from './DashboardSidebar';

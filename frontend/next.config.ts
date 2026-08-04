@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  /* Silence the 'multiple lockfiles detected' workspace root warning */
+  outputFileTracingRoot: path.join(__dirname),
   allowedDevOrigins: ['192.168.1.36', 'localhost', '127.0.0.1'],
   async rewrites() {
     return [
