@@ -205,62 +205,84 @@ export default function ObjectDetectionBridge() {
     };
   }, []);
 
-  // WebSocket Connection
+  // WebSocket Connection with Auto-reconnect & Fallback URLs
   useEffect(() => {
-    let wsUrl = 'ws://localhost:8889/ws/stream';
-    if (typeof window !== 'undefined') {
+    let isComponentMounted = true;
+    let reconnectTimer: NodeJS.Timeout | null = null;
+    let attemptIndex = 0;
+
+    const connectWebSocket = () => {
+      if (!isComponentMounted) return;
+
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      if (window.location.protocol === 'https:') {
-        wsUrl = `${protocol}//${window.location.host}/ws/stream`;
-      } else {
-        const hostname = window.location.hostname || 'localhost';
-        wsUrl = `${protocol}//${hostname}:8889/ws/stream`;
-      }
-    }
+      const hostname = window.location.hostname || 'localhost';
+      const host = window.location.host;
 
-    const ws = new WebSocket(wsUrl);
-    wsRef.current = ws;
+      // Candidate URLs to try in sequence:
+      // 1. Proxied relative path via Next.js/Nginx: /ws/stream
+      // 2. Direct port 8889 on current hostname
+      // 3. Fallback localhost port 8889
+      const candidateUrls = [
+        `${protocol}//${host}/ws/stream`,
+        `${protocol}//${hostname}:8889/ws/stream`,
+        `ws://localhost:8889/ws/stream`,
+      ];
 
-    ws.onopen = () => {
-      setIsConnected(true);
-      console.log('Object Detection WS connected');
-    };
+      const wsUrl = candidateUrls[attemptIndex % candidateUrls.length];
+      console.log(`[Object Detection WS] Connecting to ${wsUrl}...`);
 
-    ws.onclose = () => {
-      setIsConnected(false);
-      console.log('Object Detection WS disconnected');
-    };
+      const ws = new WebSocket(wsUrl);
+      wsRef.current = ws;
 
-    ws.onerror = (err) => {
-      console.error('WS Error:', err);
-    };
+      ws.onopen = () => {
+        if (!isComponentMounted) return;
+        setIsConnected(true);
+        console.log(`[Object Detection WS] Connected successfully to ${wsUrl}`);
+      };
 
-    ws.onmessage = (event) => {
-      if (typeof event.data === 'string') {
-        try {
-          const msg = JSON.parse(event.data);
-          if (msg.type === 'detections') {
-            setDetectedObjects(msg.objects || []);
-            detectedObjectsRef.current = msg.objects || [];
-          } else if (msg.type === 'haptic') {
-            triggerHaptic();
-          } else if (msg.type === 'narrative_text') {
-            addTranscript(msg.text);
-            speakText(msg.text);
-          } else if (msg.type === 'audio_end') {
-            setTimeout(() => {
-              isProcessingFrameRef.current = false;
-            }, 300);
+      ws.onclose = () => {
+        if (!isComponentMounted) return;
+        setIsConnected(false);
+        console.log('[Object Detection WS] Disconnected. Retrying in 3 seconds...');
+        attemptIndex++;
+        reconnectTimer = setTimeout(connectWebSocket, 3000);
+      };
+
+      ws.onerror = (err) => {
+        console.warn(`[Object Detection WS] Connection error on ${wsUrl}:`, err);
+      };
+
+      ws.onmessage = (event) => {
+        if (typeof event.data === 'string') {
+          try {
+            const msg = JSON.parse(event.data);
+            if (msg.type === 'detections') {
+              setDetectedObjects(msg.objects || []);
+              detectedObjectsRef.current = msg.objects || [];
+            } else if (msg.type === 'haptic') {
+              triggerHaptic();
+            } else if (msg.type === 'narrative_text') {
+              addTranscript(msg.text);
+              speakText(msg.text);
+            } else if (msg.type === 'audio_end') {
+              setTimeout(() => {
+                isProcessingFrameRef.current = false;
+              }, 300);
+            }
+          } catch (e) {
+            console.error('Error parsing WS message:', e);
           }
-        } catch (e) {
-          console.error('Error parsing WS message:', e);
         }
-      }
+      };
     };
+
+    connectWebSocket();
 
     return () => {
-      if (ws.readyState === WebSocket.OPEN) {
-        ws.close();
+      isComponentMounted = false;
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      if (wsRef.current && (wsRef.current.readyState === WebSocket.OPEN || wsRef.current.readyState === WebSocket.CONNECTING)) {
+        wsRef.current.close();
       }
     };
   }, [addTranscript, speakText, triggerHaptic]);
