@@ -36,18 +36,21 @@ export default function Home() {
         {/* Main Workspace Area Container */}
         <main id="main-content" className="w-full max-w-[1340px] mx-auto px-4 md:px-6 pb-8 min-w-0 flex-1" tabIndex={-1}>
           
-          {/* Module 1: Deaf / HoH 3D Sign Language Bridge */}
-          {activeModule === 'deaf' && (
-            <div 
-              id="bridge-panel-deaf"
-              role="tabpanel"
-              aria-labelledby="tab-deaf"
-              tabIndex={-1}
-              className="w-full focus:outline-none"
-            >
-              <DeafBridge />
-            </div>
-          )}
+          {/* Module 1: Deaf / HoH 3D Sign Language Bridge.
+              Kept mounted (hidden when inactive) so the Kozha/CWASA WebGL avatar
+              context survives tab switches. Unmounting destroys the canvas, and
+              re-initializing CWASA (a load-once global) fails to re-render the
+              avatar — which is why it used to disappear on return. */}
+          <div
+            id="bridge-panel-deaf"
+            role="tabpanel"
+            aria-labelledby="tab-deaf"
+            tabIndex={-1}
+            aria-hidden={activeModule !== 'deaf'}
+            className={`w-full focus:outline-none ${activeModule === 'deaf' ? '' : 'hidden'}`}
+          >
+            <DeafBridge />
+          </div>
 
           {/* Module 2: Visually Impaired Speech Interface */}
           {activeModule === 'blind' && (
