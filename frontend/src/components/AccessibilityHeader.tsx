@@ -11,7 +11,7 @@ export default function AccessibilityHeader() {
     const savedTheme = localStorage.getItem('theme');
     const hasDarkClass = document.documentElement.classList.contains('dark');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
+
     if (savedTheme === 'dark' || (!savedTheme && (prefersDark || hasDarkClass))) {
       setIsDark(true);
       document.documentElement.classList.add('dark');
@@ -24,7 +24,7 @@ export default function AccessibilityHeader() {
   const toggleTheme = () => {
     const isCurrentlyDark = document.documentElement.classList.contains('dark');
     const nextDark = !isCurrentlyDark;
-    
+
     if (nextDark) {
       document.documentElement.classList.add('dark');
       localStorage.setItem('theme', 'dark');
@@ -50,11 +50,9 @@ export default function AccessibilityHeader() {
           <div className="flex flex-col">
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-[19px] md:text-[21px] font-bold text-white tracking-tight flex items-center gap-2">
-                Niral Thiruvizha
+                OpenAccess
               </h1>
-              <span className="bg-[#FF9933]/20 text-[#FF9933] border border-[#FF9933]/40 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                MEITY GOVT OF INDIA
-              </span>
+
               <span className="bg-[#198754]/20 text-[#86EFAC] border border-[#198754]/40 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#86EFAC] animate-pulse" />
                 LIVE SERVICE
