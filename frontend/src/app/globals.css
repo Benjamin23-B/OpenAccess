@@ -112,7 +112,7 @@ body {
 }
 
 /* Strictly prevent any inner container from rendering a secondary vertical scrollbar */
-#__next, .accessibility-wrapper, .app-container, main, #main-content {
+#__next, .accessibility-wrapper, .app-container, main, #main-content, .visually-impaired-bridge, #bridge-panel-blind {
   overflow: visible !important;
   overflow-y: visible !important;
   overflow-x: hidden !important;

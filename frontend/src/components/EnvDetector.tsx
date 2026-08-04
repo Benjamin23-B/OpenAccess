@@ -49,18 +49,18 @@ export default function EnvDetector({ streamRef, onAnnouncement }: EnvDetectorPr
 
   return (
     <section
-      className="env-detector-panel"
+      className="bg-white dark:bg-[#1E293B] border border-[#D8E2EC] dark:border-[#334155] rounded-2xl p-6 md:p-7 shadow-[0_4px_12px_rgba(15,23,42,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.35)] hover:shadow-md transition-all duration-200 flex flex-col gap-4"
       aria-labelledby="env-detector-heading"
     >
       {/* ── Heading ── */}
-      <h3 id="env-detector-heading" className="section-title">
-        <svg className="w-5 h-5 text-[#0B5CAD]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <h3 id="env-detector-heading" className="text-[20px] font-semibold text-[#16324F] dark:text-white flex items-center gap-2.5">
+        <svg className="w-5 h-5 text-[#0F4C81] dark:text-[#3B82F6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
         </svg>
         Scene Narration
       </h3>
 
-      <p className="env-detector-description">
+      <p className="text-[14px] text-[#475569] dark:text-[#CBD5E1] leading-relaxed">
         Detects objects around you and announces them aloud with spatial audio.
         Objects on your left are heard from the left speaker.
       </p>

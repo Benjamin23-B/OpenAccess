@@ -149,11 +149,7 @@ export default function VisuallyImpairedBridge({ onLiveMessage }: VisuallyImpair
 
   return (
     <div
-      id="bridge-panel-blind"
-      className="visually-impaired-bridge flex flex-col gap-6 md:gap-7 w-full max-w-[1340px] mx-auto p-4 md:p-6 text-[#1E293B] dark:text-[#F8FAFC]"
-      role="tabpanel"
-      aria-labelledby="tab-blind"
-      tabIndex={0}
+      className="visually-impaired-bridge flex flex-col gap-6 md:gap-7 w-full max-w-[1340px] mx-auto p-4 md:p-6 text-[#1E293B] dark:text-[#F8FAFC] overflow-visible"
     >
       {/* Header Banner Card */}
       <div className="bg-white dark:bg-[#1E293B] border border-[#D8E2EC] dark:border-[#334155] rounded-2xl p-6 md:p-7 shadow-[0_4px_12px_rgba(15,23,42,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.35)] hover:shadow-md transition-all duration-200 mb-2">

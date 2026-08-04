@@ -73,7 +73,7 @@ export default function TranscriptionPanel({
           ref={textareaRef}
           value={transcript}
           readOnly
-          className="w-full bg-[#FFFFFF] dark:bg-[#1E293B] text-[#1E293B] dark:text-[#F8FAFC] border border-[#CBD5E1] dark:border-[#334155] rounded-xl p-5 text-[15px] focus:outline-none focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/30 resize-none h-40 placeholder-[#94A3B8] font-sans transition-all duration-200"
+          className="w-full bg-[#FFFFFF] dark:bg-[#1E293B] text-[#1E293B] dark:text-[#F8FAFC] border border-[#CBD5E1] dark:border-[#334155] rounded-xl p-5 text-[15px] focus:outline-none focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/30 resize-none min-h-[140px] max-h-[260px] overflow-y-auto placeholder-[#94A3B8] font-sans transition-all duration-200"
           aria-label="Speech transcription output"
           placeholder="Your spoken text will appear here automatically when dictating..."
           rows={5}
