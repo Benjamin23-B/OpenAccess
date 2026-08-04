@@ -10,7 +10,7 @@ interface AccessibilityWrapperProps {
 
 export default function AccessibilityWrapper({ children, liveMessage, progressMessage }: AccessibilityWrapperProps) {
   return (
-    <div className="accessibility-wrapper w-full bg-[#F5F7FA] dark:bg-[#0F172A] text-[#1E293B] dark:text-[#F8FAFC] transition-colors duration-300">
+    <div className="accessibility-wrapper w-full min-h-screen bg-[#F5F7FA] dark:bg-[#0F172A] text-[#1E293B] dark:text-[#F8FAFC] transition-colors duration-300 flex flex-col">
       {/* Screen Reader Only Live Region for Assertive Updates */}
       <div 
         aria-live="assertive" 

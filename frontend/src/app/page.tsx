@@ -23,7 +23,7 @@ export default function Home() {
 
   return (
     <AccessibilityWrapper liveMessage={liveMsg} progressMessage={progressMsg}>
-      <div className="app-container w-full bg-[#F5F7FA] dark:bg-[#0F172A] text-[#1E293B] dark:text-[#F8FAFC] transition-colors duration-300">
+      <div className="app-container w-full min-h-screen bg-[#F5F7FA] dark:bg-[#0F172A] text-[#1E293B] dark:text-[#F8FAFC] transition-colors duration-300 flex flex-col flex-1">
         {/* Government Accessibility Header with Theme Switcher */}
         <AccessibilityHeader />
 
@@ -34,7 +34,7 @@ export default function Home() {
         />
 
         {/* Main Workspace Area Container */}
-        <main id="main-content" className="max-w-[1340px] mx-auto px-4 md:px-6 pb-8 min-w-0" tabIndex={-1}>
+        <main id="main-content" className="w-full max-w-[1340px] mx-auto px-4 md:px-6 pb-8 min-w-0 flex-1" tabIndex={-1}>
           
           {/* Module 1: Deaf / HoH 3D Sign Language Bridge */}
           {activeModule === 'deaf' && (
