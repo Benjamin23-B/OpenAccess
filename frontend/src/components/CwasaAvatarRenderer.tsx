@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { sanitizeSigml } from '../services/signDictionaryService';
 
 interface CwasaAvatarRendererProps {
   sigmlText?: string;
@@ -120,6 +119,17 @@ export default function CwasaAvatarRenderer({
       document.head.appendChild(link);
     }
 
+    // Load the Kozha SiGML validator (provides window.SigmlValidator). It is a
+    // no-op until CWASA is ready and exposes its HamNoSys tag set; kozhaClient
+    // accepts entries as "unchecked" (valid) if it is not yet available.
+    if (!document.getElementById('sigml-validator-js')) {
+      const vscript = document.createElement('script');
+      vscript.id = 'sigml-validator-js';
+      vscript.src = '/sigml-validator.js';
+      vscript.async = true;
+      document.head.appendChild(vscript);
+    }
+
     // Load allcsa.js if not already present
     if (window.CWASA && typeof window.CWASA.init === 'function') {
       initCWASA();
@@ -164,47 +174,28 @@ export default function CwasaAvatarRenderer({
     document.body.appendChild(script);
   }, []);
 
-  // Play SiGML whenever sigmlText updates and transition to Idle on completion
+  // Play SiGML whenever sigmlText updates and transition to Idle on completion.
+  //
+  // Real Kozha behaviour: play the composed `<sigml>` document verbatim (already
+  // validated by kozhaClient.buildSigml) and let CWASA's `ambIdle` animation
+  // return the avatar to a natural rest pose. We deliberately do NOT call
+  // `CWASA.stop(0)` after a guessed timeout — that freezes the WebGL bone meshes
+  // at the last-applied frame, leaving the model in a skewed "weird" pose.
   useEffect(() => {
     if (!sigmlText || sigmlText === lastPlayedSigml.current || !isLoaded) return;
     if (typeof sigmlText !== 'string' || !sigmlText.trim()) return;
     if (sigmlText.includes('[object Object]')) return;
 
-    const cleanSigml = sanitizeSigml(sigmlText);
-    if (!cleanSigml || !cleanSigml.trim()) return;
-
     if (window.CWASA && typeof window.CWASA.playSiGMLText === 'function') {
       try {
         lastPlayedSigml.current = sigmlText;
         onStatusChange?.('Signing Animation');
-
-        // Estimate duration based on sign count & speed
-        const signCount = (cleanSigml.match(/<hns_sign/g) || [1]).length;
-        const durationMs = Math.max(3000, Math.round((signCount * 2500) / (signingSpeed || 1.0)));
-        
-        // Directly trigger playSiGMLText without calling CWASA.stop(0) which freezes WebGL bone meshes
-        try {
-          window.CWASA.playSiGMLText(cleanSigml, 0);
-        } catch (e) {
-          console.warn('CWASA animation trigger notice:', e);
-        }
-
-        // Schedule transition back to Idle pose after talking/signing completes
-        const timer = setTimeout(() => {
-          onStatusChange?.('Idle');
-          try {
-            if (window.CWASA && typeof window.CWASA.stop === 'function') {
-              window.CWASA.stop(0);
-            }
-          } catch (_e) {}
-        }, durationMs);
-
-        return () => clearTimeout(timer);
+        window.CWASA.playSiGMLText(sigmlText, 0);
       } catch (err: any) {
         console.warn('CWASA Play Error:', err);
       }
     }
-  }, [sigmlText, isLoaded, signingSpeed, onStatusChange]);
+  }, [sigmlText, isLoaded, onStatusChange]);
 
   // Switch avatar character
   useEffect(() => {

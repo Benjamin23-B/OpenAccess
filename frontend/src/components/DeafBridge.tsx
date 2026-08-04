@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSpeechRecognition } from '@/hooks';
-import SignLanguageTranslationR3F from './SignLanguageTranslationR3F';
 import CwasaAvatarRenderer from './CwasaAvatarRenderer';
 import StatusIndicator from './StatusIndicator';
 import { signDictionaryService, ProcessedSignSequence } from '@/services/signDictionaryService';
@@ -14,11 +13,9 @@ export default function DeafBridge() {
   const [signingSpeed, setSigningSpeed] = useState(1.0);
   const [selectedLanguage, setSelectedLanguage] = useState<'en-IN' | 'ta-IN' | 'thanglish'>('en-IN');
 
-  // Kozha Integration State
-  const [rendererMode, setRendererMode] = useState<'cwasa' | 'r3f'>('cwasa');
+  // Kozha Integration State (BSL + ISL only)
   const [selectedAvatar, setSelectedAvatar] = useState<'anna' | 'marc' | 'francoise' | 'luna' | 'siggi'>('anna');
-  const [signLanguage, setSignLanguage] = useState<'ISL' | 'BSL' | 'ASL' | 'DGS' | 'LSF'>('BSL');
-  const [useAiTranslator, setUseAiTranslator] = useState<boolean>(false);
+  const [signLanguage, setSignLanguage] = useState<'ISL' | 'BSL'>('ISL');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'translate' | 'dictionary' | 'inspector'>('translate');
   const [copiedSigml, setCopiedSigml] = useState(false);
@@ -49,12 +46,15 @@ export default function DeafBridge() {
       return;
     }
 
-    // Set immediate local processing so responsive UI isn't blocked
-    const initialLocal = signDictionaryService.processTextToSign(activeSignText, signLanguage);
-    setProcessedSequence(initialLocal);
+    // Start with the local Kozha database mapping so the UI isn't blocked.
+    signDictionaryService.processTextToSign(activeSignText, signLanguage).then((localPlan) => {
+      if (isMounted && localPlan.sigmlSequence) {
+        setProcessedSequence(localPlan);
+      }
+    });
 
-    // Fetch async NLP plan from Kozha Engine on port 8001
-    signDictionaryService.fetchKozhaPlan(activeSignText, signLanguage, useAiTranslator).then((plan) => {
+    // Then fetch the real Kozha NLP plan (port 8001) and re-map onto the DB.
+    signDictionaryService.fetchKozhaPlan(activeSignText, signLanguage).then((plan) => {
       if (isMounted && plan && plan.sigmlSequence) {
         setProcessedSequence(plan);
       }
@@ -63,7 +63,7 @@ export default function DeafBridge() {
     return () => {
       isMounted = false;
     };
-  }, [activeSignText, signLanguage, useAiTranslator]);
+  }, [activeSignText, signLanguage]);
 
   // Watch for new voice transcripts and forward them to the avatar
   useEffect(() => {
@@ -137,65 +137,25 @@ export default function DeafBridge() {
             </p>
           </div>
 
-          {/* Unified Global Control Toolbar (No Duplicates) */}
+          {/* Unified Global Control Toolbar */}
           <div className="flex flex-wrap items-center gap-2.5 bg-slate-950 p-3 rounded-xl border border-slate-800">
-            {/* AI Sign Mode Toggle */}
-            <button
-              onClick={() => setUseAiTranslator(!useAiTranslator)}
-              className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-all flex items-center gap-1.5 ${
-                useAiTranslator
-                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 border-indigo-400 text-white shadow-md'
-                  : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-slate-200'
-              }`}
-              title="Toggle Kozha AI LLM Gloss Translation"
-            >
-              <span>✨ AI Sign Mode:</span>
-              <span className="font-extrabold uppercase">{useAiTranslator ? 'ON' : 'OFF'}</span>
-            </button>
-
-            {/* Renderer Switcher */}
-            <div className="flex items-center bg-slate-900 rounded-lg p-1 border border-slate-800">
-              <button
-                onClick={() => setRendererMode('cwasa')}
-                className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${
-                  rendererMode === 'cwasa'
-                    ? 'bg-cyan-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
+            {/* Avatar Selection */}
+            <div className="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">
+              <label className="text-xs text-slate-400 font-medium">Character:</label>
+              <select
+                value={selectedAvatar}
+                onChange={(e) => setSelectedAvatar(e.target.value as any)}
+                className="bg-slate-950 text-cyan-300 font-bold border border-slate-700 rounded-md px-2 py-0.5 text-xs outline-none focus:border-cyan-500 cursor-pointer"
               >
-                CWASA 3D WebGL
-              </button>
-              <button
-                onClick={() => setRendererMode('r3f')}
-                className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${
-                  rendererMode === 'r3f'
-                    ? 'bg-cyan-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                Three.js R3F
-              </button>
+                <option value="anna">Anna (Female)</option>
+                <option value="marc">Marc (Male)</option>
+                <option value="francoise">Francoise (Female)</option>
+                <option value="luna">Luna (Stylized)</option>
+                <option value="siggi">Siggi (Male)</option>
+              </select>
             </div>
 
-            {/* Avatar Selection (Shown when CWASA mode is active) */}
-            {rendererMode === 'cwasa' && (
-              <div className="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">
-                <label className="text-xs text-slate-400 font-medium">Character:</label>
-                <select
-                  value={selectedAvatar}
-                  onChange={(e) => setSelectedAvatar(e.target.value as any)}
-                  className="bg-slate-950 text-cyan-300 font-bold border border-slate-700 rounded-md px-2 py-0.5 text-xs outline-none focus:border-cyan-500 cursor-pointer"
-                >
-                  <option value="anna">Anna (Female)</option>
-                  <option value="marc">Marc (Male)</option>
-                  <option value="francoise">Francoise (Female)</option>
-                  <option value="luna">Luna (Stylized)</option>
-                  <option value="siggi">Siggi (Male)</option>
-                </select>
-              </div>
-            )}
-
-            {/* Sign Language Selection */}
+            {/* Sign Language Selection (BSL + ISL only) */}
             <div className="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">
               <label className="text-xs text-slate-400 font-medium">Sign System:</label>
               <select
@@ -205,9 +165,6 @@ export default function DeafBridge() {
               >
                 <option value="ISL">Indian (ISL)</option>
                 <option value="BSL">British (BSL)</option>
-                <option value="ASL">American (ASL)</option>
-                <option value="DGS">German (DGS)</option>
-                <option value="LSF">French (LSF)</option>
               </select>
             </div>
           </div>
@@ -228,7 +185,7 @@ export default function DeafBridge() {
               <div className="flex items-center gap-2 text-xs">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="font-semibold text-slate-300">
-                  {rendererMode === 'cwasa' ? `CWASA 3D (${selectedAvatar.toUpperCase()})` : 'Three.js R3F Avatar'}
+                  {`CWASA 3D (${selectedAvatar.toUpperCase()})`}
                 </span>
               </div>
 
@@ -251,22 +208,14 @@ export default function DeafBridge() {
               </div>
             </div>
 
-            {/* 3D Renderer Canvas Area */}
+            {/* 3D Renderer Canvas Area (Kozha / CWASA) */}
             <div className="relative flex-1 w-full bg-slate-950 min-h-[440px]">
-              {rendererMode === 'cwasa' ? (
-                <CwasaAvatarRenderer
-                  sigmlText={processedSequence.sigmlSequence}
-                  avatarName={selectedAvatar}
-                  signingSpeed={signingSpeed}
-                  onStatusChange={setSigningStatus}
-                />
-              ) : (
-                <SignLanguageTranslationR3F
-                  textToSign={activeSignText}
-                  signingSpeed={signingSpeed}
-                  onStatusChange={setSigningStatus}
-                />
-              )}
+              <CwasaAvatarRenderer
+                sigmlText={processedSequence.sigmlSequence}
+                avatarName={selectedAvatar}
+                signingSpeed={signingSpeed}
+                onStatusChange={setSigningStatus}
+              />
             </div>
 
             {/* Viewport Bottom Status Bar */}
