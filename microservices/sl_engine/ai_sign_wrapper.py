@@ -16,8 +16,9 @@ logger = logging.getLogger(__name__)
 def load_env_file():
     """Dynamically search and load key-value pairs from .env files into os.environ."""
     candidates = [
-        Path(__file__).resolve().parent / ".env",
         Path(__file__).resolve().parent.parent.parent / ".env",
+        Path(__file__).resolve().parent.parent / ".env",
+        Path(__file__).resolve().parent / ".env",
     ]
     for path in candidates:
         if path.exists():
@@ -29,7 +30,7 @@ def load_env_file():
                             k, v = line.split("=", 1)
                             k = k.strip()
                             v = v.strip().strip('"').strip("'")
-                            if k and k not in os.environ:
+                            if k and v and (not os.environ.get(k) or path == candidates[0]):
                                 os.environ[k] = v
             except Exception as e:
                 logger.warning(f"Failed to read .env file at {path}: {e}")
@@ -103,48 +104,30 @@ def translate_text_with_ai(text: str, sign_language: str = "bsl") -> Optional[Di
         ],
         "temperature": 0.2,
         "max_tokens": 300,
+        "stream": False,
     }
 
     url = f"{base_url}/chat/completions"
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {api_key}",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     }
 
     try:
         req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"), headers=headers, method="POST")
-        with urllib.request.urlopen(req, timeout=8) as response:
+        with urllib.request.urlopen(req, timeout=20) as response:
             res_body = response.read().decode("utf-8")
             res_json = json.loads(res_body)
 
             content = res_json["choices"][0]["message"]["content"].strip()
+            # Extract JSON payload using regex to handle any surrounding markdown text
+            import re
+            json_match = re.search(r'\{.*\}', content, re.DOTALL)
+            if json_match:
+                content = json_match.group(0)
 
-            # --- Robust JSON extraction ---
-            # 1. Strip markdown code fences (```json ... ``` or ``` ... ```)
-            if content.startswith("```"):
-                content = content.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
-
-            # 2. Extract the first JSON object via brace matching (handles leading/trailing prose)
-            brace_start = content.find("{")
-            brace_end = content.rfind("}")
-            if brace_start != -1 and brace_end != -1 and brace_end > brace_start:
-                content = content[brace_start:brace_end + 1]
-
-            # 3. Attempt to parse; if it still fails try to recover a truncated object
-            parsed = None
-            try:
-                parsed = json.loads(content)
-            except json.JSONDecodeError:
-                # Try to recover partial / unterminated JSON by closing open brackets
-                try:
-                    open_braces = content.count("{") - content.count("}")
-                    open_brackets = content.count("[") - content.count("]")
-                    recovery = content.rstrip().rstrip(",")
-                    recovery += "]" * max(open_brackets, 0) + "}" * max(open_braces, 0)
-                    parsed = json.loads(recovery)
-                except Exception:
-                    logger.warning("[AI Wrapper] JSON recovery failed; falling back to local engine.")
-
+            parsed = json.loads(content)
             if isinstance(parsed, dict) and "glosses" in parsed:
                 return {
                     "glosses": [str(g).upper().strip() for g in parsed.get("glosses", []) if g],

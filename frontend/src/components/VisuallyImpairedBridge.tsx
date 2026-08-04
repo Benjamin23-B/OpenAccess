@@ -153,14 +153,14 @@ export default function VisuallyImpairedBridge({ onLiveMessage }: VisuallyImpair
       <div className="flex flex-col gap-4">
         <div className="bg-white dark:bg-[#1E293B] border border-[#D8E2EC] dark:border-[#334155] rounded-2xl p-5 md:p-6 shadow-[0_4px_12px_rgba(15,23,42,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.35)] flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h2 className="text-[22px] font-bold text-[#16324F] dark:text-white tracking-tight flex items-center gap-2.5">
+            <h2 className="text-[22px] font-bold text-[#0F172A] dark:text-white tracking-tight flex items-center gap-2.5">
               <svg className="w-6 h-6 text-[#0F4C81] dark:text-[#3B82F6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
               </svg>
               Speech & Audio Assistive Interface
             </h2>
-            <p className="text-[14px] text-[#475569] dark:text-[#CBD5E1] mt-1">
+            <p className="text-[14.5px] font-medium text-[#334155] dark:text-[#CBD5E1] mt-1">
               Speech-to-text dictation, text-to-speech read aloud, and spatial scene narration. All controls keyboard accessible.
             </p>
           </div>
@@ -246,24 +246,24 @@ export default function VisuallyImpairedBridge({ onLiveMessage }: VisuallyImpair
 
           {/* Keyboard Shortcuts Cheatsheet */}
           <section className="bg-white dark:bg-[#1E293B] border border-[#D8E2EC] dark:border-[#334155] rounded-2xl p-5 md:p-6 shadow-[0_4px_12px_rgba(15,23,42,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.35)] flex flex-col gap-3.5" aria-labelledby="shortcuts-heading">
-            <h3 id="shortcuts-heading" className="text-[18px] font-semibold text-[#16324F] dark:text-white flex items-center gap-2">
-              <svg className="w-5 h-5 text-[#0F4C81] dark:text-[#3B82F6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            <h3 id="shortcuts-heading" className="text-[18px] font-bold text-[#0F172A] dark:text-white flex items-center gap-2">
+              <svg className="w-5.5 h-5.5 text-[#0F4C81] dark:text-[#3B82F6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
               Keyboard Shortcuts Cheatsheet
             </h3>
             <ul className="grid grid-cols-2 gap-3">
-              <li className="bg-[#F4F7FB] dark:bg-[#0F172A] border border-[#D8E2EC] dark:border-[#334155] p-3 rounded-xl flex items-center gap-2.5 text-[13px] text-[#475569] dark:text-[#CBD5E1]">
-                <kbd className="bg-white dark:bg-[#1E293B] border border-[#CBD5E1] dark:border-[#475569] px-2 py-0.5 rounded text-[11px] font-bold font-mono text-[#16324F] dark:text-white">Tab</kbd> Move focus
+              <li className="bg-[#E2E8F0] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] p-3 rounded-xl flex items-center gap-2.5 text-[13.5px] text-[#0F172A] dark:text-[#F8FAFC] font-bold">
+                <kbd className="bg-white dark:bg-[#1E293B] border border-[#0F172A] dark:border-[#64748B] px-2 py-0.5 rounded text-[12px] font-black font-mono text-[#0F172A] dark:text-white shadow-xs">Tab</kbd> Move focus
               </li>
-              <li className="bg-[#F4F7FB] dark:bg-[#0F172A] border border-[#D8E2EC] dark:border-[#334155] p-3 rounded-xl flex items-center gap-2.5 text-[13px] text-[#475569] dark:text-[#CBD5E1]">
-                <kbd className="bg-white dark:bg-[#1E293B] border border-[#CBD5E1] dark:border-[#475569] px-2 py-0.5 rounded text-[11px] font-bold font-mono text-[#16324F] dark:text-white">Enter</kbd> Activate CTA
+              <li className="bg-[#E2E8F0] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] p-3 rounded-xl flex items-center gap-2.5 text-[13.5px] text-[#0F172A] dark:text-[#F8FAFC] font-bold">
+                <kbd className="bg-white dark:bg-[#1E293B] border border-[#0F172A] dark:border-[#64748B] px-2 py-0.5 rounded text-[12px] font-black font-mono text-[#0F172A] dark:text-white shadow-xs">Enter</kbd> Activate CTA
               </li>
-              <li className="bg-[#F4F7FB] dark:bg-[#0F172A] border border-[#D8E2EC] dark:border-[#334155] p-3 rounded-xl flex items-center gap-2.5 text-[13px] text-[#475569] dark:text-[#CBD5E1]">
-                <kbd className="bg-white dark:bg-[#1E293B] border border-[#CBD5E1] dark:border-[#475569] px-2 py-0.5 rounded text-[11px] font-bold font-mono text-[#16324F] dark:text-white">Shift+Tab</kbd> Backwards
+              <li className="bg-[#E2E8F0] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] p-3 rounded-xl flex items-center gap-2.5 text-[13.5px] text-[#0F172A] dark:text-[#F8FAFC] font-bold">
+                <kbd className="bg-white dark:bg-[#1E293B] border border-[#0F172A] dark:border-[#64748B] px-2 py-0.5 rounded text-[12px] font-black font-mono text-[#0F172A] dark:text-white shadow-xs">Shift+Tab</kbd> Backwards
               </li>
-              <li className="bg-[#F4F7FB] dark:bg-[#0F172A] border border-[#D8E2EC] dark:border-[#334155] p-3 rounded-xl flex items-center gap-2.5 text-[13px] text-[#475569] dark:text-[#CBD5E1]">
-                <kbd className="bg-white dark:bg-[#1E293B] border border-[#CBD5E1] dark:border-[#475569] px-2 py-0.5 rounded text-[11px] font-bold font-mono text-[#16324F] dark:text-white">Esc</kbd> Stop Audio
+              <li className="bg-[#E2E8F0] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] p-3 rounded-xl flex items-center gap-2.5 text-[13.5px] text-[#0F172A] dark:text-[#F8FAFC] font-bold">
+                <kbd className="bg-white dark:bg-[#1E293B] border border-[#0F172A] dark:border-[#64748B] px-2 py-0.5 rounded text-[12px] font-black font-mono text-[#0F172A] dark:text-white shadow-xs">Esc</kbd> Stop Audio
               </li>
             </ul>
           </section>
