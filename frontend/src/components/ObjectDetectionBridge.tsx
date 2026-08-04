@@ -207,11 +207,11 @@ export default function ObjectDetectionBridge() {
 
   // WebSocket Connection
   useEffect(() => {
-    let wsUrl = 'ws://localhost:8000/ws/stream';
+    let wsUrl = 'ws://localhost:8889/ws/stream';
     if (typeof window !== 'undefined') {
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       const host = window.location.hostname || 'localhost';
-      wsUrl = `${protocol}//${host}:8000/ws/stream`;
+      wsUrl = `${protocol}//${host}:8889/ws/stream`;
     }
 
     const ws = new WebSocket(wsUrl);

@@ -15,8 +15,8 @@ SL_ENGINE_MAIN = os.path.join(ROOT_DIR, "microservices", "sl_engine", "main.py")
 VENV_PYTHON = os.path.join(ROOT_DIR, ".venv", "bin", "python")
 PYTHON_EXE = VENV_PYTHON if os.path.exists(VENV_PYTHON) else sys.executable
 
-FRONTEND_URL = "http://localhost:3000"
-BACKEND_URL = "http://localhost:8000/api/status"
+FRONTEND_URL = "http://localhost:8888"
+BACKEND_URL = "http://localhost:8889/api/status"
 SL_ENGINE_URL = "http://localhost:8001/api/health"
 
 processes = []
@@ -52,11 +52,11 @@ def main():
     print("=" * 60)
     print(f"Using Python Interpreter: {PYTHON_EXE}")
 
-    # 1. Start Object Detection Backend (FastAPI on Port 8000)
+    # 1. Start Object Detection Backend (FastAPI on Port 8889)
     if is_server_running(BACKEND_URL):
         print(f"[Backend] AI Object Detection server already running at {BACKEND_URL}")
     else:
-        print("[Backend] Starting Object Detection AI server (Port 8000)...")
+        print("[Backend] Starting Object Detection AI server (Port 8889)...")
         backend_proc = subprocess.Popen(
             [PYTHON_EXE, BACKEND_MAIN],
             cwd=ROOT_DIR
@@ -74,11 +74,11 @@ def main():
         )
         processes.append(sl_proc)
 
-    # 3. Start Frontend Server (Next.js on Port 3000)
+    # 3. Start Frontend Server (Next.js on Port 8888)
     if is_server_running(FRONTEND_URL):
         print(f"[Frontend] Next.js frontend already running at {FRONTEND_URL}")
     else:
-        print("[Frontend] Starting Next.js Web Frontend (npm run dev on Port 3000)...")
+        print("[Frontend] Starting Next.js Web Frontend (npm run dev on Port 8888)...")
         frontend_proc = subprocess.Popen(
             "npm run dev",
             cwd=FRONTEND_DIR,
@@ -95,7 +95,7 @@ def main():
     for i in range(25):
         if not backend_ready and is_server_running(BACKEND_URL):
             backend_ready = True
-            print(" -> AI Backend Ready (Port 8000)")
+            print(" -> AI Backend Ready (Port 8889)")
 
         if not sl_ready and is_server_running(SL_ENGINE_URL):
             sl_ready = True
@@ -103,7 +103,8 @@ def main():
         
         if not frontend_ready and is_server_running(FRONTEND_URL):
             frontend_ready = True
-            print(" -> Web Frontend Ready (Port 3000)")
+            print(" -> Web Frontend Ready (Port 8888)")
+
 
         if backend_ready and sl_ready and frontend_ready:
             break
