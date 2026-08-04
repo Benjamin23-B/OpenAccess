@@ -1,5 +1,5 @@
 """
-Niral Thiruvizha - Single Launcher Script
+OpenAccess - Single Launcher Script
 Runs both Backend and Frontend web services and opens the browser.
 """
 from run_app import main

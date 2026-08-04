@@ -13,12 +13,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Niral Thiruvizha - Accessibility Platform",
+  title: "OpenAccess - Accessibility Platform",
   description: "Empowering communication through technology. Speech-to-text, text-to-speech, and accessibility tools for everyone.",
   keywords: ["accessibility", "speech recognition", "text to speech", "assistive technology", "visually impaired", "deaf", "mute"],
-  authors: [{ name: "Niral Thiruvizha Team" }],
+  authors: [{ name: "OpenAccess Team" }],
   openGraph: {
-    title: "Niral Thiruvizha - Accessibility Platform",
+    title: "OpenAccess - Accessibility Platform",
     description: "Empowering communication through technology",
     type: "website",
   },

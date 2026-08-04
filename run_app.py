@@ -46,7 +46,7 @@ def is_server_running(url, timeout=1.5):
         return False
 
 def cleanup(signum=None, frame=None):
-    print("\nShutting down Niral Thiruvizha services...")
+    print("\nShutting down OpenAccess services...")
     for p in processes:
         try:
             p.terminate()
@@ -64,7 +64,7 @@ def main():
     signal.signal(signal.SIGTERM, cleanup)
 
     print("=" * 60)
-    print(" Niral Thiruvizha - Combined Project Launcher")
+    print(" OpenAccess - Combined Project Launcher")
     print(" Includes: Deaf, Blind, AAC, Object Detection AI & Kozha SL Engine")
     print("=" * 60)
     print(f"Using Python Interpreter: {PYTHON_EXE}")
@@ -135,7 +135,7 @@ def main():
 
     print(f"\nOpening Web UI in default browser: {FRONTEND_URL}")
     webbrowser.open(FRONTEND_URL)
-    print("Niral Thiruvizha Web App is live! Press Ctrl+C to terminate services.")
+    print("OpenAccess Web App is live! Press Ctrl+C to terminate services.")
 
     # Keep script alive
     try:
