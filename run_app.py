@@ -15,7 +15,24 @@ SL_ENGINE_MAIN = os.path.join(ROOT_DIR, "microservices", "sl_engine", "main.py")
 VENV_PYTHON = os.path.join(ROOT_DIR, ".venv", "bin", "python")
 PYTHON_EXE = VENV_PYTHON if os.path.exists(VENV_PYTHON) else sys.executable
 
-FRONTEND_URL = "http://localhost:8888"
+def load_dotenv(env_path):
+    if os.path.exists(env_path):
+        with open(env_path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                if "=" in line:
+                    key, val = line.split("=", 1)
+                    key = key.strip()
+                    val = val.strip().strip("'").strip('"')
+                    if key:
+                        os.environ[key] = val
+
+load_dotenv(os.path.join(ROOT_DIR, ".env"))
+
+FRONTEND_PORT = os.environ.get("FRONTEND_PORT") or os.environ.get("PORT", "8888")
+FRONTEND_URL = f"http://localhost:{FRONTEND_PORT}"
 BACKEND_URL = "http://localhost:8889/api/status"
 SL_ENGINE_URL = "http://localhost:8001/api/health"
 
@@ -59,7 +76,8 @@ def main():
         print("[Backend] Starting Object Detection AI server (Port 8889)...")
         backend_proc = subprocess.Popen(
             [PYTHON_EXE, BACKEND_MAIN],
-            cwd=ROOT_DIR
+            cwd=ROOT_DIR,
+            env=os.environ.copy()
         )
         processes.append(backend_proc)
 
@@ -70,19 +88,23 @@ def main():
         print("[SL Engine] Starting Kozha 3D Sign Engine (Port 8001)...")
         sl_proc = subprocess.Popen(
             [PYTHON_EXE, SL_ENGINE_MAIN],
-            cwd=ROOT_DIR
+            cwd=ROOT_DIR,
+            env=os.environ.copy()
         )
         processes.append(sl_proc)
 
-    # 3. Start Frontend Server (Next.js on Port 8888)
+    # 3. Start Frontend Server (Next.js on Port from .env)
     if is_server_running(FRONTEND_URL):
         print(f"[Frontend] Next.js frontend already running at {FRONTEND_URL}")
     else:
-        print("[Frontend] Starting Next.js Web Frontend (npm run dev on Port 8888)...")
+        print(f"[Frontend] Starting Next.js Web Frontend (npm run dev on Port {FRONTEND_PORT})...")
+        env = os.environ.copy()
+        env["PORT"] = str(FRONTEND_PORT)
         frontend_proc = subprocess.Popen(
             "npm run dev",
             cwd=FRONTEND_DIR,
-            shell=True
+            shell=True,
+            env=env
         )
         processes.append(frontend_proc)
 
@@ -103,7 +125,7 @@ def main():
         
         if not frontend_ready and is_server_running(FRONTEND_URL):
             frontend_ready = True
-            print(" -> Web Frontend Ready (Port 8888)")
+            print(f" -> Web Frontend Ready (Port {FRONTEND_PORT})")
 
 
         if backend_ready and sl_ready and frontend_ready:
