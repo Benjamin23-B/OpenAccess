@@ -12,6 +12,10 @@ const nextConfig: NextConfig = {
         destination: 'http://127.0.0.1:8001/api/plan',
       },
       {
+        source: '/ws/:path*',
+        destination: 'http://127.0.0.1:8889/ws/:path*',
+      },
+      {
         source: '/api/:path*',
         destination: 'http://127.0.0.1:8889/api/:path*',
       },

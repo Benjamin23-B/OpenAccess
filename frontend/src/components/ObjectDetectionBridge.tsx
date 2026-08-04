@@ -210,8 +210,12 @@ export default function ObjectDetectionBridge() {
     let wsUrl = 'ws://localhost:8889/ws/stream';
     if (typeof window !== 'undefined') {
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const host = window.location.hostname || 'localhost';
-      wsUrl = `${protocol}//${host}:8889/ws/stream`;
+      if (window.location.protocol === 'https:') {
+        wsUrl = `${protocol}//${window.location.host}/ws/stream`;
+      } else {
+        const hostname = window.location.hostname || 'localhost';
+        wsUrl = `${protocol}//${hostname}:8889/ws/stream`;
+      }
     }
 
     const ws = new WebSocket(wsUrl);
