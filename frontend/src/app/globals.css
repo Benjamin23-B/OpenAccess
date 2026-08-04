@@ -88,8 +88,8 @@
 
 /* Global Clean Single Scrollbar Architecture */
 html {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
   min-height: 100%;
   margin: 0;
   padding: 0;
@@ -101,14 +101,19 @@ html {
 }
 
 body {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
   min-height: 100vh;
   margin: 0;
   padding: 0;
   overflow: visible !important;
   overflow-y: visible !important;
   overflow-x: hidden !important;
+}
+
+html.dark, html.dark body {
+  background-color: #0F172A !important;
+  color: #F8FAFC !important;
 }
 
 /* Strictly prevent any inner container from rendering a secondary vertical scrollbar */

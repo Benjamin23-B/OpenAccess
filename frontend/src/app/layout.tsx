@@ -39,10 +39,10 @@ export default function RootLayout({
   return (
     <html 
       lang="en" 
-      className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-[#F5F7FA] dark:bg-[#0F172A]`}
+      className={`${geistSans.variable} ${geistMono.variable}`}
       dir="ltr"
     >
-      <body className="min-h-screen bg-[#F5F7FA] dark:bg-[#0F172A] text-[#1E293B] dark:text-[#F8FAFC] antialiased transition-colors duration-300">
+      <body className="antialiased transition-colors duration-300">
         {children}
       </body>
     </html>
