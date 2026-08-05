@@ -221,6 +221,13 @@ export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
 
   const speakLocal = useCallback((text: string, lang?: 'en-IN' | 'ta-IN' | 'thanglish') => {
     if (!synthesisRef.current) return;
+    setError(null);
+
+    // Detach listeners on active utterance before cancelling to prevent spurious interrupted errors
+    if (utteranceRef.current) {
+      utteranceRef.current.onerror = null;
+      utteranceRef.current.onend = null;
+    }
     synthesisRef.current.cancel();
 
     let textToSpeak = text;
@@ -286,7 +293,8 @@ export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
     };
 
     utterance.onerror = (event) => {
-      if (event.error !== 'canceled') {
+      // Ignore 'canceled' and 'interrupted' errors which occur when stopping/re-initiating speech
+      if (event.error !== 'canceled' && event.error !== 'interrupted') {
         setError(`Speech error: ${event.error}`);
       }
       setSpeechState('idle');
@@ -308,6 +316,10 @@ export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
 
   const speakCloudTTS = useCallback((text: string, langCode: string, lang?: 'en-IN' | 'ta-IN' | 'thanglish') => {
     // Stop local speech synthesis or active audio
+    if (utteranceRef.current) {
+      utteranceRef.current.onerror = null;
+      utteranceRef.current.onend = null;
+    }
     synthesisRef.current?.cancel();
     if (audioRef.current) {
       audioRef.current.pause();
@@ -361,6 +373,7 @@ export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
 
       audio.onplay = () => {
         setSpeechState('speaking');
+        setError(null);
       };
 
       audio.onended = () => {
@@ -385,6 +398,7 @@ export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
   }, [rate, speakLocal]);
 
   const speak = useCallback((text: string, lang?: 'en-IN' | 'ta-IN' | 'thanglish') => {
+    setError(null);
     if (!text.trim()) {
       setError('No text to speak. Please enter some text first.');
       return;

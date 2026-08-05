@@ -58,12 +58,12 @@ const BRIDGE_TABS: BridgeTab[] = [
 export default function BridgeTabs({ activeModule, onModuleChange }: BridgeTabsProps) {
   return (
     <nav 
-      className="w-full bg-transparent transition-colors duration-300 my-2 mb-6" 
+      className="w-full bg-transparent transition-all duration-300 my-2 mb-6" 
       role="navigation" 
       aria-label="Accessibility bridge navigation"
     >
-      <div className="max-w-[1340px] mx-auto px-4 md:px-6 py-3.5">
-        <div className="flex bg-[#EEF2F6] dark:bg-[#111827] p-2 rounded-2xl border border-[#D9E2EC] dark:border-[#334155] gap-3 transition-colors duration-300">
+      <div className="max-w-[1340px] mx-auto px-4 md:px-6 py-2">
+        <div className="flex bg-white/70 dark:bg-[#161B26]/70 backdrop-blur-xl p-2 rounded-3xl border border-slate-200/80 dark:border-[#273142] gap-3 shadow-lg shadow-slate-900/5 dark:shadow-black/30 transition-all duration-300">
           {BRIDGE_TABS.map((tab) => {
             const isActive = activeModule === tab.id;
             
@@ -71,10 +71,10 @@ export default function BridgeTabs({ activeModule, onModuleChange }: BridgeTabsP
               <button
                 key={tab.id}
                 onClick={() => onModuleChange(tab.id)}
-                className={`flex-1 h-[48px] px-5 rounded-xl font-bold text-[14px] md:text-[15px] transition-all duration-300 flex items-center justify-center gap-2.5 cursor-pointer whitespace-nowrap active:scale-[0.98] ${
+                className={`flex-1 h-[52px] px-5 rounded-2xl font-bold text-[14px] md:text-[15px] transition-all duration-200 flex items-center justify-center gap-2.5 cursor-pointer whitespace-nowrap active:scale-95 ${
                   isActive
-                    ? 'bg-[#0F4C81] dark:bg-[#3B82F6] text-white shadow-md shadow-[#0F4C81]/20 dark:shadow-[#3B82F6]/20'
-                    : 'text-[#475569] dark:text-[#CBD5E1] hover:text-[#0F4C81] dark:hover:text-[#3B82F6] hover:bg-[#DCEBFA] dark:hover:bg-[#1E3A5F]'
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/60'
                 }`}
                 role="tab"
                 aria-selected={isActive}
@@ -83,11 +83,11 @@ export default function BridgeTabs({ activeModule, onModuleChange }: BridgeTabsP
                 tabIndex={0}
               >
                 <span className="shrink-0">{tab.svgIcon}</span>
-                <span className="truncate">{tab.label}</span>
-                <span className={`hidden lg:inline text-[11px] font-bold px-2 py-0.5 rounded-full border ${
+                <span className="truncate tracking-tight">{tab.label}</span>
+                <span className={`hidden lg:inline text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border transition-all ${
                   isActive
-                    ? 'bg-white/20 text-white border-white/30'
-                    : 'bg-white dark:bg-[#1E293B] text-[#64748B] dark:text-[#94A3B8] border-[#D9E2EC] dark:border-[#334155]'
+                    ? 'bg-white/20 text-white border-white/30 backdrop-blur-xs'
+                    : 'bg-slate-100 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700'
                 }`}>
                   {tab.badge}
                 </span>

@@ -147,28 +147,28 @@ export default function VisuallyImpairedBridge({ onLiveMessage }: VisuallyImpair
   const displayError = recognitionError || (synthesisError ? { type: 'unknown', message: synthesisError } : null);
 
   return (
-    <div className="visually-impaired-bridge flex flex-col gap-6 w-full max-w-[1340px] mx-auto p-4 md:p-6 text-[#1E293B] dark:text-[#F8FAFC]">
+    <div className="visually-impaired-bridge flex flex-col gap-6 w-full max-w-[1340px] mx-auto p-4 md:p-6 text-[#0F172A] dark:text-[#F8FAFC]">
       {/* Top Banner & Status Header */}
       <div className="flex flex-col gap-4">
-        <div className="bg-white dark:bg-[#1E293B] border border-[#D8E2EC] dark:border-[#334155] rounded-2xl p-5 md:p-6 shadow-[0_4px_12px_rgba(15,23,42,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.35)] flex items-center justify-between flex-wrap gap-4">
+        <div className="apple-banner flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h2 className="text-[22px] font-bold text-[#0F172A] dark:text-white tracking-tight flex items-center gap-2.5">
-              <svg className="w-6 h-6 text-[#0F4C81] dark:text-[#3B82F6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <h2 className="text-[22px] font-extrabold text-[#0F172A] dark:text-white tracking-tight flex items-center gap-2.5">
+              <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
               </svg>
               Speech & Audio Assistive Interface
             </h2>
-            <p className="text-[14.5px] font-medium text-[#334155] dark:text-[#CBD5E1] mt-1">
-              Speech-to-text dictation, text-to-speech read aloud, and spatial scene narration. All controls keyboard accessible.
+            <p className="text-[14.5px] font-medium text-slate-500 dark:text-slate-400 mt-1">
+              Speech-to-text dictation and text-to-speech read aloud. All controls keyboard accessible.
             </p>
           </div>
           <StatusIndicator state={listeningState} error={displayError} />
         </div>
 
         {displayError && (
-          <div className="bg-[#FEF2F2] dark:bg-[#451A1A] border border-[#FCA5A5] dark:border-[#DC2626] text-[#991B1B] dark:text-[#FCA5A5] p-4 rounded-xl flex items-center gap-3 text-[14px] font-medium" role="alert" aria-live="assertive">
-            <svg className="w-5 h-5 text-[#C0392B] dark:text-[#DC2626] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 p-4 rounded-2xl flex items-center gap-3 text-[14px] font-medium" role="alert" aria-live="assertive">
+            <svg className="w-5 h-5 text-rose-600 dark:text-rose-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             <span>{displayError.message}</span>
@@ -176,8 +176,8 @@ export default function VisuallyImpairedBridge({ onLiveMessage }: VisuallyImpair
         )}
 
         {copiedMessage && (
-          <div className="bg-[#E8F5E9] dark:bg-[#166534]/40 border border-[#A5D6A7] dark:border-[#22C55E]/40 text-[#198754] dark:text-[#86EFAC] p-4 rounded-xl flex items-center gap-3 text-[14px] font-medium" role="status" aria-live="polite">
-            <svg className="w-5 h-5 text-[#198754] dark:text-[#16A34A] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 p-4 rounded-2xl flex items-center gap-3 text-[14px] font-medium" role="status" aria-live="polite">
+            <svg className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span>{copiedMessage}</span>
@@ -185,8 +185,8 @@ export default function VisuallyImpairedBridge({ onLiveMessage }: VisuallyImpair
         )}
 
         {!isSTTSupported && (
-          <div className="bg-[#FFFBEB] dark:bg-[#78350F]/30 border border-[#FCD34D] dark:border-[#D97706] text-[#D97706] dark:text-[#FDE68A] p-4 rounded-xl flex items-center gap-3 text-[14px] font-medium" role="alert">
-            <svg className="w-5 h-5 text-[#D97706] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 p-4 rounded-2xl flex items-center gap-3 text-[14px] font-medium" role="alert">
+            <svg className="w-5 h-5 text-amber-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             <span><strong>Speech recognition not supported:</strong> Please use Chrome, Edge, or Safari for voice input.</span>
@@ -194,8 +194,8 @@ export default function VisuallyImpairedBridge({ onLiveMessage }: VisuallyImpair
         )}
 
         {!isTTSSupported && (
-          <div className="bg-[#FFFBEB] dark:bg-[#78350F]/30 border border-[#FCD34D] dark:border-[#D97706] text-[#D97706] dark:text-[#FDE68A] p-4 rounded-xl flex items-center gap-3 text-[14px] font-medium" role="alert">
-            <svg className="w-5 h-5 text-[#D97706] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 p-4 rounded-2xl flex items-center gap-3 text-[14px] font-medium" role="alert">
+            <svg className="w-5 h-5 text-amber-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             <span><strong>Text-to-speech not supported:</strong> Your browser does not support speech synthesis.</span>
@@ -205,7 +205,7 @@ export default function VisuallyImpairedBridge({ onLiveMessage }: VisuallyImpair
 
       {/* 2-Column Responsive Workspace Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column: Speech Controls & Scene Narration (Span 7) */}
+        {/* Left Column: Speech Controls (Span 7) */}
         <div className="lg:col-span-7 flex flex-col gap-6">
           <SpeechControls
             listeningState={listeningState}
@@ -239,25 +239,25 @@ export default function VisuallyImpairedBridge({ onLiveMessage }: VisuallyImpair
           />
 
           {/* Keyboard Shortcuts Cheatsheet */}
-          <section className="bg-white dark:bg-[#1E293B] border border-[#D8E2EC] dark:border-[#334155] rounded-2xl p-5 md:p-6 shadow-[0_4px_12px_rgba(15,23,42,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.35)] flex flex-col gap-3.5" aria-labelledby="shortcuts-heading">
-            <h3 id="shortcuts-heading" className="text-[18px] font-bold text-[#0F172A] dark:text-white flex items-center gap-2">
-              <svg className="w-5.5 h-5.5 text-[#0F4C81] dark:text-[#3B82F6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <section className="apple-card flex flex-col gap-3.5" aria-labelledby="shortcuts-heading">
+            <h3 id="shortcuts-heading" className="text-[18px] font-extrabold text-[#0F172A] dark:text-white flex items-center gap-2">
+              <svg className="w-5.5 h-5.5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
               Keyboard Shortcuts Cheatsheet
             </h3>
             <ul className="grid grid-cols-2 gap-3">
-              <li className="bg-[#E2E8F0] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] p-3 rounded-xl flex items-center gap-2.5 text-[13.5px] text-[#0F172A] dark:text-[#F8FAFC] font-bold">
-                <kbd className="bg-white dark:bg-[#1E293B] border border-[#0F172A] dark:border-[#64748B] px-2 py-0.5 rounded text-[12px] font-black font-mono text-[#0F172A] dark:text-white shadow-xs">Tab</kbd> Move focus
+              <li className="bg-slate-100 dark:bg-[#0F172A] border border-slate-200 dark:border-[#273142] p-3 rounded-2xl flex items-center gap-2.5 text-[13.5px] text-[#0F172A] dark:text-[#F8FAFC] font-bold">
+                <kbd className="bg-white dark:bg-[#161B26] border border-slate-300 dark:border-slate-700 px-2 py-0.5 rounded-lg text-[12px] font-black font-mono text-[#0F172A] dark:text-white shadow-xs">Tab</kbd> Move focus
               </li>
-              <li className="bg-[#E2E8F0] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] p-3 rounded-xl flex items-center gap-2.5 text-[13.5px] text-[#0F172A] dark:text-[#F8FAFC] font-bold">
-                <kbd className="bg-white dark:bg-[#1E293B] border border-[#0F172A] dark:border-[#64748B] px-2 py-0.5 rounded text-[12px] font-black font-mono text-[#0F172A] dark:text-white shadow-xs">Enter</kbd> Activate CTA
+              <li className="bg-slate-100 dark:bg-[#0F172A] border border-slate-200 dark:border-[#273142] p-3 rounded-2xl flex items-center gap-2.5 text-[13.5px] text-[#0F172A] dark:text-[#F8FAFC] font-bold">
+                <kbd className="bg-white dark:bg-[#161B26] border border-slate-300 dark:border-slate-700 px-2 py-0.5 rounded-lg text-[12px] font-black font-mono text-[#0F172A] dark:text-white shadow-xs">Enter</kbd> Activate CTA
               </li>
-              <li className="bg-[#E2E8F0] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] p-3 rounded-xl flex items-center gap-2.5 text-[13.5px] text-[#0F172A] dark:text-[#F8FAFC] font-bold">
-                <kbd className="bg-white dark:bg-[#1E293B] border border-[#0F172A] dark:border-[#64748B] px-2 py-0.5 rounded text-[12px] font-black font-mono text-[#0F172A] dark:text-white shadow-xs">Shift+Tab</kbd> Backwards
+              <li className="bg-slate-100 dark:bg-[#0F172A] border border-slate-200 dark:border-[#273142] p-3 rounded-2xl flex items-center gap-2.5 text-[13.5px] text-[#0F172A] dark:text-[#F8FAFC] font-bold">
+                <kbd className="bg-white dark:bg-[#161B26] border border-slate-300 dark:border-slate-700 px-2 py-0.5 rounded-lg text-[12px] font-black font-mono text-[#0F172A] dark:text-white shadow-xs">Shift+Tab</kbd> Backwards
               </li>
-              <li className="bg-[#E2E8F0] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] p-3 rounded-xl flex items-center gap-2.5 text-[13.5px] text-[#0F172A] dark:text-[#F8FAFC] font-bold">
-                <kbd className="bg-white dark:bg-[#1E293B] border border-[#0F172A] dark:border-[#64748B] px-2 py-0.5 rounded text-[12px] font-black font-mono text-[#0F172A] dark:text-white shadow-xs">Esc</kbd> Stop Audio
+              <li className="bg-slate-100 dark:bg-[#0F172A] border border-slate-200 dark:border-[#273142] p-3 rounded-2xl flex items-center gap-2.5 text-[13.5px] text-[#0F172A] dark:text-[#F8FAFC] font-bold">
+                <kbd className="bg-white dark:bg-[#161B26] border border-slate-300 dark:border-slate-700 px-2 py-0.5 rounded-lg text-[12px] font-black font-mono text-[#0F172A] dark:text-white shadow-xs">Esc</kbd> Stop Audio
               </li>
             </ul>
           </section>

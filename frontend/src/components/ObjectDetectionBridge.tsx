@@ -632,26 +632,26 @@ export default function ObjectDetectionBridge() {
   };
 
   return (
-    <div className="flex flex-col gap-6 md:gap-7 w-full max-w-[1340px] mx-auto p-4 md:p-6 text-[#1E293B] dark:text-[#F8FAFC]">
+    <div className="flex flex-col gap-6 md:gap-7 w-full max-w-[1340px] mx-auto p-4 md:p-6 text-[#0F172A] dark:text-[#F8FAFC]">
 
       {/* Header Banner Card */}
-      <div className="bg-white dark:bg-[#1E293B] border border-[#D8E2EC] dark:border-[#334155] rounded-2xl p-6 md:p-7 shadow-[0_4px_12px_rgba(15,23,42,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.35)] hover:shadow-md transition-all duration-200 flex items-center justify-between flex-wrap gap-4 mb-2">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-[#0F4C81]/10 dark:bg-[#3B82F6]/20 rounded-xl">
-            <svg className="w-7 h-7 text-[#0F4C81] dark:text-[#3B82F6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="apple-banner flex items-center justify-between flex-wrap gap-4 mb-2">
+        <div className="flex items-center gap-3.5">
+          <div className="p-3 bg-blue-500/10 dark:bg-blue-500/20 rounded-2xl">
+            <svg className="w-7 h-7 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
           </div>
           <div>
-            <h2 className="text-[24px] font-bold text-[#16324F] dark:text-white tracking-tight">ROI Bounding Box Object Detection</h2>
-            <p className="text-[15px] text-[#475569] dark:text-[#CBD5E1] mt-0.5">High-Accuracy Region-of-Interest (ROI) Object Detection & Scene AI</p>
+            <h2 className="text-[24px] font-extrabold text-[#0F172A] dark:text-white tracking-tight">ROI Bounding Box Object Detection</h2>
+            <p className="text-[15px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">High-Accuracy Region-of-Interest (ROI) Object Detection & Scene AI</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 bg-[#F4F7FB] dark:bg-[#0F172A] px-3.5 py-1.5 rounded-full border border-[#D8E2EC] dark:border-[#334155]">
-          <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-[#198754] dark:bg-[#16A34A] animate-pulse' : 'bg-[#C0392B] dark:bg-[#DC2626]'}`} />
-          <span className="text-[13px] text-[#1E293B] dark:text-[#F8FAFC] font-semibold">{isConnected ? 'Backend Connected' : 'Disconnected'}</span>
+        <div className="flex items-center gap-2 bg-slate-100 dark:bg-[#0F172A] px-4 py-2 rounded-full border border-slate-200 dark:border-[#273142]">
+          <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
+          <span className="text-[13px] text-slate-800 dark:text-slate-200 font-extrabold">{isConnected ? 'Backend Connected' : 'Disconnected'}</span>
         </div>
       </div>
 
@@ -667,7 +667,7 @@ export default function ObjectDetectionBridge() {
             onPointerDown={handleRoiPointerDown}
             onPointerMove={handleRoiPointerMove}
             onPointerUp={handleRoiPointerUp}
-            className={`relative w-full aspect-video bg-[#16324F] dark:bg-[#0F172A] rounded-2xl overflow-hidden border ${isHapticActive ? 'border-[#0F4C81] dark:border-[#3B82F6] shadow-[0_0_20px_rgba(15,76,129,0.4)]' : 'border-[#D8E2EC] dark:border-[#334155] shadow-sm'} ${roiEnabled ? 'cursor-crosshair select-none' : ''} transition-all duration-200 mb-2`}
+            className={`relative w-full aspect-video bg-[#0B0F17] rounded-3xl overflow-hidden border ${isHapticActive ? 'border-blue-500 shadow-[0_0_25px_rgba(59,130,246,0.4)]' : 'border-slate-200 dark:border-[#273142] shadow-2xl'} ${roiEnabled ? 'cursor-crosshair select-none' : ''} transition-all duration-200 mb-2`}
           >
             <video ref={videoRef} autoPlay playsInline muted className="hidden" />
             <canvas ref={displayCanvasRef} className="w-full h-full object-cover" />
@@ -675,16 +675,16 @@ export default function ObjectDetectionBridge() {
             {/* HUD Overlay */}
             <div className="absolute top-4 left-4 right-4 flex justify-between pointer-events-none z-10">
               <div className="flex gap-2">
-                <div className="bg-[#16324F]/90 dark:bg-[#0F172A]/90 px-3 py-1 rounded-md border border-white/20 text-[#F8FAFC] text-[13px] font-semibold">
+                <div className="bg-[#161B26]/90 px-3 py-1.5 rounded-xl border border-white/20 text-[#F8FAFC] text-[13px] font-extrabold backdrop-blur-md">
                   FPS: {fps}
                 </div>
                 {roiEnabled && roi && (
-                  <div className="bg-[#10B981]/90 px-3 py-1 rounded-md border border-white/30 text-white text-[13px] font-bold shadow animate-pulse">
+                  <div className="bg-emerald-500/90 px-3.5 py-1.5 rounded-xl border border-white/30 text-white text-[13px] font-extrabold shadow-lg animate-pulse backdrop-blur-md">
                     ⚡ {calculateZoomFactor(roi.w, roi.h)}x ROI Pixel Density Zoom
                   </div>
                 )}
               </div>
-              <div className={`bg-[#16324F]/90 dark:bg-[#0F172A]/90 px-3 py-1 rounded-md border border-white/20 text-[13px] font-semibold ${useMockCamera ? 'text-[#D97706]' : 'text-[#86EFAC]'}`}>
+              <div className={`bg-[#161B26]/90 px-3.5 py-1.5 rounded-xl border border-white/20 text-[13px] font-extrabold backdrop-blur-md ${useMockCamera ? 'text-amber-400' : 'text-emerald-400'}`}>
                 {cameraStatus}
               </div>
             </div>
@@ -705,7 +705,7 @@ export default function ObjectDetectionBridge() {
 
                 {/* High-contrast ROI Selection Bounding Box Frame */}
                 <div
-                  className="absolute border-2 border-[#10B981] shadow-[0_0_20px_rgba(16,185,129,0.6)] rounded-md"
+                  className="absolute border-2 border-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.6)] rounded-2xl"
                   style={{
                     left: `${roi.x}px`,
                     top: `${roi.y}px`,
@@ -714,18 +714,18 @@ export default function ObjectDetectionBridge() {
                   }}
                 >
                   {/* Corner handles */}
-                  <div className="absolute -top-1.5 -left-1.5 w-3.5 h-3.5 bg-[#10B981] rounded-full border-2 border-white" />
-                  <div className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 bg-[#10B981] rounded-full border-2 border-white" />
-                  <div className="absolute -bottom-1.5 -left-1.5 w-3.5 h-3.5 bg-[#10B981] rounded-full border-2 border-white" />
-                  <div className="absolute -bottom-1.5 -right-1.5 w-3.5 h-3.5 bg-[#10B981] rounded-full border-2 border-white" />
+                  <div className="absolute -top-1.5 -left-1.5 w-3.5 h-3.5 bg-emerald-400 rounded-full border-2 border-white" />
+                  <div className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 bg-emerald-400 rounded-full border-2 border-white" />
+                  <div className="absolute -bottom-1.5 -left-1.5 w-3.5 h-3.5 bg-emerald-400 rounded-full border-2 border-white" />
+                  <div className="absolute -bottom-1.5 -right-1.5 w-3.5 h-3.5 bg-emerald-400 rounded-full border-2 border-white" />
 
                   {/* Floating Tag */}
-                  <div className="absolute -top-8 left-0 bg-[#10B981] text-white text-[12px] font-bold px-2.5 py-0.5 rounded-md shadow-md flex items-center gap-1.5">
+                  <div className="absolute -top-9 left-0 bg-emerald-500 text-white text-[12px] font-extrabold px-3 py-1 rounded-xl shadow-lg flex items-center gap-1.5">
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                     <span>ROI: {Math.round(roi.w)}×{Math.round(roi.h)}px</span>
-                    <span className="bg-black/30 px-1 rounded text-[10px]">{calculateZoomFactor(roi.w, roi.h)}x Boost</span>
+                    <span className="bg-black/30 px-1.5 py-0.5 rounded-lg text-[10px]">{calculateZoomFactor(roi.w, roi.h)}x Boost</span>
                   </div>
                 </div>
               </div>
@@ -733,9 +733,9 @@ export default function ObjectDetectionBridge() {
 
             {/* Instruction banner when ROI is enabled but not drawn yet */}
             {roiEnabled && !roi && (
-              <div className="absolute inset-0 bg-black/30 pointer-events-none flex items-center justify-center z-20">
-                <div className="bg-[#0F172A]/90 border border-[#10B981]/50 text-white px-5 py-3 rounded-xl text-sm font-semibold shadow-2xl backdrop-blur-md flex items-center gap-3">
-                  <svg className="w-6 h-6 text-[#10B981] animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="absolute inset-0 bg-black/40 pointer-events-none flex items-center justify-center z-20">
+                <div className="bg-[#0B0F17]/90 border border-emerald-500/50 text-white px-6 py-3.5 rounded-2xl text-sm font-extrabold shadow-2xl backdrop-blur-xl flex items-center gap-3">
+                  <svg className="w-6 h-6 text-emerald-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
                   </svg>
                   <span>Click & Drag on the camera feed to set Region of Interest (ROI) bounding box</span>
@@ -745,15 +745,14 @@ export default function ObjectDetectionBridge() {
           </div>
 
           {/* ROI & Camera Controls Card */}
-          <div className="bg-white dark:bg-[#1E293B] border border-[#D8E2EC] dark:border-[#334155] rounded-2xl p-6 md:p-7 shadow-[0_4px_12px_rgba(15,23,42,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.35)] flex flex-col gap-5 transition-colors duration-200 mb-2">
+          <div className="apple-card flex flex-col gap-5 mb-2">
 
             {/* Top Toolbar Row */}
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-3 flex-wrap">
                 <button
                   onClick={handleToggleNarration}
-                  className={`h-[48px] px-6 py-3.5 rounded-xl font-semibold text-[15px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-pointer flex items-center gap-2 text-white shadow-sm ${isNarrating ? 'bg-[#C0392B] dark:bg-[#DC2626] hover:bg-[#A93226]' : 'bg-[#0F4C81] dark:bg-[#2563EB] hover:bg-[#0B3D66] dark:hover:bg-[#1D4ED8]'
-                    }`}
+                  className={isNarrating ? 'apple-btn-danger' : 'apple-btn-primary'}
                 >
                   {isNarrating ? (
                     <>
@@ -773,12 +772,12 @@ export default function ObjectDetectionBridge() {
                 </button>
 
                 {/* Ignore Person Checkbox Toggle */}
-                <label className="h-[48px] px-4 py-2.5 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl flex items-center gap-2 text-[14px] font-semibold text-[#1E293B] dark:text-[#F8FAFC] cursor-pointer hover:bg-[#E2E8F0] dark:hover:bg-[#1E293B] transition-colors select-none">
+                <label className="h-[48px] px-4 py-2.5 bg-slate-100 dark:bg-[#0F172A] border border-slate-200 dark:border-[#273142] rounded-2xl flex items-center gap-2 text-[14px] font-bold text-[#0F172A] dark:text-[#F8FAFC] cursor-pointer hover:bg-slate-200 dark:hover:bg-[#161B26] transition-colors select-none">
                   <input
                     type="checkbox"
                     checked={ignorePerson}
                     onChange={e => setIgnorePerson(e.target.checked)}
-                    className="w-4.5 h-4.5 accent-[#DC2626] rounded border-[#CBD5E1] cursor-pointer"
+                    className="w-4.5 h-4.5 accent-rose-600 rounded cursor-pointer"
                   />
                   <span>Ignore Person (Don&apos;t look for person)</span>
                 </label>
@@ -790,8 +789,7 @@ export default function ObjectDetectionBridge() {
                     setRoiEnabled(next);
                     if (!next) setRoi(null);
                   }}
-                  className={`h-[48px] px-5 py-3.5 rounded-xl font-semibold text-[14px] transition-all duration-200 flex items-center gap-2 border shadow-sm cursor-pointer ${roiEnabled ? 'bg-[#10B981] text-white border-[#059669] shadow-[0_0_12px_rgba(16,185,129,0.3)]' : 'bg-[#F1F5F9] dark:bg-[#0F172A] text-[#1E293B] dark:text-[#F8FAFC] border-[#CBD5E1] dark:border-[#334155] hover:bg-[#E2E8F0] dark:hover:bg-[#1E293B]'
-                    }`}
+                  className={roiEnabled ? 'apple-btn-primary bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/25' : 'apple-btn-secondary'}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
@@ -802,7 +800,7 @@ export default function ObjectDetectionBridge() {
                 {roiEnabled && roi && (
                   <button
                     onClick={() => setRoi(null)}
-                    className="h-[48px] px-4 py-3.5 rounded-xl font-medium text-[13px] text-[#DC2626] hover:bg-[#FEE2E2] dark:hover:bg-[#451A1A] border border-[#FCA5A5] dark:border-[#7F1D1D] transition-colors cursor-pointer"
+                    className="apple-btn-danger text-xs"
                   >
                     Clear ROI Box
                   </button>
@@ -810,12 +808,12 @@ export default function ObjectDetectionBridge() {
               </div>
 
               <div className="flex items-center gap-4 flex-wrap">
-                <label className="flex items-center gap-2 text-[14px] text-[#1E293B] dark:text-[#F8FAFC] font-semibold">
+                <label className="flex items-center gap-2 text-[14px] text-[#0F172A] dark:text-[#F8FAFC] font-extrabold">
                   Camera
                   <select
                     value={resolutionKey}
                     onChange={e => handleResolutionChange(e.target.value)}
-                    className="bg-white dark:bg-[#0F172A] text-[#1E293B] dark:text-[#F8FAFC] border border-[#CBD5E1] dark:border-[#334155] rounded-lg px-2.5 py-1.5 text-[14px] cursor-pointer"
+                    className="apple-input font-bold cursor-pointer py-1.5"
                   >
                     {Object.entries(CAMERA_RESOLUTIONS).map(([key, res]) => (
                       <option key={key} value={key}>{res.label}</option>
@@ -823,12 +821,12 @@ export default function ObjectDetectionBridge() {
                   </select>
                 </label>
 
-                <label className="flex items-center gap-2 text-[14px] text-[#1E293B] dark:text-[#F8FAFC] font-semibold cursor-pointer">
+                <label className="flex items-center gap-2 text-[14px] text-[#0F172A] dark:text-[#F8FAFC] font-extrabold cursor-pointer">
                   <input
                     type="checkbox"
                     checked={highResMode}
                     onChange={e => setHighResMode(e.target.checked)}
-                    className="w-4.5 h-4.5 accent-[#0F4C81] dark:accent-[#3B82F6] rounded border-[#CBD5E1] cursor-pointer"
+                    className="w-4.5 h-4.5 accent-blue-600 rounded cursor-pointer"
                   />
                   High-Res (OCR)
                 </label>
@@ -836,23 +834,23 @@ export default function ObjectDetectionBridge() {
             </div>
 
             {/* ROI Quick Presets Bar */}
-            <div className="flex items-center gap-3 pt-3 border-t border-[#E2E8F0] dark:border-[#334155] flex-wrap">
-              <span className="text-[13px] font-semibold text-[#64748B] dark:text-[#94A3B8]">ROI Presets:</span>
+            <div className="flex items-center gap-2.5 pt-4 border-t border-slate-200 dark:border-[#273142] flex-wrap">
+              <span className="text-[13px] font-extrabold text-slate-400">ROI Presets:</span>
               <button
                 onClick={() => setPresetRoi('center')}
-                className="px-3.5 py-1.5 bg-[#F8FAFC] dark:bg-[#0F172A] hover:bg-[#E2E8F0] dark:hover:bg-[#334155] border border-[#CBD5E1] dark:border-[#334155] rounded-lg text-[13px] font-medium transition-colors cursor-pointer"
+                className="px-3.5 py-2 bg-slate-100 dark:bg-[#0F172A] hover:bg-slate-200 dark:hover:bg-[#161B26] border border-slate-200 dark:border-[#273142] rounded-xl text-[13px] font-bold transition-all cursor-pointer active:scale-95"
               >
                 Center Focus (50%)
               </button>
               <button
                 onClick={() => setPresetRoi('top')}
-                className="px-3.5 py-1.5 bg-[#F8FAFC] dark:bg-[#0F172A] hover:bg-[#E2E8F0] dark:hover:bg-[#334155] border border-[#CBD5E1] dark:border-[#334155] rounded-lg text-[13px] font-medium transition-colors cursor-pointer"
+                className="px-3.5 py-2 bg-slate-100 dark:bg-[#0F172A] hover:bg-slate-200 dark:hover:bg-[#161B26] border border-slate-200 dark:border-[#273142] rounded-xl text-[13px] font-bold transition-all cursor-pointer active:scale-95"
               >
                 Upper Region
               </button>
               <button
                 onClick={() => setPresetRoi('bottom')}
-                className="px-3.5 py-1.5 bg-[#F8FAFC] dark:bg-[#0F172A] hover:bg-[#E2E8F0] dark:hover:bg-[#334155] border border-[#CBD5E1] dark:border-[#334155] rounded-lg text-[13px] font-medium transition-colors cursor-pointer"
+                className="px-3.5 py-2 bg-slate-100 dark:bg-[#0F172A] hover:bg-slate-200 dark:hover:bg-[#161B26] border border-slate-200 dark:border-[#273142] rounded-xl text-[13px] font-bold transition-all cursor-pointer active:scale-95"
               >
                 Lower Region
               </button>
@@ -863,26 +861,26 @@ export default function ObjectDetectionBridge() {
         </div>
 
         {/* Right Column: Scene Description Transcript & Detected Objects Panel */}
-        <div className="lg:col-span-4 bg-white dark:bg-[#1E293B] border border-[#D8E2EC] dark:border-[#334155] rounded-2xl p-6 md:p-7 shadow-[0_4px_12px_rgba(15,23,42,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.35)] flex flex-col gap-5 min-h-[500px] transition-colors duration-200">
+        <div className="lg:col-span-4 apple-card flex flex-col gap-5 min-h-[500px]">
 
           {/* Detections Summary */}
-          <div className="border-b border-[#D8E2EC] dark:border-[#334155] pb-4">
-            <h3 className="text-[18px] font-bold text-[#16324F] dark:text-white flex items-center justify-between">
+          <div className="border-b border-slate-200 dark:border-[#273142] pb-4">
+            <h3 className="text-[18px] font-extrabold text-[#0F172A] dark:text-white flex items-center justify-between">
               <span className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-[#10B981]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 ROI Detections
               </span>
-              <span className="bg-[#10B981]/15 text-[#10B981] text-[12px] px-2.5 py-0.5 rounded-full font-semibold">
+              <span className="apple-badge">
                 {detectedObjects.length} Objects
               </span>
             </h3>
             {detectedObjects.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-3">
                 {detectedObjects.map((obj, i) => (
-                  <span key={i} className="inline-flex items-center gap-1 bg-[#F1F5F9] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] text-[12px] font-semibold px-2.5 py-1 rounded-md">
-                    <span className="w-2 h-2 rounded-full bg-[#3B82F6]" />
+                  <span key={i} className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-[#0F172A] border border-slate-200 dark:border-[#273142] text-[12px] font-extrabold px-3 py-1 rounded-xl">
+                    <span className="w-2 h-2 rounded-full bg-blue-500" />
                     {obj.label}
                   </span>
                 ))}
@@ -891,26 +889,26 @@ export default function ObjectDetectionBridge() {
           </div>
 
           {/* Scene Analysis Log */}
-          <div className="flex justify-between items-center border-b border-[#D8E2EC] dark:border-[#334155] pb-3">
-            <h3 className="text-[18px] font-semibold text-[#16324F] dark:text-white flex items-center gap-2">
-              <svg className="w-5 h-5 text-[#0F4C81] dark:text-[#3B82F6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex justify-between items-center border-b border-slate-200 dark:border-[#273142] pb-3">
+            <h3 className="text-[18px] font-extrabold text-[#0F172A] dark:text-white flex items-center gap-2">
+              <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
               Scene Analysis Log
             </h3>
-            <span className="text-[12px] text-[#64748B] dark:text-[#94A3B8] font-semibold">{transcripts.length} entries</span>
+            <span className="text-[12px] text-slate-400 font-bold">{transcripts.length} entries</span>
           </div>
 
           <div className="flex flex-col gap-3 pr-1 overflow-y-auto max-h-[380px]">
             {transcripts.length === 0 ? (
-              <p className="text-[14px] text-[#64748B] dark:text-[#94A3B8] text-center my-auto italic py-8">
+              <p className="text-[14px] text-slate-400 text-center my-auto italic py-8">
                 Click &quot;Start Narration&quot; or select an ROI bounding box to perform object detection.
               </p>
             ) : (
               transcripts.map(t => (
-                <div key={t.id} className="bg-[#F4F7FB] dark:bg-[#0F172A] border border-[#D8E2EC] dark:border-[#334155] border-l-4 border-l-[#0F4C81] dark:border-l-[#3B82F6] p-3.5 rounded-lg text-[14px]">
-                  <div className="text-[12px] text-[#64748B] dark:text-[#94A3B8] font-semibold mb-1">{t.timestamp}</div>
-                  <div className="text-[#1E293B] dark:text-[#F8FAFC]">{t.text}</div>
+                <div key={t.id} className="bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-[#273142] border-l-4 border-l-blue-600 dark:border-l-blue-500 p-3.5 rounded-2xl text-[14px]">
+                  <div className="text-[12px] text-slate-400 font-bold mb-1">{t.timestamp}</div>
+                  <div className="text-slate-800 dark:text-slate-100 font-medium">{t.text}</div>
                 </div>
               ))
             )}
