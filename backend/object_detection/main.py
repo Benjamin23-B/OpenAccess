@@ -49,6 +49,15 @@ async def websocket_stream(websocket: WebSocket):
     try:
         while True:
             data_str = await websocket.receive_text()
+            
+            # Drain any stale queued frames in buffer so we always process the LATEST frame with 0 latency
+            while True:
+                try:
+                    newer_data_str = await asyncio.wait_for(websocket.receive_text(), timeout=0.001)
+                    data_str = newer_data_str
+                except Exception:
+                    break
+
             data = json.loads(data_str)
             
             command = data.get("command", None)
@@ -58,6 +67,8 @@ async def websocket_stream(websocket: WebSocket):
                 
                 ignore_person = data.get("ignore_person", False)
                 ignore_classes = ["person"] if ignore_person else data.get("ignore_classes", [])
+                detect_objects = data.get("detect_objects", True)
+                detect_text = data.get("detect_text", False)
 
                 # A. Ingestion Layer
                 high_res_mode = data.get("high_res_mode", False)
@@ -69,7 +80,8 @@ async def websocket_stream(websocket: WebSocket):
 
                 # B. Multimodal Perception Layer
                 markdown_result, detections = vlm_engine.process_image_detailed(
-                    pil_image, text_prompt=command, ignore_classes=ignore_classes
+                    pil_image, text_prompt=command, ignore_classes=ignore_classes,
+                    detect_objects=detect_objects, detect_text=detect_text
                 )
                 
                 # Send structured bounding box detections to frontend

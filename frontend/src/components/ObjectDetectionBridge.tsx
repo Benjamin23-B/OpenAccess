@@ -103,12 +103,20 @@ export default function ObjectDetectionBridge() {
 
   const [ignorePerson, setIgnorePerson] = useState(false);
   const ignorePersonRef = useRef<boolean>(false);
+  const [activeMode, setActiveMode] = useState<'objects' | 'text'>('objects');
+  const detectObjectsRef = useRef<boolean>(true);
+  const detectTextRef = useRef<boolean>(false);
   const lastSpokenTextRef = useRef<string>('');
   const lastSpokenTimeRef = useRef<number>(0);
 
   useEffect(() => {
     ignorePersonRef.current = ignorePerson;
   }, [ignorePerson]);
+
+  useEffect(() => {
+    detectObjectsRef.current = activeMode === 'objects';
+    detectTextRef.current = activeMode === 'text';
+  }, [activeMode]);
 
   const speakText = useCallback((text: string) => {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
@@ -579,6 +587,8 @@ export default function ObjectDetectionBridge() {
           image: base64Data,
           high_res_mode: highResModeRef.current,
           ignore_person: ignorePersonRef.current,
+          detect_objects: detectObjectsRef.current,
+          detect_text: detectTextRef.current,
           command: commandStr
         };
 
@@ -754,16 +764,45 @@ export default function ObjectDetectionBridge() {
                   )}
                 </button>
 
-                {/* Ignore Person Checkbox Toggle */}
-                <label className="h-[48px] px-4 py-2.5 bg-slate-100 dark:bg-[#0F172A] border border-slate-200 dark:border-[#273142] rounded-2xl flex items-center gap-2 text-[14px] font-bold text-[#0F172A] dark:text-[#F8FAFC] cursor-pointer hover:bg-slate-200 dark:hover:bg-[#161B26] transition-colors select-none">
-                  <input
-                    type="checkbox"
-                    checked={ignorePerson}
-                    onChange={e => setIgnorePerson(e.target.checked)}
-                    className="w-4.5 h-4.5 accent-rose-600 rounded cursor-pointer"
-                  />
-                  <span>Ignore Person (Don&apos;t look for person)</span>
-                </label>
+                {/* Single Segmented Mode Switch: Object Mode vs Text Mode */}
+                <div className="h-[48px] p-1 bg-slate-100 dark:bg-[#0F172A] border border-slate-200 dark:border-[#273142] rounded-2xl flex items-center gap-1 select-none">
+                  <button
+                    type="button"
+                    onClick={() => setActiveMode('objects')}
+                    className={`h-full px-4 rounded-xl text-[14px] font-extrabold transition-all duration-200 flex items-center gap-2 cursor-pointer ${
+                      activeMode === 'objects'
+                        ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-[#0F172A] dark:hover:text-white'
+                    }`}
+                  >
+                    <span>🔍 Object Mode</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveMode('text')}
+                    className={`h-full px-4 rounded-xl text-[14px] font-extrabold transition-all duration-200 flex items-center gap-2 cursor-pointer ${
+                      activeMode === 'text'
+                        ? 'bg-amber-500 text-white shadow-md shadow-amber-500/30'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-[#0F172A] dark:hover:text-white'
+                    }`}
+                  >
+                    <span>📝 Text Mode</span>
+                  </button>
+                </div>
+
+                {/* Ignore Person Toggle Button */}
+                <button
+                  type="button"
+                  onClick={() => setIgnorePerson(!ignorePerson)}
+                  className={`h-[48px] px-4 py-2.5 rounded-2xl flex items-center gap-2 text-[14px] font-extrabold transition-all shadow-sm cursor-pointer select-none ${
+                    ignorePerson
+                      ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-rose-500/25 ring-2 ring-rose-400/50'
+                      : 'bg-slate-100 dark:bg-[#0F172A] border border-slate-200 dark:border-[#273142] text-slate-500 hover:bg-slate-200 dark:hover:bg-[#161B26]'
+                  }`}
+                >
+                  <span className="text-base">{ignorePerson ? '🚫' : '👤'}</span>
+                  <span>{ignorePerson ? 'Ignoring Person' : 'Ignore Person'}</span>
+                </button>
 
                 {/* ROI Mode Toggle Button */}
                 <button

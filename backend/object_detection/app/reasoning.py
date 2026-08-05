@@ -20,7 +20,7 @@ def calculate_iou(box1: list, box2: list) -> float:
     return inter_area / union_area if union_area > 0 else 0.0
 
 class SemanticAggregator:
-    def __init__(self, stale_cooldown_sec: float = 30.0):
+    def __init__(self, stale_cooldown_sec: float = 10.0):
         # Map: obj_label -> list of {"box": list, "last_announced": float}
         self.announced_history = {}
         self.stale_cooldown_sec = stale_cooldown_sec
@@ -73,7 +73,8 @@ class SemanticAggregator:
         """
         Parses the Markdown output from the VLM.
         Finds objects and their bounding boxes.
-        Applies repetition suppression (30s cooldown for stationary objects).
+        Applies repetition suppression (10s cooldown for stationary objects).
+        Prioritizes physical objects over text reading.
         Returns a dictionary with 'narrative' (sentences to speak) and 'spatial_audio' data.
         """
         narrative_sentences = []
@@ -89,18 +90,28 @@ class SemanticAggregator:
 
         now = time.time()
         
-        # Parse all objects first
-        parsed_objects = []
+        # Separate physical objects and text detections
+        object_items = []
+        text_items = []
+        
         for raw_obj_name, box_str in matches:
             if raw_obj_name.lower() in ignored_set:
                 continue
             box = self._parse_coordinates(box_str)
-            if box:
-                parsed_objects.append({"label": raw_obj_name, "box": box})
+            if not box:
+                continue
+                
+            is_text = raw_obj_name.startswith("text reading")
+            item = {"label": raw_obj_name, "box": box, "is_text": is_text}
+            
+            if is_text:
+                text_items.append(item)
+            else:
+                object_items.append(item)
 
-        # Number duplicates if any unnumbered labels exist
+        # Number duplicate physical objects if any unnumbered labels exist
         by_base_label = {}
-        for item in parsed_objects:
+        for item in object_items:
             base = re.sub(r'\s+\d+$', '', item["label"]).strip()
             by_base_label.setdefault(base, []).append(item)
 
@@ -110,9 +121,13 @@ class SemanticAggregator:
                 for idx, item in enumerate(items, start=1):
                     item["label"] = f"{base} {idx}"
 
-        for item in parsed_objects:
+        # Combine: PHYSICAL OBJECTS FIRST, followed by at most 2 text readings
+        combined_items = object_items + text_items[:2]
+
+        for item in combined_items:
             obj_name = item["label"]
             box = item["box"]
+            is_text = item["is_text"]
             
             # Check repetition history with IoU
             history = self.announced_history.get(obj_name, [])
@@ -126,19 +141,25 @@ class SemanticAggregator:
                     break
 
             if recently_announced:
-                # Skip repeating speech for stationary object
                 continue
 
-            # Update history for this object label
+            # Update history
             new_history = [r for r in history if (now - r["last_announced"]) < self.stale_cooldown_sec]
             new_history.append({"box": box, "last_announced": now})
             self.announced_history[obj_name] = new_history
 
             location = self._get_spatial_location(box)
-            if location == "center":
-                sentence = f"I see a {obj_name} in the center."
+            if is_text:
+                clean_txt = obj_name.replace('text reading "', '').rstrip('"')
+                if location == "center":
+                    sentence = f"I see text reading '{clean_txt}' in the center."
+                else:
+                    sentence = f"I see text reading '{clean_txt}' on the {location}."
             else:
-                sentence = f"I see a {obj_name} on the {location}."
+                if location == "center":
+                    sentence = f"I see a {obj_name} in the center."
+                else:
+                    sentence = f"I see a {obj_name} on the {location}."
                 
             narrative_sentences.append(sentence)
             

@@ -55,111 +55,7 @@ def keep_distinct_boxes(boxes: list) -> list:
     return kept
 
 
-def detect_pens(image_cv) -> list:
-    """
-    Detects long, thin, pen-like objects using aspect ratio heuristics.
-    Returns list of normalized bounding boxes: [[x1, y1, x2, y2], ...]
-    """
-    h, w = image_cv.shape[:2]
-    gray = cv2.cvtColor(image_cv, cv2.COLOR_BGR2GRAY)
-    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-    edges = cv2.Canny(blurred, 50, 150)
-    
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
-    dilated = cv2.dilate(edges, kernel, iterations=1)
-    
-    contours, _ = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    pens = []
-    
-    for cnt in contours:
-        area = cv2.contourArea(cnt)
-        if area < 100 or area > 12000:
-            continue
-            
-        rect = cv2.minAreaRect(cnt)
-        (cx, cy), (width, height), angle = rect
-        
-        if width == 0 or height == 0:
-            continue
-            
-        aspect_ratio = max(width, height) / min(width, height)
-        # Pens are typically long and thin
-        if aspect_ratio >= 4.0 and aspect_ratio <= 18.0:
-            x, y, box_w, box_h = cv2.boundingRect(cnt)
-            norm_x1 = int((x / w) * 1000)
-            norm_y1 = int((y / h) * 1000)
-            norm_x2 = int(((x + box_w) / w) * 1000)
-            norm_y2 = int(((y + box_h) / h) * 1000)
-            
-            pens.append([norm_x1, norm_y1, norm_x2, norm_y2])
-            
-    return keep_distinct_boxes(pens)
 
-
-def detect_fruits(image_cv) -> list:
-    """
-    Detects round, colorful objects (red/orange/yellow/green) as fruits using HSV thresholding.
-    Returns list of dicts: [{"label": "apple/orange/banana/fruit", "box": [x1, y1, x2, y2]}, ...]
-    """
-    h, w = image_cv.shape[:2]
-    hsv = cv2.cvtColor(image_cv, cv2.COLOR_BGR2HSV)
-    
-    # Red has two segments in HSV space
-    mask_red1 = cv2.inRange(hsv, np.array([0, 100, 60]), np.array([10, 255, 255]))
-    mask_red2 = cv2.inRange(hsv, np.array([165, 100, 60]), np.array([180, 255, 255]))
-    
-    # Orange / Yellow
-    mask_orange_yellow = cv2.inRange(hsv, np.array([11, 80, 70]), np.array([35, 255, 255]))
-    
-    # Green (for green apples, limes, pears, etc.)
-    mask_green = cv2.inRange(hsv, np.array([36, 60, 50]), np.array([85, 255, 255]))
-    
-    combined_mask = mask_red1 | mask_red2 | mask_orange_yellow | mask_green
-    
-    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
-    cleaned = cv2.morphologyEx(combined_mask, cv2.MORPH_OPEN, kernel)
-    cleaned = cv2.morphologyEx(cleaned, cv2.MORPH_CLOSE, kernel)
-    
-    contours, _ = cv2.findContours(cleaned, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    fruits = []
-    
-    for cnt in contours:
-        area = cv2.contourArea(cnt)
-        if area < 200 or area > 60000:
-            continue
-            
-        perimeter = cv2.arcLength(cnt, True)
-        if perimeter == 0:
-            continue
-        circularity = 4 * np.pi * area / (perimeter * perimeter)
-        
-        # Fruits are generally roundish
-        if circularity > 0.40:
-            x, y, box_w, box_h = cv2.boundingRect(cnt)
-            
-            # Determine color category
-            cnt_mask = np.zeros_like(cleaned)
-            cv2.drawContours(cnt_mask, [cnt], -1, 255, -1)
-            mean_val = cv2.mean(hsv, mask=cnt_mask)
-            hue = mean_val[0]
-            
-            if (hue >= 0 and hue <= 10) or (hue >= 165 and hue <= 180):
-                label = "apple"
-            elif hue > 10 and hue <= 25:
-                label = "orange"
-            elif hue > 25 and hue <= 35:
-                label = "banana"
-            else:
-                label = "fruit"
-                
-            norm_x1 = int((x / w) * 1000)
-            norm_y1 = int((y / h) * 1000)
-            norm_x2 = int(((x + box_w) / w) * 1000)
-            norm_y2 = int(((y + box_h) / h) * 1000)
-            
-            fruits.append({"label": label, "box": [norm_x1, norm_y1, norm_x2, norm_y2]})
-            
-    return fruits
 
 class VLMEngine:
     def __init__(self, mock_mode: bool = False, conf_threshold: float = 0.5,
@@ -170,6 +66,8 @@ class VLMEngine:
         self.iou_threshold = iou_threshold
         self.model = None
         self.reader = None
+        self.last_ocr_time = 0
+        self.cached_text_lines = []
 
         if not self.mock_mode:
             self._initialize_model()
@@ -244,9 +142,10 @@ class VLMEngine:
         else:
             print("EasyOCR not installed. Text reading will be disabled.")
 
-    def process_image(self, image: Image.Image, text_prompt: str = None, ignore_classes: list = None) -> str:
+    def process_image(self, image: Image.Image, text_prompt: str = None, ignore_classes: list = None,
+                      detect_objects: bool = True, detect_text: bool = True) -> str:
         """
-        Processes the image through YOLO11, specialized heuristics (pens/fruits), and EasyOCR.
+        Processes the image through YOLO11 (if detect_objects=True) and EasyOCR (if detect_text=True).
         Supports filtering ignored classes (e.g. ['person']) and numbering duplicate objects.
         """
         ignored_set = set(c.lower() for c in ignore_classes) if ignore_classes else set()
@@ -291,92 +190,64 @@ class VLMEngine:
                 ]
                 text_lines = ['- text reading "10:30 AM": [490, 120, 570, 160]']
 
-            filtered_raw = [obj for obj in raw_objects if obj[0].lower() not in ignored_set]
+            filtered_raw = [obj for obj in raw_objects if obj[0].lower() not in ignored_set] if detect_objects else []
             
             markdown_lines = ["# Scene Analysis\n", "## Objects Detected"]
             for label, box in filtered_raw:
                 markdown_lines.append(f"- {label}: [{box[0]}, {box[1]}, {box[2]}, {box[3]}]")
-            if text_lines:
+            if text_lines and detect_text:
                 markdown_lines.append("\n## Text Detected")
                 markdown_lines.extend(text_lines)
             return "\n".join(markdown_lines)
             
-        # Run inference with hardware acceleration & FP16 half precision when CUDA is available.
-        has_cuda = torch.cuda.is_available()
-        device = 0 if has_cuda else "cpu"
-        
-        results = self.model(
-            image,
-            conf=self.conf_threshold,
-            iou=self.iou_threshold,
-            imgsz=self.imgsz,
-            device=device,
-            half=has_cuda,
-            agnostic_nms=True,
-            verbose=False,
-        )
-        
         detected_items = []
-        
-        for r in results:
-            boxes = r.boxes
-            for box in boxes:
-                cls_id = int(box.cls[0])
-                class_name = self.model.names[cls_id]
-                
-                if class_name.lower() in ignored_set:
-                    continue
 
-                x1, y1, x2, y2 = box.xyxy[0].tolist()
-                
-                norm_x1 = int((x1 / image.width) * 1000)
-                norm_y1 = int((y1 / image.height) * 1000)
-                norm_x2 = int((x2 / image.width) * 1000)
-                norm_y2 = int((y2 / image.height) * 1000)
-                
-                conf = box.conf[0].item()
-                if conf > self.conf_threshold:
-                    friendly_name = class_name
-                    if class_name == "dining table":
-                        friendly_name = "table"
-                    elif class_name == "potted plant":
-                        friendly_name = "plant"
-
-                    detected_items.append({
-                        "label": friendly_name,
-                        "box": [norm_x1, norm_y1, norm_x2, norm_y2],
-                        "conf": conf
-                    })
-                    
-        # Apply specialized computer-vision heuristics for small/thin objects (e.g. pens, fruits)
-        try:
-            image_cv = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+        # Run YOLO Object Inference if detect_objects mode is enabled
+        if detect_objects:
+            has_cuda = torch.cuda.is_available()
+            device = 0 if has_cuda else "cpu"
             
-            # Detect pens if not ignored
-            if "pen" not in ignored_set:
-                pen_boxes = detect_pens(image_cv)
-                for pb in pen_boxes:
-                    # Avoid adding pen if overlapping existing detection
-                    if not any(check_overlap(pb, existing["box"]) for existing in detected_items):
-                        detected_items.append({
-                            "label": "pen",
-                            "box": pb,
-                            "conf": 0.85
-                        })
-                        
-            # Detect fruits if not ignored
-            if "fruit" not in ignored_set and "apple" not in ignored_set:
-                fruit_objs = detect_fruits(image_cv)
-                for fo in fruit_objs:
-                    if not any(check_overlap(fo["box"], existing["box"]) for existing in detected_items):
-                        detected_items.append({
-                            "label": fo["label"],
-                            "box": fo["box"],
-                            "conf": 0.82
-                        })
-        except Exception as he:
-            print(f"Heuristic detection notice: {he}")
+            results = self.model(
+                image,
+                conf=self.conf_threshold,
+                iou=self.iou_threshold,
+                imgsz=self.imgsz,
+                device=device,
+                half=has_cuda,
+                agnostic_nms=True,
+                verbose=False,
+            )
+            
+            for r in results:
+                boxes = r.boxes
+                for box in boxes:
+                    cls_id = int(box.cls[0])
+                    class_name = self.model.names[cls_id]
                     
+                    if class_name.lower() in ignored_set:
+                        continue
+
+                    x1, y1, x2, y2 = box.xyxy[0].tolist()
+                    
+                    norm_x1 = int((x1 / image.width) * 1000)
+                    norm_y1 = int((y1 / image.height) * 1000)
+                    norm_x2 = int((x2 / image.width) * 1000)
+                    norm_y2 = int((y2 / image.height) * 1000)
+                    
+                    conf = box.conf[0].item()
+                    if conf > self.conf_threshold:
+                        friendly_name = class_name
+                        if class_name == "dining table":
+                            friendly_name = "table"
+                        elif class_name == "potted plant":
+                            friendly_name = "plant"
+
+                        detected_items.append({
+                            "label": friendly_name,
+                            "box": [norm_x1, norm_y1, norm_x2, norm_y2],
+                            "conf": conf
+                        })
+
         # Group detections by label and assign numbers (e.g. Person 1, Person 2) if duplicate
         grouped_by_label = {}
         for item in detected_items:
@@ -384,7 +255,6 @@ class VLMEngine:
 
         final_items = []
         for label, items in grouped_by_label.items():
-            # Sort left to right by x1 coordinate
             items.sort(key=lambda x: x["box"][0])
             if len(items) > 1:
                 for idx, item in enumerate(items, start=1):
@@ -394,7 +264,6 @@ class VLMEngine:
                 items[0]["final_label"] = label
                 final_items.append(items[0])
 
-        # Sort final items left-to-right for consistent ordering
         final_items.sort(key=lambda x: (x["box"][0], x["box"][1]))
 
         markdown_lines = ["# Scene Analysis\n", "## Objects Detected"]
@@ -405,55 +274,82 @@ class VLMEngine:
         if len(markdown_lines) == 2:
             markdown_lines.append("- None detected.")
             
-        # OCR / Text Detection Layer
-        if self.reader is not None:
-            ocr_max_dim = 320
-            ocr_image = image.copy()
-            w, h = ocr_image.size
-            if max(w, h) > ocr_max_dim:
-                scale = ocr_max_dim / max(w, h)
-                ocr_image = ocr_image.resize((int(w * scale), int(h * scale)), Image.Resampling.BILINEAR)
-            
-            ocr_w, ocr_h = ocr_image.size
-            image_np = np.array(ocr_image)
-            
-            try:
-                ocr_results = self.reader.readtext(image_np, paragraph=True)
+        # OCR / Text Detection Layer (Active only when detect_text is True)
+        import time
+        now = time.time()
+        
+        if detect_text and self.reader is not None:
+            # Run EasyOCR at most once every 1.5 seconds to keep video streaming 100% fluid & real-time
+            if now - self.last_ocr_time >= 1.5:
+                self.last_ocr_time = now
+                ocr_max_dim = 640
+                ocr_image = image.copy()
+                w, h = ocr_image.size
+                if max(w, h) > ocr_max_dim:
+                    scale = ocr_max_dim / max(w, h)
+                    ocr_image = ocr_image.resize((int(w * scale), int(h * scale)), Image.Resampling.BILINEAR)
                 
-                text_lines = []
-                for bbox, text in ocr_results:
-                    text = text.strip()
-                    if text:
-                        xs = [pt[0] for pt in bbox]
-                        ys = [pt[1] for pt in bbox]
-                        x1, y1 = min(xs), min(ys)
-                        x2, y2 = max(xs), max(ys)
-                        
-                        norm_x1 = int((x1 / ocr_w) * 1000)
-                        norm_y1 = int((y1 / ocr_h) * 1000)
-                        norm_x2 = int((x2 / ocr_w) * 1000)
-                        norm_y2 = int((y2 / ocr_h) * 1000)
-                        
-                        text_escaped = text.replace('"', '\\"')
-                        text_lines.append(f"- text reading \"{text_escaped}\": [{norm_x1}, {norm_y1}, {norm_x2}, {norm_y2}]")
+                ocr_w, ocr_h = ocr_image.size
+                image_np = np.array(ocr_image)
                 
-                if text_lines:
-                    markdown_lines.append("\n## Text Detected")
-                    markdown_lines.extend(text_lines)
-            except Exception as e:
-                print(f"OCR Error: {e}")
+                try:
+                    ocr_results = self.reader.readtext(
+                        image_np,
+                        paragraph=False,
+                        min_size=8,
+                        text_threshold=0.60,
+                        low_text=0.45,
+                    )
+                    
+                    text_lines = []
+                    for res in ocr_results:
+                        if len(res) == 3:
+                            bbox, text, prob = res
+                        else:
+                            bbox, text = res[0], res[1]
+                            prob = 1.0
+
+                        text = text.strip()
+                        # Strict confidence & alphanumeric filter: ignore wall cracks, scratches, & single noise symbols
+                        if prob >= 0.65 and len(text) >= 2:
+                            alnum_chars = [c for c in text if c.isalnum()]
+                            if len(alnum_chars) >= 3:
+                                xs = [pt[0] for pt in bbox]
+                                ys = [pt[1] for pt in bbox]
+                                x1, y1 = min(xs), min(ys)
+                                x2, y2 = max(xs), max(ys)
+                                
+                                norm_x1 = int((x1 / ocr_w) * 1000)
+                                norm_y1 = int((y1 / ocr_h) * 1000)
+                                norm_x2 = int((x2 / ocr_w) * 1000)
+                                norm_y2 = int((y2 / ocr_h) * 1000)
+                                
+                                text_escaped = text.replace('"', '\\"')
+                                text_lines.append(f"- text reading \"{text_escaped}\": [{norm_x1}, {norm_y1}, {norm_x2}, {norm_y2}]")
+                    
+                    self.cached_text_lines = text_lines
+                except Exception as e:
+                    print(f"OCR Error: {e}")
+            
+            if self.cached_text_lines:
+                markdown_lines.append("\n## Text Detected")
+                markdown_lines.extend(self.cached_text_lines)
             
         output_text = "\n".join(markdown_lines)
         return output_text
 
-    def process_image_detailed(self, image: Image.Image, text_prompt: str = None, ignore_classes: list = None):
+    def process_image_detailed(self, image: Image.Image, text_prompt: str = None, ignore_classes: list = None,
+                               detect_objects: bool = True, detect_text: bool = True):
         """
         Processes image and returns both (markdown_text, detected_objects_list).
         Each object in detected_objects_list is a dict:
         {"label": str, "box": [x1, y1, x2, y2], "confidence": float, "is_text": bool}
         Coordinates are normalized 0-1000 scale.
         """
-        markdown_text = self.process_image(image, text_prompt=text_prompt, ignore_classes=ignore_classes)
+        markdown_text = self.process_image(
+            image, text_prompt=text_prompt, ignore_classes=ignore_classes,
+            detect_objects=detect_objects, detect_text=detect_text
+        )
         detections = []
         
         import re
