@@ -11,3 +11,5 @@ mediapipe>=0.10.13
 opencv-python>=4.8.1.78
 spacy>=3.8.0
 en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0.tar.gz
+pytesseract>=0.3.10
+easyocr>=1.7.0
