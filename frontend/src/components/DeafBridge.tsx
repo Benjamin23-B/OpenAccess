@@ -97,10 +97,12 @@ export default function DeafBridge() {
     setPlayNonce((prev) => prev + 1);
   }, []);
 
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+
   // Filtered dictionary entries for dictionary tab
   const dictionaryEntries = useMemo(() => {
-    return signDictionaryService.searchEntries(searchQuery);
-  }, [searchQuery]);
+    return signDictionaryService.searchEntries(searchQuery, selectedCategory);
+  }, [searchQuery, selectedCategory]);
 
   // Copy SiGML XML to Clipboard
   const handleCopySigml = useCallback(() => {
@@ -111,11 +113,17 @@ export default function DeafBridge() {
     }
   }, [processedSequence.sigmlSequence]);
 
-  // Categorized quick presets
-  const presetCategories = [
-    { title: 'Greetings', items: ['Namaste', 'Hello', 'Welcome', 'Thanks'] },
-    { title: 'Emergency', items: ['Help', 'Doctor', 'Hospital', 'Danger'] },
-    { title: 'Essentials', items: ['Please', 'Sorry', 'Yes', 'No', 'Water'] },
+  const libraryCategories = [
+    'All',
+    'Greetings',
+    'Emergency',
+    'Medical',
+    'Essentials',
+    'Questions',
+    'Family',
+    'Time',
+    'Numbers',
+    'Database Signs',
   ];
 
   return (
@@ -391,47 +399,20 @@ export default function DeafBridge() {
                 )}
               </div>
 
-              {/* Categorized Quick Sign Presets Card */}
-              <div className="apple-card flex flex-col gap-3">
-                <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1.5 uppercase tracking-wider">
-                  <span>⚡</span> Quick Sign Presets
-                </h3>
-                
-                <div className="flex flex-col gap-2.5">
-                  {presetCategories.map((cat) => (
-                    <div key={cat.title} className="flex flex-col gap-1.5">
-                      <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
-                        {cat.title}
-                      </span>
-                      <div className="flex flex-wrap gap-1.5">
-                        {cat.items.map((phrase) => (
-                          <button
-                            key={phrase}
-                            onClick={() => handlePresetTrigger(phrase)}
-                            className="bg-slate-100 dark:bg-[#0F172A] hover:bg-slate-200 dark:hover:bg-[#1E2638] border border-slate-200 dark:border-[#273142] text-slate-800 dark:text-slate-200 py-1.5 px-3.5 rounded-xl text-xs font-semibold transition-all cursor-pointer active:scale-95"
-                          >
-                            {phrase}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
             </div>
           )}
 
           {/* TAB 2: Sign Library */}
           {activeTab === 'dictionary' && (
-            <div className="apple-card flex flex-col gap-4 max-h-[560px]">
-              <div className="flex flex-col gap-2">
+            <div className="apple-card flex flex-col gap-4 max-h-[620px]">
+              <div className="flex flex-col gap-2.5">
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm font-extrabold text-[#0F172A] dark:text-white">📖 Sign Library ({signLanguage})</h3>
                   <span className="apple-badge">
                     {dictionaryEntries.length} Signs
                   </span>
                 </div>
+                
                 <input
                   type="text"
                   placeholder="Search sign dictionary (e.g. 'help', 'doctor', 'thanks')..."
@@ -439,6 +420,23 @@ export default function DeafBridge() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="apple-input w-full text-xs"
                 />
+
+                {/* Category Filter Pills */}
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
+                  {libraryCategories.map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setSelectedCategory(cat)}
+                      className={`px-2.5 py-1 text-[11px] font-bold rounded-xl whitespace-nowrap transition-all cursor-pointer ${
+                        selectedCategory === cat
+                          ? 'bg-blue-600 text-white shadow-xs'
+                          : 'bg-slate-100 dark:bg-[#0F172A] text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#161B26] border border-slate-200 dark:border-[#273142]'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <div className="flex-1 overflow-y-auto pr-1 flex flex-col gap-2 min-h-[340px]">

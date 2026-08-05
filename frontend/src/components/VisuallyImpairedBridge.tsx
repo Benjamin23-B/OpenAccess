@@ -228,7 +228,7 @@ export default function VisuallyImpairedBridge({ onLiveMessage }: VisuallyImpair
           />
         </div>
 
-        {/* Right Column: Transcription Log & Cheatsheet (Span 5) */}
+        {/* Right Column: Transcription Log (Span 5) */}
         <div className="lg:col-span-5 flex flex-col gap-6">
           <TranscriptionPanel
             transcript={transcript}
@@ -237,30 +237,6 @@ export default function VisuallyImpairedBridge({ onLiveMessage }: VisuallyImpair
             onClear={handleClear}
             onCopy={handleCopy}
           />
-
-          {/* Keyboard Shortcuts Cheatsheet */}
-          <section className="apple-card flex flex-col gap-3.5" aria-labelledby="shortcuts-heading">
-            <h3 id="shortcuts-heading" className="text-[18px] font-extrabold text-[#0F172A] dark:text-white flex items-center gap-2">
-              <svg className="w-5.5 h-5.5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-              Keyboard Shortcuts Cheatsheet
-            </h3>
-            <ul className="grid grid-cols-2 gap-3">
-              <li className="bg-slate-100 dark:bg-[#0F172A] border border-slate-200 dark:border-[#273142] p-3 rounded-2xl flex items-center gap-2.5 text-[13.5px] text-[#0F172A] dark:text-[#F8FAFC] font-bold">
-                <kbd className="bg-white dark:bg-[#161B26] border border-slate-300 dark:border-slate-700 px-2 py-0.5 rounded-lg text-[12px] font-black font-mono text-[#0F172A] dark:text-white shadow-xs">Tab</kbd> Move focus
-              </li>
-              <li className="bg-slate-100 dark:bg-[#0F172A] border border-slate-200 dark:border-[#273142] p-3 rounded-2xl flex items-center gap-2.5 text-[13.5px] text-[#0F172A] dark:text-[#F8FAFC] font-bold">
-                <kbd className="bg-white dark:bg-[#161B26] border border-slate-300 dark:border-slate-700 px-2 py-0.5 rounded-lg text-[12px] font-black font-mono text-[#0F172A] dark:text-white shadow-xs">Enter</kbd> Activate CTA
-              </li>
-              <li className="bg-slate-100 dark:bg-[#0F172A] border border-slate-200 dark:border-[#273142] p-3 rounded-2xl flex items-center gap-2.5 text-[13.5px] text-[#0F172A] dark:text-[#F8FAFC] font-bold">
-                <kbd className="bg-white dark:bg-[#161B26] border border-slate-300 dark:border-slate-700 px-2 py-0.5 rounded-lg text-[12px] font-black font-mono text-[#0F172A] dark:text-white shadow-xs">Shift+Tab</kbd> Backwards
-              </li>
-              <li className="bg-slate-100 dark:bg-[#0F172A] border border-slate-200 dark:border-[#273142] p-3 rounded-2xl flex items-center gap-2.5 text-[13.5px] text-[#0F172A] dark:text-[#F8FAFC] font-bold">
-                <kbd className="bg-white dark:bg-[#161B26] border border-slate-300 dark:border-slate-700 px-2 py-0.5 rounded-lg text-[12px] font-black font-mono text-[#0F172A] dark:text-white shadow-xs">Esc</kbd> Stop Audio
-              </li>
-            </ul>
-          </section>
         </div>
       </div>
     </div>
