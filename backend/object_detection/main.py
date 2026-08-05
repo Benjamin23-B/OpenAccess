@@ -56,6 +56,9 @@ async def websocket_stream(websocket: WebSocket):
             if "image" in data:
                 image_bytes = base64.b64decode(data["image"])
                 
+                ignore_person = data.get("ignore_person", False)
+                ignore_classes = ["person"] if ignore_person else data.get("ignore_classes", [])
+
                 # A. Ingestion Layer
                 high_res_mode = data.get("high_res_mode", False)
                 pil_image = ingestion.process_frame(image_bytes, high_res_mode=high_res_mode)
@@ -65,7 +68,9 @@ async def websocket_stream(websocket: WebSocket):
                     continue
 
                 # B. Multimodal Perception Layer
-                markdown_result, detections = vlm_engine.process_image_detailed(pil_image, text_prompt=command)
+                markdown_result, detections = vlm_engine.process_image_detailed(
+                    pil_image, text_prompt=command, ignore_classes=ignore_classes
+                )
                 
                 # Send structured bounding box detections to frontend
                 await websocket.send_text(json.dumps({
@@ -74,7 +79,9 @@ async def websocket_stream(websocket: WebSocket):
                 }))
                 
                 # C. Reasoning Layer
-                narrative_payload = reasoning.generate_speech_payload(markdown_result)
+                narrative_payload = reasoning.generate_speech_payload(
+                    markdown_result, ignore_classes=ignore_classes
+                )
 
                 
                 for sentence in narrative_payload.get("narrative", []):

@@ -12,6 +12,7 @@ declare class ImageCapture {
 
 import { useRef, useState, useCallback, useEffect } from 'react';
 import {
+  COCO_LABELS,
   enrichDetection,
   nms,
   SpatialMapper,
@@ -33,6 +34,8 @@ export interface EnvDetectorState {
   lastAnnouncement: string;
   detectionCount: number;
   workerError: string | null;
+  ignorePerson: boolean;
+  setIgnorePerson: (val: boolean) => void;
   toggle: () => void;
 }
 
@@ -45,15 +48,21 @@ export function useEnvDetector(
   const [lastAnnouncement, setLast]     = useState('');
   const [detectionCount, setCount]      = useState(0);
   const [workerError, setWorkerError]   = useState<string | null>(null);
+  const [ignorePerson, setIgnorePerson] = useState(false);
 
-  const workerRef     = useRef<Worker | null>(null);
-  const canvasRef     = useRef<HTMLCanvasElement | null>(null);
-  const deltaEngine   = useRef(new SceneDeltaEngine());
-  const priorityQueue = useRef(new ScenePriorityQueue());
-  const audioQueue    = useRef(new SceneAudioQueue());
-  const activeRef     = useRef(false);
-  const lastFrameTime = useRef(0);
-  const rafId         = useRef<number>(0);
+  const workerRef       = useRef<Worker | null>(null);
+  const canvasRef       = useRef<HTMLCanvasElement | null>(null);
+  const deltaEngine     = useRef(new SceneDeltaEngine());
+  const priorityQueue   = useRef(new ScenePriorityQueue());
+  const audioQueue      = useRef(new SceneAudioQueue());
+  const activeRef       = useRef(false);
+  const ignorePersonRef = useRef(false);
+  const lastFrameTime   = useRef(0);
+  const rafId           = useRef<number>(0);
+
+  useEffect(() => {
+    ignorePersonRef.current = ignorePerson;
+  }, [ignorePerson]);
 
   // ── Boot worker once on mount ─────────────────────────────────────────────
   useEffect(() => {
@@ -74,8 +83,13 @@ export function useEnvDetector(
       } else if (type === 'DETECTIONS') {
         const rawList = payload as RawDetection[];
 
+        // Filter out person if ignorePerson setting is active
+        const filteredRaw = ignorePersonRef.current
+          ? rawList.filter(r => COCO_LABELS[r.classId] !== 'person')
+          : rawList;
+
         // Enrich → NMS → spatial map
-        const enriched: Detection[] = rawList
+        const enriched: Detection[] = filteredRaw
           .map(enrichDetection)
           .filter((d): d is Detection => d !== null)
           .map(SpatialMapper.map);
@@ -227,5 +241,15 @@ export function useEnvDetector(
     });
   }, [streamRef]);
 
-  return { isActive, isModelReady, webnnAvailable, lastAnnouncement, detectionCount, workerError, toggle };
+  return {
+    isActive,
+    isModelReady,
+    webnnAvailable,
+    lastAnnouncement,
+    detectionCount,
+    workerError,
+    ignorePerson,
+    setIgnorePerson,
+    toggle,
+  };
 }

@@ -62,7 +62,7 @@ const TIER_2 = new Set([
 const TIER_DELAY: Record<number, number> = { 1: 0, 2: 500, 3: 999999 };
 
 // Stale suppression — do not re-announce unless object has moved (ms)
-const STALE_MS = 3000;
+const STALE_MS = 30000;
 // IoU threshold below which an object is considered moved
 const MOVE_IOU_THRESHOLD = 0.45;
 // Confidence threshold
@@ -87,8 +87,9 @@ function iou(a: Detection, b: Detection): number {
 }
 
 function tier(label: string): number {
-  if (TIER_1.has(label)) return 1;
-  if (TIER_2.has(label)) return 2;
+  const baseLabel = label.replace(/\s+\d+$/, '').toLowerCase();
+  if (TIER_1.has(baseLabel)) return 1;
+  if (TIER_2.has(baseLabel)) return 2;
   return 3;
 }
 
@@ -115,6 +116,31 @@ export function enrichDetection(raw: RawDetection): Detection | null {
   };
 }
 
+/** Suffix duplicate detections of the same label with numbers (e.g. person 1, person 2) ordered left to right */
+export function numberDuplicateDetections(detections: Detection[]): Detection[] {
+  const byLabel: Record<string, Detection[]> = {};
+  for (const d of detections) {
+    const base = d.label.replace(/\s+\d+$/, '');
+    (byLabel[base] ??= []).push(d);
+  }
+
+  const result: Detection[] = [];
+  for (const [base, items] of Object.entries(byLabel)) {
+    if (items.length > 1) {
+      items.sort((a, b) => a.cx - b.cx); // sort left-to-right
+      items.forEach((item, idx) => {
+        result.push({ ...item, label: `${base} ${idx + 1}` });
+      });
+    } else {
+      result.push(items[0]);
+    }
+  }
+
+  // Sort overall result left-to-right for consistent presentation
+  result.sort((a, b) => a.cx - b.cx);
+  return result;
+}
+
 /** Non-maximum suppression over same-label detections */
 export function nms(detections: Detection[], iouThreshold = 0.45): Detection[] {
   const result: Detection[] = [];
@@ -137,7 +163,7 @@ export function nms(detections: Detection[], iouThreshold = 0.45): Detection[] {
     result.push(...kept);
   }
 
-  return result;
+  return numberDuplicateDetections(result);
 }
 
 // ── Step 2: SpatialMapper ────────────────────────────────────────────────────

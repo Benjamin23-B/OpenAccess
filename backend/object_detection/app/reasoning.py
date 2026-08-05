@@ -1,8 +1,29 @@
 import re
+import time
+
+def calculate_iou(box1: list, box2: list) -> float:
+    """Calculates IoU between two [x1, y1, x2, y2] boxes."""
+    if not box1 or not box2 or len(box1) != 4 or len(box2) != 4:
+        return 0.0
+    ix1 = max(box1[0], box2[0])
+    iy1 = max(box1[1], box2[1])
+    ix2 = min(box1[2], box2[2])
+    iy2 = min(box1[3], box2[3])
+
+    if ix2 <= ix1 or iy2 <= iy1:
+        return 0.0
+
+    inter_area = (ix2 - ix1) * (iy2 - iy1)
+    area1 = max(1, (box1[2] - box1[0]) * (box1[3] - box1[1]))
+    area2 = max(1, (box2[2] - box2[0]) * (box2[3] - box2[1]))
+    union_area = area1 + area2 - inter_area
+    return inter_area / union_area if union_area > 0 else 0.0
 
 class SemanticAggregator:
-    def __init__(self):
-        pass
+    def __init__(self, stale_cooldown_sec: float = 30.0):
+        # Map: obj_label -> list of {"box": list, "last_announced": float}
+        self.announced_history = {}
+        self.stale_cooldown_sec = stale_cooldown_sec
 
     def _parse_coordinates(self, box_str: str):
         """
@@ -48,40 +69,87 @@ class SemanticAggregator:
         else:
             return h_pos
 
-    def parse_markdown_to_narrative(self, markdown_text: str) -> dict:
+    def parse_markdown_to_narrative(self, markdown_text: str, ignore_classes: list = None) -> dict:
         """
         Parses the Markdown output from the VLM.
         Finds objects and their bounding boxes.
+        Applies repetition suppression (30s cooldown for stationary objects).
         Returns a dictionary with 'narrative' (sentences to speak) and 'spatial_audio' data.
         """
         narrative_sentences = []
         spatial_data = []
+        ignored_set = set(c.lower() for c in ignore_classes) if ignore_classes else set()
 
         pattern = re.compile(r'- (.*?):\s*(\[\d+,\s*\d+,\s*\d+,\s*\d+\])')
         matches = pattern.findall(markdown_text)
 
         if not matches:
             clean_text = re.sub(r'[*#]', '', markdown_text).strip()
-            return {"narrative": [clean_text], "spatial_data": []}
+            return {"narrative": [clean_text] if clean_text else [], "spatial_data": []}
 
-        for obj_name, box_str in matches:
+        now = time.time()
+        
+        # Parse all objects first
+        parsed_objects = []
+        for raw_obj_name, box_str in matches:
+            if raw_obj_name.lower() in ignored_set:
+                continue
             box = self._parse_coordinates(box_str)
             if box:
-                location = self._get_spatial_location(box)
+                parsed_objects.append({"label": raw_obj_name, "box": box})
+
+        # Number duplicates if any unnumbered labels exist
+        by_base_label = {}
+        for item in parsed_objects:
+            base = re.sub(r'\s+\d+$', '', item["label"]).strip()
+            by_base_label.setdefault(base, []).append(item)
+
+        for base, items in by_base_label.items():
+            if len(items) > 1:
+                items.sort(key=lambda x: x["box"][0]) # left to right
+                for idx, item in enumerate(items, start=1):
+                    item["label"] = f"{base} {idx}"
+
+        for item in parsed_objects:
+            obj_name = item["label"]
+            box = item["box"]
+            
+            # Check repetition history with IoU
+            history = self.announced_history.get(obj_name, [])
+            recently_announced = False
+            
+            for record in history:
+                prev_box = record["box"]
+                prev_time = record["last_announced"]
+                if calculate_iou(box, prev_box) > 0.40 and (now - prev_time) < self.stale_cooldown_sec:
+                    recently_announced = True
+                    break
+
+            if recently_announced:
+                # Skip repeating speech for stationary object
+                continue
+
+            # Update history for this object label
+            new_history = [r for r in history if (now - r["last_announced"]) < self.stale_cooldown_sec]
+            new_history.append({"box": box, "last_announced": now})
+            self.announced_history[obj_name] = new_history
+
+            location = self._get_spatial_location(box)
+            if location == "center":
+                sentence = f"I see a {obj_name} in the center."
+            else:
                 sentence = f"I see a {obj_name} on the {location}."
-                if location == "center":
-                    sentence = f"I see a {obj_name} in the center."
-                    
-                narrative_sentences.append(sentence)
                 
-                center_x = (box[0] + box[2]) / 2
-                pan = (center_x / 500.0) - 1.0 
-                
-                spatial_data.append({
-                    "object": obj_name,
-                    "location": location,
-                    "pan": max(-1.0, min(1.0, pan))
-                })
+            narrative_sentences.append(sentence)
+            
+            center_x = (box[0] + box[2]) / 2
+            pan = (center_x / 500.0) - 1.0 
+            
+            spatial_data.append({
+                "object": obj_name,
+                "location": location,
+                "pan": max(-1.0, min(1.0, pan))
+            })
 
         return {
             "narrative": narrative_sentences,
@@ -92,9 +160,10 @@ class PromptManager:
     def __init__(self):
         self.aggregator = SemanticAggregator()
 
-    def generate_speech_payload(self, vlm_markdown: str):
+    def generate_speech_payload(self, vlm_markdown: str, ignore_classes: list = None):
         """
         Transforms the VLM's structured Markdown into a final payload for the TTS layer.
         """
-        parsed_data = self.aggregator.parse_markdown_to_narrative(vlm_markdown)
+        parsed_data = self.aggregator.parse_markdown_to_narrative(vlm_markdown, ignore_classes=ignore_classes)
         return parsed_data
+

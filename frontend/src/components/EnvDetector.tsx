@@ -28,6 +28,8 @@ export default function EnvDetector({ streamRef, onAnnouncement }: EnvDetectorPr
     lastAnnouncement,
     detectionCount,
     workerError,
+    ignorePerson,
+    setIgnorePerson,
     toggle,
   } = useEnvDetector(streamRef);
 
@@ -68,8 +70,8 @@ export default function EnvDetector({ streamRef, onAnnouncement }: EnvDetectorPr
         Objects on your left are heard from the left speaker.
       </p>
 
-      {/* ── Toggle button ── */}
-      <div className="env-detector-controls">
+      {/* ── Toggle button & Options ── */}
+      <div className="env-detector-controls flex flex-wrap items-center gap-3">
         <button
           id="env-detector-toggle"
           onClick={toggle}
@@ -94,6 +96,16 @@ export default function EnvDetector({ streamRef, onAnnouncement }: EnvDetectorPr
             {isActive ? 'Stop Scene Narration' : 'Start Scene Narration'}
           </span>
         </button>
+
+        <label className="h-[44px] px-4 py-2 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl flex items-center gap-2 text-[13.5px] font-semibold text-[#1E293B] dark:text-[#F8FAFC] cursor-pointer hover:bg-[#E2E8F0] dark:hover:bg-[#1E293B] transition-colors select-none">
+          <input
+            type="checkbox"
+            checked={ignorePerson}
+            onChange={e => setIgnorePerson(e.target.checked)}
+            className="w-4 h-4 accent-[#DC2626] rounded border-[#CBD5E1] cursor-pointer"
+          />
+          <span>Ignore Person (Don&apos;t look for person)</span>
+        </label>
       </div>
 
       {/* ── Status row ── */}

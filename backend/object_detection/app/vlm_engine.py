@@ -235,61 +235,62 @@ class VLMEngine:
         else:
             print("EasyOCR not installed. Text reading will be disabled.")
 
-    def process_image(self, image: Image.Image, text_prompt: str = None) -> str:
+    def process_image(self, image: Image.Image, text_prompt: str = None, ignore_classes: list = None) -> str:
         """
         Processes the image through YOLO and EasyOCR, and formats the results into structured Markdown.
+        Supports filtering ignored classes (e.g. ['person']) and numbering duplicate objects (e.g. Person 1, Person 2).
         """
+        ignored_set = set(c.lower() for c in ignore_classes) if ignore_classes else set()
+
         if self.mock_mode or self.model is None:
             import time
             # Cycle through 3 different daily life scenes every 20 seconds
             scene_idx = int(time.time() / 20) % 3
             
             if scene_idx == 0:
-                # Office / Study desk scene
-                return """
-# Scene Analysis
-## Objects Detected
-- Person: [120, 100, 480, 900]
-- Laptop: [350, 400, 680, 720]
-- Coffee Mug: [720, 550, 800, 680]
-- Cell Phone: [200, 600, 280, 720]
-- Keyboard: [380, 650, 620, 750]
-- Mouse: [650, 680, 700, 740]
-- Book: [820, 450, 950, 520]
-- Pen: [670, 610, 700, 670]
-## Text Detected
-- text reading "AI Coding Active": [100, 50, 500, 120]
-"""
+                raw_objects = [
+                    ("Person", [120, 100, 480, 900]),
+                    ("Laptop", [350, 400, 680, 720]),
+                    ("Coffee Mug", [720, 550, 800, 680]),
+                    ("Cell Phone", [200, 600, 280, 720]),
+                    ("Keyboard", [380, 650, 620, 750]),
+                    ("Mouse", [650, 680, 700, 740]),
+                    ("Book", [820, 450, 950, 520]),
+                    ("Pen", [670, 610, 700, 670]),
+                ]
+                text_lines = ['- text reading "AI Coding Active": [100, 50, 500, 120]']
             elif scene_idx == 1:
-                # Kitchen / Dining scene
-                return """
-# Scene Analysis
-## Objects Detected
-- Person: [150, 120, 400, 800]
-- Water Bottle: [550, 300, 620, 600]
-- Dining Table: [200, 500, 950, 950]
-- Cup: [680, 520, 750, 620]
-- Banana: [320, 510, 420, 580]
-- Apple: [440, 530, 490, 580]
-- Orange: [490, 530, 540, 580]
-- Chair: [800, 450, 980, 950]
-## Text Detected
-- text reading "Organic Fruit": [330, 520, 410, 560]
-"""
+                raw_objects = [
+                    ("Person", [150, 120, 400, 800]),
+                    ("Water Bottle", [550, 300, 620, 600]),
+                    ("Dining Table", [200, 500, 950, 950]),
+                    ("Cup", [680, 520, 750, 620]),
+                    ("Banana", [320, 510, 420, 580]),
+                    ("Apple", [440, 530, 490, 580]),
+                    ("Orange", [490, 530, 540, 580]),
+                    ("Chair", [800, 450, 980, 950]),
+                ]
+                text_lines = ['- text reading "Organic Fruit": [330, 520, 410, 560]']
             else:
-                # Living Room scene
-                return """
-# Scene Analysis
-## Objects Detected
-- Person: [150, 120, 400, 800]
-- Couch: [100, 400, 900, 850]
-- TV: [300, 150, 700, 450]
-- Backpack: [750, 550, 880, 780]
-- Book: [450, 580, 550, 640]
-- Clock: [480, 80, 580, 180]
-## Text Detected
-- text reading "10:30 AM": [490, 120, 570, 160]
-"""
+                raw_objects = [
+                    ("Person", [150, 120, 400, 800]),
+                    ("Couch", [100, 400, 900, 850]),
+                    ("TV", [300, 150, 700, 450]),
+                    ("Backpack", [750, 550, 880, 780]),
+                    ("Book", [450, 580, 550, 640]),
+                    ("Clock", [480, 80, 580, 180]),
+                ]
+                text_lines = ['- text reading "10:30 AM": [490, 120, 570, 160]']
+
+            filtered_raw = [obj for obj in raw_objects if obj[0].lower() not in ignored_set]
+            
+            markdown_lines = ["# Scene Analysis\n", "## Objects Detected"]
+            for label, box in filtered_raw:
+                markdown_lines.append(f"- {label}: [{box[0]}, {box[1]}, {box[2]}, {box[3]}]")
+            if text_lines:
+                markdown_lines.append("\n## Text Detected")
+                markdown_lines.extend(text_lines)
+            return "\n".join(markdown_lines)
             
         # Run inference. imgsz=640 (YOLO's native training resolution) yields
         # markedly better detection than 320; use GPU automatically if available.
@@ -303,8 +304,7 @@ class VLMEngine:
             verbose=False,
         )
         
-        markdown_lines = ["# Scene Analysis\n", "## Objects Detected"]
-        detected_boxes = []
+        detected_items = []
         
         for r in results:
             boxes = r.boxes
@@ -312,6 +312,9 @@ class VLMEngine:
                 cls_id = int(box.cls[0])
                 class_name = self.model.names[cls_id]
                 
+                if class_name.lower() in ignored_set:
+                    continue
+
                 x1, y1, x2, y2 = box.xyxy[0].tolist()
                 
                 norm_x1 = int((x1 / image.width) * 1000)
@@ -326,13 +329,38 @@ class VLMEngine:
                         friendly_name = "table"
                     elif class_name == "potted plant":
                         friendly_name = "plant"
-                        
-                    markdown_lines.append(f"- {friendly_name}: [{norm_x1}, {norm_y1}, {norm_x2}, {norm_y2}]")
-                    detected_boxes.append([norm_x1, norm_y1, norm_x2, norm_y2])
+
+                    detected_items.append({
+                        "label": friendly_name,
+                        "box": [norm_x1, norm_y1, norm_x2, norm_y2],
+                        "conf": conf
+                    })
                     
-        # The naive traditional CV detectors (Canny/HSV) have been removed 
-        # because they are highly prone to false positives. YOLO handles all classes natively.
-        
+        # Group detections by label and assign numbers (e.g. Person 1, Person 2) if duplicate
+        grouped_by_label = {}
+        for item in detected_items:
+            grouped_by_label.setdefault(item["label"], []).append(item)
+
+        final_items = []
+        for label, items in grouped_by_label.items():
+            # Sort left to right by x1 coordinate
+            items.sort(key=lambda x: x["box"][0])
+            if len(items) > 1:
+                for idx, item in enumerate(items, start=1):
+                    item["final_label"] = f"{label} {idx}"
+                    final_items.append(item)
+            else:
+                items[0]["final_label"] = label
+                final_items.append(items[0])
+
+        # Sort final items left-to-right for consistent ordering
+        final_items.sort(key=lambda x: (x["box"][0], x["box"][1]))
+
+        markdown_lines = ["# Scene Analysis\n", "## Objects Detected"]
+        for item in final_items:
+            b = item["box"]
+            markdown_lines.append(f"- {item['final_label']}: [{b[0]}, {b[1]}, {b[2]}, {b[3]}]")
+
         if len(markdown_lines) == 2:
             markdown_lines.append("- None detected.")
             
@@ -377,14 +405,14 @@ class VLMEngine:
         output_text = "\n".join(markdown_lines)
         return output_text
 
-    def process_image_detailed(self, image: Image.Image, text_prompt: str = None):
+    def process_image_detailed(self, image: Image.Image, text_prompt: str = None, ignore_classes: list = None):
         """
         Processes image and returns both (markdown_text, detected_objects_list).
         Each object in detected_objects_list is a dict:
         {"label": str, "box": [x1, y1, x2, y2], "confidence": float, "is_text": bool}
         Coordinates are normalized 0-1000 scale.
         """
-        markdown_text = self.process_image(image, text_prompt=text_prompt)
+        markdown_text = self.process_image(image, text_prompt=text_prompt, ignore_classes=ignore_classes)
         detections = []
         
         import re

@@ -101,15 +101,34 @@ export default function ObjectDetectionBridge() {
     }
   }, []);
 
+  const [ignorePerson, setIgnorePerson] = useState(false);
+  const ignorePersonRef = useRef<boolean>(false);
+  const lastSpokenTextRef = useRef<string>('');
+  const lastSpokenTimeRef = useRef<number>(0);
+
+  useEffect(() => {
+    ignorePersonRef.current = ignorePerson;
+  }, [ignorePerson]);
+
   const speakText = useCallback((text: string) => {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
       const clean = text.replace(/<[^>]*>/g, '').trim();
       if (!clean) {
         isProcessingFrameRef.current = false;
         return;
       }
 
+      // Deduplicate spoken sentences within 15 seconds window
+      const now = Date.now();
+      if (clean === lastSpokenTextRef.current && (now - lastSpokenTimeRef.current) < 15000) {
+        isProcessingFrameRef.current = false;
+        return;
+      }
+
+      lastSpokenTextRef.current = clean;
+      lastSpokenTimeRef.current = now;
+
+      window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(clean);
       utterance.rate = 1.0;
       utterance.pitch = 1.0;
@@ -218,10 +237,6 @@ export default function ObjectDetectionBridge() {
       const hostname = window.location.hostname || 'localhost';
       const host = window.location.host;
 
-      // Candidate URLs to try in sequence:
-      // 1. Proxied relative path via Next.js/Nginx: /ws/stream
-      // 2. Direct port 8889 on current hostname
-      // 3. Fallback localhost port 8889
       const candidateUrls = [
         `${protocol}//${host}/ws/stream`,
         `${protocol}//${hostname}:8889/ws/stream`,
@@ -257,11 +272,19 @@ export default function ObjectDetectionBridge() {
           try {
             const msg = JSON.parse(event.data);
             if (msg.type === 'detections') {
-              setDetectedObjects(msg.objects || []);
-              detectedObjectsRef.current = msg.objects || [];
+              const rawObjs: DetectedObject[] = msg.objects || [];
+              const filtered = ignorePersonRef.current
+                ? rawObjs.filter(o => !o.label.toLowerCase().startsWith('person'))
+                : rawObjs;
+              setDetectedObjects(filtered);
+              detectedObjectsRef.current = filtered;
             } else if (msg.type === 'haptic') {
               triggerHaptic();
             } else if (msg.type === 'narrative_text') {
+              if (ignorePersonRef.current && msg.text.toLowerCase().includes('person')) {
+                // Ignore narrative texts mentioning person when ignorePerson is active
+                return;
+              }
               addTranscript(msg.text);
               speakText(msg.text);
             } else if (msg.type === 'audio_end') {
@@ -551,6 +574,7 @@ export default function ObjectDetectionBridge() {
         const payload = {
           image: base64Data,
           high_res_mode: highResModeRef.current,
+          ignore_person: ignorePersonRef.current,
           command: commandStr
         };
 
@@ -721,7 +745,7 @@ export default function ObjectDetectionBridge() {
 
             {/* Top Toolbar Row */}
             <div className="flex items-center justify-between flex-wrap gap-4">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-wrap">
                 <button
                   onClick={handleToggleNarration}
                   className={`h-[48px] px-6 py-3.5 rounded-xl font-semibold text-[15px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-pointer flex items-center gap-2 text-white shadow-sm ${isNarrating ? 'bg-[#C0392B] dark:bg-[#DC2626] hover:bg-[#A93226]' : 'bg-[#0F4C81] dark:bg-[#2563EB] hover:bg-[#0B3D66] dark:hover:bg-[#1D4ED8]'
@@ -743,6 +767,17 @@ export default function ObjectDetectionBridge() {
                     </>
                   )}
                 </button>
+
+                {/* Ignore Person Checkbox Toggle */}
+                <label className="h-[48px] px-4 py-2.5 bg-[#F8FAFC] dark:bg-[#0F172A] border border-[#CBD5E1] dark:border-[#334155] rounded-xl flex items-center gap-2 text-[14px] font-semibold text-[#1E293B] dark:text-[#F8FAFC] cursor-pointer hover:bg-[#E2E8F0] dark:hover:bg-[#1E293B] transition-colors select-none">
+                  <input
+                    type="checkbox"
+                    checked={ignorePerson}
+                    onChange={e => setIgnorePerson(e.target.checked)}
+                    className="w-4.5 h-4.5 accent-[#DC2626] rounded border-[#CBD5E1] cursor-pointer"
+                  />
+                  <span>Ignore Person (Don&apos;t look for person)</span>
+                </label>
 
                 {/* ROI Mode Toggle Button */}
                 <button
