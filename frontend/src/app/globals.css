@@ -150,3 +150,197 @@ body::-webkit-scrollbar-thumb:hover {
 .dark body::-webkit-scrollbar-thumb:hover {
   background: rgba(71, 85, 105, 0.8);
 }
+
+/* ==========================================================================
+   STANDARDIZED OPENACCESS CLEAN GOVERNMENT NAVY DESIGN UTILITIES
+   ========================================================================== */
+
+@layer components {
+  /* Standard Card Container */
+  .navy-card {
+    background-color: var(--surface-card);
+    border: 1px solid var(--border-color);
+    border-radius: 1rem;
+    padding: 1.25rem;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark .navy-card {
+    background-color: #1E293B;
+    border-color: #334155;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  /* Module Top Header Banner Card */
+  .navy-banner {
+    background-color: var(--surface-card);
+    border: 1px solid var(--border-color);
+    border-radius: 1rem;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+  }
+
+  .dark .navy-banner {
+    background-color: #1E293B;
+    border-color: #334155;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  /* Standard Action Buttons */
+  .navy-btn-primary {
+    background-color: #0F4C81;
+    color: #FFFFFF;
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.75rem;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(15, 76, 129, 0.2);
+  }
+
+  .navy-btn-primary:hover:not(:disabled) {
+    background-color: #0C3C66;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(15, 76, 129, 0.3);
+  }
+
+  .dark .navy-btn-primary {
+    background-color: #2563EB;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+  }
+
+  .dark .navy-btn-primary:hover:not(:disabled) {
+    background-color: #1D4ED8;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+  }
+
+  .navy-btn-secondary {
+    background-color: #EEF2F6;
+    color: #334155;
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.75rem;
+    border: 1px solid #CBD5E1;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+  }
+
+  .navy-btn-secondary:hover:not(:disabled) {
+    background-color: #E2E8F0;
+    color: #0F172A;
+  }
+
+  .dark .navy-btn-secondary {
+    background-color: #0F172A;
+    color: #CBD5E1;
+    border-color: #334155;
+  }
+
+  .dark .navy-btn-secondary:hover:not(:disabled) {
+    background-color: #1E293B;
+    color: #FFFFFF;
+  }
+
+  .navy-btn-danger {
+    background-color: #C0392B;
+    color: #FFFFFF;
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.75rem;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(192, 57, 43, 0.2);
+  }
+
+  .navy-btn-danger:hover:not(:disabled) {
+    background-color: #A93226;
+  }
+
+  .dark .navy-btn-danger {
+    background-color: #DC2626;
+  }
+
+  .dark .navy-btn-danger:hover:not(:disabled) {
+    background-color: #B91C1C;
+  }
+
+  /* Badge Pill Indicators */
+  .navy-badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1;
+    background-color: rgba(15, 76, 129, 0.1);
+    color: #0F4C81;
+    border: 1px solid rgba(15, 76, 129, 0.2);
+  }
+
+  .dark .navy-badge-pill {
+    background-color: rgba(59, 130, 246, 0.15);
+    color: #93C5FD;
+    border-color: rgba(59, 130, 246, 0.3);
+  }
+
+  .navy-badge-live {
+    background-color: rgba(25, 135, 84, 0.12);
+    color: #198754;
+    border: 1px solid rgba(25, 135, 84, 0.3);
+  }
+
+  .dark .navy-badge-live {
+    background-color: rgba(34, 197, 94, 0.15);
+    color: #86EFAC;
+    border-color: rgba(34, 197, 94, 0.3);
+  }
+
+  /* Input Fields */
+  .navy-input {
+    background-color: #FFFFFF;
+    color: #1E293B;
+    border: 1px solid #CBD5E1;
+    border-radius: 0.75rem;
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .navy-input:focus {
+    outline: none;
+    border-color: #0F4C81;
+    box-shadow: 0 0 0 3px rgba(15, 76, 129, 0.15);
+  }
+
+  .dark .navy-input {
+    background-color: #0F172A;
+    color: #F8FAFC;
+    border-color: #334155;
+  }
+
+  .dark .navy-input:focus {
+    border-color: #3B82F6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+  }
+}
+

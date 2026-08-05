@@ -5,7 +5,6 @@ import { useSpeechRecognition, useSpeechSynthesis } from '@/hooks';
 import StatusIndicator from './StatusIndicator';
 import SpeechControls from './SpeechControls';
 import TranscriptionPanel from './TranscriptionPanel';
-import EnvDetector from './EnvDetector';
 
 interface VisuallyImpairedBridgeProps {
   onLiveMessage?: (message: string) => void;
@@ -226,11 +225,6 @@ export default function VisuallyImpairedBridge({ onLiveMessage }: VisuallyImpair
             onRateChange={setRate}
             pitch={pitch}
             onPitchChange={setPitch}
-          />
-
-          <EnvDetector
-            streamRef={streamRef}
-            onAnnouncement={onLiveMessage}
           />
         </div>
 
