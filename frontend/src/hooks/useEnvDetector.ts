@@ -205,7 +205,7 @@ export function useEnvDetector(
         
         // Dynamically request webcam stream when scene narration starts
         navigator.mediaDevices.getUserMedia({
-          video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'environment' }
+          video: { width: { ideal: 1920 }, height: { ideal: 1080 }, facingMode: 'environment' }
         }).then(stream => {
           if (streamRef) {
             // @ts-ignore

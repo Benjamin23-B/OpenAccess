@@ -4,7 +4,7 @@ from PIL import Image
 import io
 
 class IngestionPipeline:
-    def __init__(self, delta_threshold: float = 0.85, max_dim: int = 640):
+    def __init__(self, delta_threshold: float = 0.85, max_dim: int = 1024):
         """
         Initializes the data ingestion layer.
         :param delta_threshold: SSIM-like structural similarity threshold.

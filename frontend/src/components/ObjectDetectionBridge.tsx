@@ -5,12 +5,12 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 // Camera capture resolution presets. Values are "ideal" constraints, so a
 // device that can't hit them exactly falls back to its closest supported size.
 const CAMERA_RESOLUTIONS: Record<string, { label: string; width: number; height: number }> = {
-  low:  { label: '640×480 (Low)',     width: 640,  height: 480 },
-  sd:   { label: '854×480 (480p)',    width: 854,  height: 480 },
-  hd:   { label: '1280×720 (720p)',   width: 1280, height: 720 },
-  fhd:  { label: '1920×1080 (1080p)', width: 1920, height: 1080 },
+  fhd:  { label: '1920×1080 (1080p Full HD)', width: 1920, height: 1080 },
+  hd:   { label: '1280×720 (720p HD)',       width: 1280, height: 720 },
+  sd:   { label: '854×480 (480p SD)',        width: 854,  height: 480 },
+  low:  { label: '640×480 (Low)',            width: 640,  height: 480 },
 };
-const DEFAULT_RESOLUTION = 'hd';
+const DEFAULT_RESOLUTION = 'fhd';
 
 interface DetectedObject {
   label: string;
@@ -23,7 +23,7 @@ export default function ObjectDetectionBridge() {
   const [isConnected, setIsConnected] = useState(false);
   const [isNarrating, setIsNarrating] = useState(false);
   const [useMockCamera, setUseMockCamera] = useState(false);
-  const [highResMode, setHighResMode] = useState(false);
+  const [highResMode, setHighResMode] = useState(true);
   const [resolutionKey, setResolutionKey] = useState<string>(DEFAULT_RESOLUTION);
   const [transcripts, setTranscripts] = useState<Array<{ id: string; text: string; timestamp: string }>>([]);
 
@@ -48,7 +48,7 @@ export default function ObjectDetectionBridge() {
   const lastFrameTimeRef = useRef<number>(performance.now());
   const frameCountRef = useRef<number>(0);
   const isNarratingRef = useRef<boolean>(false);
-  const highResModeRef = useRef<boolean>(false);
+  const highResModeRef = useRef<boolean>(true);
   const useMockCameraRef = useRef<boolean>(false);
   const resolutionKeyRef = useRef<string>(DEFAULT_RESOLUTION);
   const roiEnabledRef = useRef(false);
@@ -149,7 +149,7 @@ export default function ObjectDetectionBridge() {
     }
   }, []);
 
-  // Setup webcam
+  // Setup webcam with highest available camera resolution
   const setupWebcam = useCallback(async () => {
     try {
       if (videoRef.current && videoRef.current.srcObject) {
@@ -159,7 +159,11 @@ export default function ObjectDetectionBridge() {
 
       const res = CAMERA_RESOLUTIONS[resolutionKeyRef.current] || CAMERA_RESOLUTIONS[DEFAULT_RESOLUTION];
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: { ideal: res.width }, height: { ideal: res.height }, facingMode: 'environment' }
+        video: {
+          width: { ideal: res.width, max: 3840 },
+          height: { ideal: res.height, max: 2160 },
+          facingMode: 'environment'
+        }
       });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
