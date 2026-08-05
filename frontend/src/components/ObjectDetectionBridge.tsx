@@ -634,27 +634,6 @@ export default function ObjectDetectionBridge() {
   return (
     <div className="flex flex-col gap-6 md:gap-7 w-full max-w-[1340px] mx-auto p-4 md:p-6 text-[#0F172A] dark:text-[#F8FAFC]">
 
-      {/* Header Banner Card */}
-      <div className="apple-banner flex items-center justify-between flex-wrap gap-4 mb-2">
-        <div className="flex items-center gap-3.5">
-          <div className="p-3 bg-blue-500/10 dark:bg-blue-500/20 rounded-2xl">
-            <svg className="w-7 h-7 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-          </div>
-          <div>
-            <h2 className="text-[24px] font-extrabold text-[#0F172A] dark:text-white tracking-tight">ROI Bounding Box Object Detection</h2>
-            <p className="text-[15px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">High-Accuracy Region-of-Interest (ROI) Object Detection & Scene AI</p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 bg-slate-100 dark:bg-[#0F172A] px-4 py-2 rounded-full border border-slate-200 dark:border-[#273142]">
-          <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
-          <span className="text-[13px] text-slate-800 dark:text-slate-200 font-extrabold">{isConnected ? 'Backend Connected' : 'Disconnected'}</span>
-        </div>
-      </div>
-
       {/* Main Grid: Video + Sidebar */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-7 items-start">
 
@@ -674,13 +653,17 @@ export default function ObjectDetectionBridge() {
 
             {/* HUD Overlay */}
             <div className="absolute top-4 left-4 right-4 flex justify-between pointer-events-none z-10">
-              <div className="flex gap-2">
+              <div className="flex items-center gap-2">
                 <div className="bg-[#161B26]/90 px-3 py-1.5 rounded-xl border border-white/20 text-[#F8FAFC] text-[13px] font-extrabold backdrop-blur-md">
                   FPS: {fps}
                 </div>
+                <div className="flex items-center gap-2 bg-[#161B26]/90 px-3 py-1.5 rounded-xl border border-white/20 text-[13px] font-extrabold backdrop-blur-md">
+                  <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
+                  <span className="text-white">{isConnected ? 'AI Connected' : 'Disconnected'}</span>
+                </div>
                 {roiEnabled && roi && (
                   <div className="bg-emerald-500/90 px-3.5 py-1.5 rounded-xl border border-white/30 text-white text-[13px] font-extrabold shadow-lg animate-pulse backdrop-blur-md">
-                    ⚡ {calculateZoomFactor(roi.w, roi.h)}x ROI Pixel Density Zoom
+                    ⚡ {calculateZoomFactor(roi.w, roi.h)}x ROI Zoom
                   </div>
                 )}
               </div>

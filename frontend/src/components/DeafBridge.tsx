@@ -128,60 +128,6 @@ export default function DeafBridge() {
 
   return (
     <div className="deaf-bridge flex flex-col gap-6 w-full max-w-[1340px] mx-auto p-4 md:p-6 text-[#0F172A] dark:text-[#F8FAFC]">
-      
-      {/* Header Banner */}
-      <div className="apple-banner">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3 flex-wrap">
-              <h2 className="text-2xl md:text-3xl font-extrabold text-[#0F172A] dark:text-white tracking-tight flex items-center gap-2.5">
-                <span className="text-3xl">🤟</span> Deaf / HoH Assistive Bridge
-              </h2>
-              <span className="apple-badge">
-                Kozha 3D v2.0
-              </span>
-              <span className="apple-badge">
-                {signLanguage}
-              </span>
-            </div>
-            <p className="text-slate-500 dark:text-slate-400 mt-1.5 text-sm md:text-base max-w-2xl font-medium">
-              Real-time Speech & Text to 3D Sign Language with Kozha AI Translation, SiGML Parser & HamNoSys Inspector.
-            </p>
-          </div>
-
-          {/* Unified Global Control Toolbar */}
-          <div className="flex flex-wrap items-center gap-2.5 bg-slate-100 dark:bg-[#0F172A] p-2.5 rounded-2xl border border-slate-200 dark:border-[#273142]">
-            {/* Avatar Selection */}
-            <div className="flex items-center gap-2 bg-white dark:bg-[#161B26] px-3 py-1.5 rounded-xl border border-slate-200 dark:border-[#273142]">
-              <label className="text-xs text-slate-500 dark:text-slate-400 font-bold">Character:</label>
-              <select
-                value={selectedAvatar}
-                onChange={(e) => setSelectedAvatar(e.target.value as any)}
-                className="bg-transparent text-blue-600 dark:text-blue-400 font-extrabold text-xs outline-none cursor-pointer"
-              >
-                <option value="anna">Anna (Female)</option>
-                <option value="marc">Marc (Male)</option>
-                <option value="francoise">Francoise (Female)</option>
-                <option value="luna">Luna (Stylized)</option>
-                <option value="siggi">Siggi (Male)</option>
-              </select>
-            </div>
-
-            {/* Sign Language Selection (BSL + ISL only) */}
-            <div className="flex items-center gap-2 bg-white dark:bg-[#161B26] px-3 py-1.5 rounded-xl border border-slate-200 dark:border-[#273142]">
-              <label className="text-xs text-slate-500 dark:text-slate-400 font-bold">Sign System:</label>
-              <select
-                value={signLanguage}
-                onChange={(e) => setSignLanguage(e.target.value as any)}
-                className="bg-transparent text-blue-600 dark:text-blue-400 font-extrabold text-xs outline-none cursor-pointer"
-              >
-                <option value="ISL">Indian (ISL)</option>
-                <option value="BSL">British (BSL)</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Main Grid: Left Studio Viewport + Right Controls Pane */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -193,7 +139,7 @@ export default function DeafBridge() {
           <div className="relative w-full rounded-3xl overflow-hidden border border-slate-200 dark:border-[#273142] bg-[#0B0F17] shadow-2xl flex flex-col min-h-[500px]">
             
             {/* Viewport Header Bar inside Studio */}
-            <div className="bg-[#161B26]/90 border-b border-[#273142] px-5 py-3 flex items-center justify-between z-10">
+            <div className="bg-[#161B26]/90 border-b border-[#273142] px-4 py-2.5 flex items-center justify-between flex-wrap gap-2 z-10">
               <div className="flex items-center gap-2 text-xs">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="font-bold text-slate-200">
@@ -201,22 +147,54 @@ export default function DeafBridge() {
                 </span>
               </div>
 
-              {/* Speed Controls (0.5x, 0.75x, 1x, 1.25x, 1.5x) */}
-              <div className="flex items-center gap-1.5">
-                <span className="text-[11px] text-slate-400 font-medium">Speed:</span>
-                {[0.5, 0.75, 1.0, 1.25, 1.5].map((speed) => (
-                  <button
-                    key={speed}
-                    onClick={() => setSigningSpeed(speed)}
-                    className={`px-2.5 py-1 text-[11px] font-extrabold rounded-lg transition-all cursor-pointer ${
-                      signingSpeed === speed
-                        ? 'bg-blue-600 text-white shadow-md'
-                        : 'bg-[#0F172A] text-slate-400 hover:text-slate-200 border border-[#273142]'
-                    }`}
+              {/* Character & Sign System Controls */}
+              <div className="flex items-center gap-2 flex-wrap">
+                {/* Character Selection */}
+                <div className="flex items-center gap-1.5 bg-[#0B0F17] px-2.5 py-1 rounded-xl border border-[#273142]">
+                  <label className="text-[11px] text-slate-400 font-bold">Avatar:</label>
+                  <select
+                    value={selectedAvatar}
+                    onChange={(e) => setSelectedAvatar(e.target.value as any)}
+                    className="bg-transparent text-blue-400 font-extrabold text-[11px] outline-none cursor-pointer"
                   >
-                    {speed}x
-                  </button>
-                ))}
+                    <option value="anna" className="bg-[#161B26] text-slate-200">Anna (Female)</option>
+                    <option value="marc" className="bg-[#161B26] text-slate-200">Marc (Male)</option>
+                    <option value="francoise" className="bg-[#161B26] text-slate-200">Francoise (Female)</option>
+                    <option value="luna" className="bg-[#161B26] text-slate-200">Luna (Stylized)</option>
+                    <option value="siggi" className="bg-[#161B26] text-slate-200">Siggi (Male)</option>
+                  </select>
+                </div>
+
+                {/* Sign System Selection */}
+                <div className="flex items-center gap-1.5 bg-[#0B0F17] px-2.5 py-1 rounded-xl border border-[#273142]">
+                  <label className="text-[11px] text-slate-400 font-bold">System:</label>
+                  <select
+                    value={signLanguage}
+                    onChange={(e) => setSignLanguage(e.target.value as any)}
+                    className="bg-transparent text-blue-400 font-extrabold text-[11px] outline-none cursor-pointer"
+                  >
+                    <option value="ISL" className="bg-[#161B26] text-slate-200">Indian (ISL)</option>
+                    <option value="BSL" className="bg-[#161B26] text-slate-200">British (BSL)</option>
+                  </select>
+                </div>
+
+                {/* Speed Controls */}
+                <div className="flex items-center gap-1">
+                  <span className="text-[11px] text-slate-400 font-medium hidden xl:inline">Speed:</span>
+                  {[0.5, 0.75, 1.0, 1.25, 1.5].map((speed) => (
+                    <button
+                      key={speed}
+                      onClick={() => setSigningSpeed(speed)}
+                      className={`px-2 py-0.5 text-[11px] font-extrabold rounded-lg transition-all cursor-pointer ${
+                        signingSpeed === speed
+                          ? 'bg-blue-600 text-white shadow-xs'
+                          : 'bg-[#0B0F17] text-slate-400 hover:text-slate-200 border border-[#273142]'
+                      }`}
+                    >
+                      {speed}x
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 

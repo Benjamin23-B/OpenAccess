@@ -2,10 +2,12 @@
 
 import React from 'react';
 import { ListeningState, SpeechState } from '@/hooks';
+import StatusIndicator from './StatusIndicator';
 
 interface SpeechControlsProps {
   // STT Props
   listeningState: ListeningState;
+  displayError?: { type: string; message: string } | null;
   isSTTSupported: boolean;
   onStartListening: () => void;
   onStopListening: () => void;
@@ -30,6 +32,7 @@ interface SpeechControlsProps {
 
 export default function SpeechControls({
   listeningState,
+  displayError,
   isSTTSupported,
   onStartListening,
   onStopListening,
@@ -58,12 +61,15 @@ export default function SpeechControls({
       
       {/* STT Controls */}
       <section className="flex flex-col gap-4" aria-labelledby="stt-heading">
-        <h3 id="stt-heading" className="text-[20px] font-extrabold text-[#0F172A] dark:text-white flex items-center gap-2.5">
-          <svg className="w-5.5 h-5.5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-          </svg>
-          Speech-to-Text Dictation
-        </h3>
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <h3 id="stt-heading" className="text-[20px] font-extrabold text-[#0F172A] dark:text-white flex items-center gap-2.5">
+            <svg className="w-5.5 h-5.5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+            </svg>
+            Speech-to-Text Dictation
+          </h3>
+          <StatusIndicator state={listeningState} error={displayError || null} />
+        </div>
         <div className="flex gap-3 flex-wrap items-center">
           <button
             onClick={onStartListening}
