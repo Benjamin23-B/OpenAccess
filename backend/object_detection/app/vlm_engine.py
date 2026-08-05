@@ -213,7 +213,12 @@ class VLMEngine:
         for candidate in candidates:
             try:
                 self.model = YOLO(candidate)
-                print(f"High-Performance YOLO Model loaded successfully: {candidate}")
+                # Optimize model layers by fusing Conv2d and BatchNorm layers for zero-cost speedup
+                try:
+                    self.model.fuse()
+                except Exception:
+                    pass
+                print(f"High-Performance YOLO Model loaded and fused successfully: {candidate}")
                 break
             except Exception as e:
                 print(f"YOLO load notice ({candidate}): {e}")
@@ -221,6 +226,7 @@ class VLMEngine:
         if self.model is None:
             print("YOLO model load failed. Trying fallback YOLOWorld...")
             try:
+                from ultralytics import YOLOWorld
                 self.model = YOLOWorld("yolov8s-worldv2.pt")
             except Exception as fe:
                 print(f"Model load error: {fe}. Falling back to mock mode.")
@@ -240,8 +246,8 @@ class VLMEngine:
 
     def process_image(self, image: Image.Image, text_prompt: str = None, ignore_classes: list = None) -> str:
         """
-        Processes the image through YOLO and EasyOCR, and formats the results into structured Markdown.
-        Supports filtering ignored classes (e.g. ['person']) and numbering duplicate objects (e.g. Person 1, Person 2).
+        Processes the image through YOLO11, specialized heuristics (pens/fruits), and EasyOCR.
+        Supports filtering ignored classes (e.g. ['person']) and numbering duplicate objects.
         """
         ignored_set = set(c.lower() for c in ignore_classes) if ignore_classes else set()
 
@@ -295,15 +301,18 @@ class VLMEngine:
                 markdown_lines.extend(text_lines)
             return "\n".join(markdown_lines)
             
-        # Run inference. imgsz=640 (YOLO's native training resolution) yields
-        # markedly better detection than 320; use GPU automatically if available.
-        device = 0 if torch.cuda.is_available() else "cpu"
+        # Run inference with hardware acceleration & FP16 half precision when CUDA is available.
+        has_cuda = torch.cuda.is_available()
+        device = 0 if has_cuda else "cpu"
+        
         results = self.model(
             image,
             conf=self.conf_threshold,
             iou=self.iou_threshold,
             imgsz=self.imgsz,
             device=device,
+            half=has_cuda,
+            agnostic_nms=True,
             verbose=False,
         )
         
@@ -338,6 +347,35 @@ class VLMEngine:
                         "box": [norm_x1, norm_y1, norm_x2, norm_y2],
                         "conf": conf
                     })
+                    
+        # Apply specialized computer-vision heuristics for small/thin objects (e.g. pens, fruits)
+        try:
+            image_cv = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+            
+            # Detect pens if not ignored
+            if "pen" not in ignored_set:
+                pen_boxes = detect_pens(image_cv)
+                for pb in pen_boxes:
+                    # Avoid adding pen if overlapping existing detection
+                    if not any(check_overlap(pb, existing["box"]) for existing in detected_items):
+                        detected_items.append({
+                            "label": "pen",
+                            "box": pb,
+                            "conf": 0.85
+                        })
+                        
+            # Detect fruits if not ignored
+            if "fruit" not in ignored_set and "apple" not in ignored_set:
+                fruit_objs = detect_fruits(image_cv)
+                for fo in fruit_objs:
+                    if not any(check_overlap(fo["box"], existing["box"]) for existing in detected_items):
+                        detected_items.append({
+                            "label": fo["label"],
+                            "box": fo["box"],
+                            "conf": 0.82
+                        })
+        except Exception as he:
+            print(f"Heuristic detection notice: {he}")
                     
         # Group detections by label and assign numbers (e.g. Person 1, Person 2) if duplicate
         grouped_by_label = {}
