@@ -17,6 +17,12 @@ try:
 except ImportError:
     HAS_EASYOCR = False
 
+try:
+    import pytesseract
+    HAS_PYTESSERACT = True
+except ImportError:
+    HAS_PYTESSERACT = False
+
 
 def check_overlap(box1, box2, thresh=0.3):
     """
@@ -278,9 +284,57 @@ class VLMEngine:
         import time
         now = time.time()
         
-        if detect_text and self.reader is not None:
-            # Run EasyOCR at most once every 1.5 seconds to keep video streaming 100% fluid & real-time
-            if now - self.last_ocr_time >= 1.5:
+        if detect_text:
+            text_lines = []
+            
+            # Primary Engine: Native C++ Tesseract (15ms - 30ms execution, specialized for book & printed text)
+            if HAS_PYTESSERACT:
+                try:
+                    ocr_image = image.copy()
+                    w, h = ocr_image.size
+                    max_dim = 1024
+                    if max(w, h) > max_dim:
+                        scale = max_dim / max(w, h)
+                        ocr_image = ocr_image.resize((int(w * scale), int(h * scale)), Image.Resampling.BILINEAR)
+
+                    ocr_w, ocr_h = ocr_image.size
+                    image_np = np.array(ocr_image)
+                    gray = cv2.cvtColor(image_np, cv2.COLOR_RGB2GRAY)
+
+                    # CLAHE (Contrast Limited Adaptive Histogram Equalization) for book page shadows & screen glow
+                    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+                    enhanced = clahe.apply(gray)
+
+                    # Native Tesseract C++ Engine with Page Segmentation Mode 6 (Assume single uniform block of text)
+                    tess_data = pytesseract.image_to_data(
+                        enhanced,
+                        config='--psm 6',
+                        output_type=pytesseract.Output.DICT
+                    )
+
+                    n_boxes = len(tess_data['text'])
+                    for i in range(n_boxes):
+                        text = tess_data['text'][i].strip()
+                        conf = int(tess_data['conf'][i])
+
+                        if conf > 40 and len(text) >= 2:
+                            alnum_chars = [c for c in text if c.isalnum()]
+                            if len(alnum_chars) >= 2:
+                                x, y, bw, bh = tess_data['left'][i], tess_data['top'][i], tess_data['width'][i], tess_data['height'][i]
+                                norm_x1 = int((x / ocr_w) * 1000)
+                                norm_y1 = int((y / ocr_h) * 1000)
+                                norm_x2 = int(((x + bw) / ocr_w) * 1000)
+                                norm_y2 = int(((y + bh) / ocr_h) * 1000)
+
+                                text_escaped = text.replace('"', '\\"')
+                                text_lines.append(f"- text reading \"{text_escaped}\": [{norm_x1}, {norm_y1}, {norm_x2}, {norm_y2}]")
+
+                    self.cached_text_lines = text_lines[:8]
+                except Exception as te:
+                    print(f"PyTesseract error: {te}")
+
+            # Fallback Engine: EasyOCR (PyTorch) if PyTesseract is unavailable
+            elif self.reader is not None and (now - self.last_ocr_time >= 1.5):
                 self.last_ocr_time = now
                 ocr_max_dim = 640
                 ocr_image = image.copy()
@@ -301,16 +355,11 @@ class VLMEngine:
                         low_text=0.45,
                     )
                     
-                    text_lines = []
                     for res in ocr_results:
-                        if len(res) == 3:
-                            bbox, text, prob = res
-                        else:
-                            bbox, text = res[0], res[1]
-                            prob = 1.0
+                        bbox, text = res[0], res[1]
+                        prob = res[2] if len(res) == 3 else 1.0
 
                         text = text.strip()
-                        # Strict confidence & alphanumeric filter: ignore wall cracks, scratches, & single noise symbols
                         if prob >= 0.65 and len(text) >= 2:
                             alnum_chars = [c for c in text if c.isalnum()]
                             if len(alnum_chars) >= 3:
@@ -329,7 +378,7 @@ class VLMEngine:
                     
                     self.cached_text_lines = text_lines
                 except Exception as e:
-                    print(f"OCR Error: {e}")
+                    print(f"EasyOCR Error: {e}")
             
             if self.cached_text_lines:
                 markdown_lines.append("\n## Text Detected")
