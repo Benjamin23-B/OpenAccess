@@ -137,8 +137,10 @@ class VLMEngine:
                 self.mock_mode = True
                 return
 
-        if HAS_EASYOCR:
-            print("Loading EasyOCR Reader...")
+        if HAS_PYTESSERACT:
+            print("PyTesseract (Native C++) initialized for instant 0-lag OCR.")
+        elif HAS_EASYOCR:
+            print("PyTesseract not found. Loading EasyOCR Reader fallback...")
             gpu_available = torch.cuda.is_available()
             try:
                 self.reader = easyocr.Reader(['en'], gpu=gpu_available, verbose=False)
@@ -146,7 +148,7 @@ class VLMEngine:
             except Exception as e:
                 print(f"EasyOCR init error: {e}")
         else:
-            print("EasyOCR not installed. Text reading will be disabled.")
+            print("No OCR engine available.")
 
     def process_image(self, image: Image.Image, text_prompt: str = None, ignore_classes: list = None,
                       detect_objects: bool = True, detect_text: bool = True) -> str:
