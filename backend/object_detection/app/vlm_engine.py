@@ -176,10 +176,10 @@ class VLMEngine:
 
     def _initialize_model(self):
         """
-        Initializes a YOLO model (yolov8m preferred for accuracy).
+        Initializes a high-performance YOLO11 model (yolo11x / yolo11m preferred for maximum accuracy).
         A named weights file is auto-downloaded by Ultralytics on the target
         machine at first run, so no weights need to ship with the repo.
-        Smaller local files are used as a fallback if yolov8m can't load.
+        Local files and fallback models (yolov8x, yolov8m) are used if YOLO11 cannot load.
         Also initializes EasyOCR for text reading.
         """
         if not HAS_YOLO:
@@ -187,30 +187,33 @@ class VLMEngine:
             self.mock_mode = True
             return
 
-        print("Loading YOLO Model...")
+        print("Loading High-Performance YOLO Model (YOLO11)...")
         model_dir = Path(__file__).parent.parent
         env_model = os.environ.get("YOLO_MODEL", "").strip()
 
-        # Preferred weights: yolov8m by default (override via YOLO_MODEL).
-        # Reuse a local file if present to avoid re-downloading, otherwise
-        # pass the bare name so Ultralytics fetches it on the target.
-        preferred = env_model or "yolov8m.pt"
+        # Preferred weights: YOLO11 flagship models by default (yolo11x.pt / yolo11m.pt)
+        preferred = env_model or "yolo11x.pt"
         candidates = []
+        
+        # Check local path for env model or default preferred
         local_preferred = model_dir / preferred
         if local_preferred.exists():
             candidates.append(str(local_preferred))
         candidates.append(preferred)
 
-        # Smaller local fallbacks, only used if the preferred model can't load.
-        for name in ("yolov8s.pt", "yolov8n.pt", "yolo26n.pt"):
-            local = model_dir / name
-            if local.exists():
-                candidates.append(str(local))
+        # High-performance candidates list (YOLO11 > YOLOv8)
+        model_priority = ("yolo11x.pt", "yolo11m.pt", "yolov8x.pt", "yolov8m.pt", "yolov8s.pt", "yolov8n.pt")
+        for name in model_priority:
+            if name != preferred:
+                local_path = model_dir / name
+                if local_path.exists():
+                    candidates.append(str(local_path))
+                candidates.append(name)
 
         for candidate in candidates:
             try:
                 self.model = YOLO(candidate)
-                print(f"YOLO Model loaded: {candidate}")
+                print(f"High-Performance YOLO Model loaded successfully: {candidate}")
                 break
             except Exception as e:
                 print(f"YOLO load notice ({candidate}): {e}")

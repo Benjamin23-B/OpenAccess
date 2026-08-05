@@ -93,15 +93,21 @@ def main():
         )
         processes.append(sl_proc)
 
-    # 3. Start Frontend Server (Next.js on Port from .env)
+    # 3. Start Frontend Server (Next.js with Bun on Port from .env)
     if is_server_running(FRONTEND_URL):
         print(f"[Frontend] Next.js frontend already running at {FRONTEND_URL}")
     else:
-        print(f"[Frontend] Starting Next.js Web Frontend (npm run dev on Port {FRONTEND_PORT})...")
+        print("[Frontend] Running bun install...")
+        subprocess.run(["bun", "install"], cwd=FRONTEND_DIR, check=True)
+
+        print("[Frontend] Building frontend with bun build...")
+        subprocess.run(["bun", "run", "build"], cwd=FRONTEND_DIR, check=True)
+
+        print(f"[Frontend] Starting Next.js Web Frontend (bun start on Port {FRONTEND_PORT})...")
         env = os.environ.copy()
         env["PORT"] = str(FRONTEND_PORT)
         frontend_proc = subprocess.Popen(
-            "npm run dev",
+            "bun start",
             cwd=FRONTEND_DIR,
             shell=True,
             env=env
