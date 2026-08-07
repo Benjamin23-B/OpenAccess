@@ -5,6 +5,7 @@ import time
 import urllib.request
 import webbrowser
 import signal
+import shutil
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 FRONTEND_DIR = os.path.join(ROOT_DIR, "frontend")
@@ -93,21 +94,24 @@ def main():
         )
         processes.append(sl_proc)
 
-    # 3. Start Frontend Server (Next.js with Bun on Port from .env)
+    # 3. Start Frontend Server (Next.js with Bun or NPM on Port from .env)
     if is_server_running(FRONTEND_URL):
         print(f"[Frontend] Next.js frontend already running at {FRONTEND_URL}")
     else:
-        print("[Frontend] Running bun install...")
-        subprocess.run(["bun", "install"], cwd=FRONTEND_DIR, check=True)
+        pkg_mgr = "bun" if (shutil.which("bun") or shutil.which("bun.cmd")) else "npm"
+        print(f"[Frontend] Using package manager: {pkg_mgr}")
 
-        print("[Frontend] Building frontend with bun build...")
-        subprocess.run(["bun", "run", "build"], cwd=FRONTEND_DIR, check=True)
+        print(f"[Frontend] Running {pkg_mgr} install...")
+        subprocess.run(f"{pkg_mgr} install", cwd=FRONTEND_DIR, check=True, shell=True)
 
-        print(f"[Frontend] Starting Next.js Web Frontend (bun start on Port {FRONTEND_PORT})...")
+        print(f"[Frontend] Building frontend with {pkg_mgr} run build...")
+        subprocess.run(f"{pkg_mgr} run build", cwd=FRONTEND_DIR, check=True, shell=True)
+
+        print(f"[Frontend] Starting Next.js Web Frontend ({pkg_mgr} start on Port {FRONTEND_PORT})...")
         env = os.environ.copy()
         env["PORT"] = str(FRONTEND_PORT)
         frontend_proc = subprocess.Popen(
-            "bun start",
+            f"{pkg_mgr} run start -- -p {FRONTEND_PORT}",
             cwd=FRONTEND_DIR,
             shell=True,
             env=env

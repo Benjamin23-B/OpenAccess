@@ -15,3 +15,5 @@ export { default as SkeletalBody3D } from './SkeletalBody3D';
 export { default as ObjectDetectionBridge } from './ObjectDetectionBridge';
 export { default as CwasaAvatarRenderer } from './CwasaAvatarRenderer';
 export { default as DashboardSidebar } from './DashboardSidebar';
+export { default as Footer } from './Footer';
+

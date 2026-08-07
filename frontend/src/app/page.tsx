@@ -8,6 +8,7 @@ import {
   VisuallyImpairedBridge,
   DeafBridge,
   ObjectDetectionBridge,
+  Footer,
   type BridgeType
 } from '@/components';
 
@@ -81,6 +82,9 @@ export default function Home() {
           )}
 
         </main>
+
+        {/* Global Footer with Developer Portfolio Link */}
+        <Footer />
       </div>
     </AccessibilityWrapper>
   );
